@@ -1,0 +1,78 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  slug         String   @unique
+  firstName    String?
+  lastName     String?
+  profilePhoto String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Server {
+  id    String @id @default(cuid())
+  title String
+  token String @unique
+
+  // fields sent from server
+  caption String?
+  name String?
+  dnsHostName String?
+  domain String?
+  manufacturer String?
+  model String?
+  systemFamily String?
+  systemSkuNumber String?
+  systemType String?
+  totalPhysicalMemory String?
+  serverName String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  drives Drive[]
+}
+
+model Drive {
+  id    String @id @default(cuid())
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inactive Boolean @default(true)
+
+  // fields sent from server
+  location String?
+  name String @unique
+  root String?
+  description String?
+  maximumSize String?
+
+  usage DriveUsage[]
+}
+
+model DriveUsage {
+  id    String @id @default(cuid())
+
+  drive   Drive @relation(fields: [driveId], references: [id])
+  driveId String
+
+  createdAt DateTime @default(now())
+
+  // fields sent from server
+  used String?
+  free String?
+}

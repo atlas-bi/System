@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "DriveUsage" ALTER COLUMN "used" SET DATA TYPE TEXT,
+ALTER COLUMN "free" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "Server" ALTER COLUMN "totalPhysicalMemory" SET DATA TYPE TEXT;
