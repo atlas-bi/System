@@ -1,4 +1,5 @@
-import type { Server, User } from '@prisma/client';
+import { encrypt } from '@/lib/utils';
+import type { Server, ServerLogs, User } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '~/db.server';
 
@@ -12,6 +13,16 @@ export function getServerByToken({ token }: Pick<Server, 'token'>) {
 export function getServer({ id }: Pick<Server, 'id'>) {
   return prisma.server.findFirst({
     where: { id },
+  });
+}
+
+export function serverLog({
+  serverId,
+  type,
+  message,
+}: Pick<ServerLogs, 'serverId' | 'type' | 'message'>) {
+  return prisma.serverLogs.create({
+    data: { serverId, type, message },
   });
 }
 
@@ -50,6 +61,7 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
       name: true,
       description: true,
       maximumSize: true,
+      size: true,
       usage: {
         select: {
           id: true,
@@ -63,11 +75,26 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
   });
 }
 
-export function createServer({ title }: Pick<Server, 'title'>) {
+export function createServer({
+  title,
+  host,
+  username,
+  password,
+  privateKey,
+  port,
+}: Pick<
+  Server,
+  'title' | 'port' | 'privateKey' | 'username' | 'password' | 'host'
+>) {
   return prisma.server.create({
     data: {
       title,
       token: uuidv4(),
+      host,
+      username,
+      password: password ? encrypt(password) : undefined,
+      privateKey: privateKey ? encrypt(privateKey) : undefined,
+      port,
     },
   });
 }
@@ -78,8 +105,38 @@ export function deleteServer({ id }: Pick<Server, 'id'>) {
   });
 }
 
+export function getEnabledServers() {
+  return prisma.server.findMany({
+    where: {
+      enabled: true,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
 export function getServers() {
-  return prisma.server.findMany({});
+  return prisma.server.findMany({
+    select: {
+      id: true,
+      title: true,
+      token: true,
+      host: true,
+      caption: true,
+      name: true,
+      dnsHostName: true,
+      domain: true,
+      manufacturer: true,
+      model: true,
+      systemFamily: true,
+      systemSkuNumber: true,
+      systemType: true,
+      totalPhysicalMemory: true,
+      serverName: true,
+      enabled: true,
+    },
+  });
 }
 
 export function updateServer({
@@ -100,6 +157,18 @@ export function updateServer({
     totalPhysicalMemory?: string;
     serverName?: string;
   };
+  drives: {
+    data: {
+      location?: string;
+      name?: string;
+      root?: string;
+      description?: string;
+      maximumSize?: string;
+      size: Number;
+    };
+    used?: string;
+    free?: string;
+  }[];
 }) {
   return prisma.server.update({
     where: { id },

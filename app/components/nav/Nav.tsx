@@ -31,6 +31,7 @@ export default function Nav() {
 
           <div className="flex space-x-6">
             <Links />
+
             {/*<Search />*/}
           </div>
           <div className="flex space-x-6">

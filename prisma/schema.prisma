@@ -8,43 +8,74 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-  slug         String   @unique
+  id           String  @id @default(cuid())
+  email        String  @unique
+  slug         String  @unique
   firstName    String?
   lastName     String?
   profilePhoto String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  groups    Group[]
+}
+
+model Group {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
 }
 
 model Server {
-  id    String @id @default(cuid())
-  title String
-  token String @unique
+  id      String  @id @default(cuid())
+  title   String
+  token   String  @unique
+  enabled Boolean @default(true)
+
+  host       String
+  username   String
+  password   String?
+  port       String
+  privateKey String?
 
   // fields sent from server
-  caption String?
-  name String?
-  dnsHostName String?
-  domain String?
-  manufacturer String?
-  model String?
-  systemFamily String?
-  systemSkuNumber String?
-  systemType String?
+  caption             String?
+  name                String?
+  dnsHostName         String?
+  domain              String?
+  manufacturer        String?
+  model               String?
+  systemFamily        String?
+  systemSkuNumber     String?
+  systemType          String?
   totalPhysicalMemory String?
-  serverName String?
+  serverName          String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   drives Drive[]
+  logs   ServerLogs[]
+}
+
+model ServerLogs {
+  id      String @id @default(cuid())
+  message String
+  type    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId String
 }
 
 model Drive {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
 
   server   Server @relation(fields: [serverId], references: [id])
   serverId String
@@ -55,19 +86,20 @@ model Drive {
   inactive Boolean @default(true)
 
   // fields sent from server
-  location String?
-  name String @unique
-  root String?
+  location    String?
+  name        String  @unique
+  root        String?
   description String?
   maximumSize String?
+  size        String?
 
   usage DriveUsage[]
 }
 
 model DriveUsage {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
 
-  drive   Drive @relation(fields: [driveId], references: [id])
+  drive   Drive  @relation(fields: [driveId], references: [id])
   driveId String
 
   createdAt DateTime @default(now())

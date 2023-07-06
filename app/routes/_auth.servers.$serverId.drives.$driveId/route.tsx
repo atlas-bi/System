@@ -16,6 +16,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import invariant from 'tiny-invariant';
 import { getDrive } from '~/models/server.server';
+import { authenticator } from '~/services/auth.server';
 
 ChartJS.register(
   CategoryScale,
@@ -55,6 +56,11 @@ export const options = {
 };
 
 export const loader = async ({ params, request }: LoaderArgs) => {
+  await authenticator.isAuthenticated(request, {
+    failureRedirect: `/auth/?returnTo=${encodeURI(
+      new URL(request.url).pathname,
+    )}`,
+  });
   invariant(params.serverId, 'serverId not found');
   invariant(params.driveId, 'driveId not found');
 

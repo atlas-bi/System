@@ -1,10 +1,12 @@
-import { Link, Outlet } from '@remix-run/react';
+import type { LoaderArgs } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
+import { authenticator } from '~/services/auth.server';
 
-export default function Index() {
-  return (
-    <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
-      <Link to={`/servers/`}>Servers</Link>
-      <Outlet />
-    </main>
-  );
-}
+export const loader = async ({ request }: LoaderArgs) => {
+  await authenticator.isAuthenticated(request, {
+    failureRedirect: `/auth/?returnTo=${encodeURI(
+      new URL(request.url).pathname,
+    )}`,
+  });
+  return redirect('/servers');
+};

@@ -14,6 +14,7 @@ import {
 } from '~/components/ui/navigation-menu';
 
 import type { loader } from '../root';
+import NewServer from './NewServer';
 
 // import { Icons } from "@/components/icons"
 
@@ -25,6 +26,7 @@ export function Links() {
           <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
             <Link to="/servers">Servers</Link>
           </NavigationMenuLink>
+          <NewServer className={navigationMenuTriggerStyle()} />
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

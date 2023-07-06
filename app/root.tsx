@@ -19,7 +19,7 @@ export const links: LinksFunction = () => [
   // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export const meta: MetaFunction = () => [{ title: 'Atlas Service' }];
+export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
 
 export default function App() {
   return (
