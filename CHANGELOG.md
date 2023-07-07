@@ -1,3 +1,8 @@
+## <small>1.2.1 (2023-07-07)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([8bff754](https://github.com/atlas-bi/System/commit/8bff754))
+* fix(prisma): fixed prisma command ([a25e7bf](https://github.com/atlas-bi/System/commit/a25e7bf))
+
 ## 1.2.0 (2023-07-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([4b2e394](https://github.com/atlas-bi/System/commit/4b2e394))
