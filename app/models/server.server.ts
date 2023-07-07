@@ -54,6 +54,15 @@ export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
   });
 }
 
+export function getServerLogs({ serverId }: Pick<ServerLogs, 'serverId'>) {
+  return prisma.serverLogs.findMany({
+    where: {
+      serverId,
+    },
+    take: 10,
+  });
+}
+
 export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
   return prisma.drive.findMany({
     where: { serverId },
@@ -66,6 +75,7 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
       description: true,
       maximumSize: true,
       size: true,
+      daysTillFull: true,
       usage: {
         select: {
           id: true,
@@ -136,15 +146,20 @@ export function getServers() {
       domain: true,
       manufacturer: true,
       model: true,
-      systemFamily: true,
-      systemSkuNumber: true,
-      systemType: true,
-      totalPhysicalMemory: true,
-      serverName: true,
+      os: true,
+      osVersion: true,
       enabled: true,
       type: true,
       hasError: true,
     },
+    orderBy: [
+      {
+        hasError: 'desc',
+      },
+      {
+        title: 'asc',
+      },
+    ],
   });
 }
 
@@ -160,11 +175,8 @@ export function updateServer({
     domain?: string;
     manufacturer?: string;
     model?: string;
-    systemFamily?: string;
-    systemSkuNumber?: string;
-    systemType?: string;
-    totalPhysicalMemory?: string;
-    serverName?: string;
+    os?: string;
+    osVersion?: string;
   };
   drives: {
     data: {
@@ -173,12 +185,15 @@ export function updateServer({
       root?: string;
       description?: string;
       maximumSize?: string;
-      size: Number;
+      size: string;
     };
     used?: string;
     free?: string;
   }[];
 }) {
+  let lastWeek = new Date();
+  lastWeek = new Date(lastWeek.setDate(lastWeek.getDate() - 7));
+
   return prisma.server.update({
     where: { id },
     data: {
@@ -215,6 +230,40 @@ export function updateServer({
         }),
       },
     },
+    select: {
+      drives: {
+        select: {
+          id: true,
+          size: true,
+          usage: {
+            where: {
+              createdAt: {
+                // new Date() creates date with current time and day and etc.
+                gte: lastWeek,
+              },
+            },
+            select: {
+              id: true,
+              used: true,
+              createdAt: true,
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export function setDriveDays({
+  id,
+  daysTillFull,
+}: Pick<Drive, 'id' | 'daysTillFull'>) {
+  return prisma.drive.update({
+    where: { id },
+    data: { daysTillFull },
   });
 }
 

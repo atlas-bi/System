@@ -50,11 +50,8 @@ model Server {
   domain              String?
   manufacturer        String?
   model               String?
-  systemFamily        String?
-  systemSkuNumber     String?
-  systemType          String?
-  totalPhysicalMemory String?
-  serverName          String?
+  os String?
+  osVersion String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,6 +90,8 @@ model Drive {
   description String?
   maximumSize String?
   size        String?
+
+  daysTillFull String?
 
   usage DriveUsage[]
 

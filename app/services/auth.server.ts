@@ -78,7 +78,7 @@ try {
   authenticator.use(samlStrategy, 'saml');
   metadata = samlStrategy.metadata();
 } catch (e) {
-  console.log(e);
+  if (process.env.NODE_ENV === 'production') console.log(e);
 }
 // use ldap
 

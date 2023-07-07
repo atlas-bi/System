@@ -89,13 +89,6 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => <div className="">{row.getValue('caption')}</div>,
   },
   {
-    accessorKey: 'serverName',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Server Name" />
-    ),
-    cell: ({ row }) => <div className="">{row.getValue('serverName')}</div>,
-  },
-  {
     accessorKey: 'model',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Model" />
@@ -131,18 +124,18 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => <div className="">{row.getValue('manufacturer')}</div>,
   },
   {
-    accessorKey: 'systemFamily',
+    accessorKey: 'os',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="System Family" />
+      <DataTableColumnHeader column={column} title="Operating System" />
     ),
-    cell: ({ row }) => <div className="">{row.getValue('systemFamily')}</div>,
+    cell: ({ row }) => <div className="">{row.getValue('os')}</div>,
   },
   {
-    accessorKey: 'systemType',
+    accessorKey: 'osVersion',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="System Type" />
+      <DataTableColumnHeader column={column} title="OS Version" />
     ),
-    cell: ({ row }) => <div className="">{row.getValue('SystemType')}</div>,
+    cell: ({ row }) => <div className="">{row.getValue('osVersion')}</div>,
   },
 
   // {

@@ -12,7 +12,7 @@ export default function Nav() {
           <Link to="/" className="flex items-center -mx-6">
             <Image
               loaderUrl="/api/image"
-              src="images/logo.svg"
+              src="/images/logo.svg"
               responsive={[
                 {
                   size: {
