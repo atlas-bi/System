@@ -11,6 +11,15 @@ export function getServer({ id }: Pick<Server, 'id'>) {
   });
 }
 
+export function serverError({ id }: Pick<Server, 'id'>) {
+  return prisma.server.update({
+    where: { id },
+    data: {
+      hasError: true,
+    },
+  });
+}
+
 export function serverLog({
   serverId,
   type,
@@ -134,6 +143,7 @@ export function getServers() {
       serverName: true,
       enabled: true,
       type: true,
+      hasError: true,
     },
   });
 }
@@ -173,6 +183,7 @@ export function updateServer({
     where: { id },
     data: {
       ...data,
+      hasError: false,
       drives: {
         upsert: drives.map((drive) => {
           return {
@@ -195,7 +206,10 @@ export function updateServer({
               },
             },
             where: {
-              name: drive.data.name,
+              serverId_name: {
+                name: drive.data.name,
+                serverId: id,
+              },
             },
           };
         }),

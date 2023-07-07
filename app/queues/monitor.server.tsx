@@ -1,7 +1,12 @@
 import { decrypt } from '@/lib/utils';
 import { NodeSSH } from 'node-ssh';
 import { Queue } from 'quirrel/remix';
-import { getServer, serverLog, updateServer } from '~/models/server.server';
+import {
+  getServer,
+  serverError,
+  serverLog,
+  updateServer,
+} from '~/models/server.server';
 
 export default Queue('queues/monitor', async (job, meta) => {
   const server = await getServer({ id: job });
@@ -99,11 +104,13 @@ export default Queue('queues/monitor', async (job, meta) => {
       ),
     });
   } catch (e) {
-    serverLog({
-      serverId: server.id,
+    console.log(e);
+    await serverLog({
+      serverId: job,
       type: 'error',
       message: JSON.stringify(e),
     });
+    await serverError({ id: job });
     console.log(`${job} monitor failed.`);
   }
 });

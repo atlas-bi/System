@@ -9,7 +9,7 @@ export default function Nav() {
     <div className="border-b">
       <div className="flex h-16 items-center px-4 container">
         <nav className="flex grow items-center justify-between space-x-4 lg:space-x-6 mx-6">
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center -mx-6">
             <Image
               loaderUrl="/api/image"
               src="images/logo.svg"

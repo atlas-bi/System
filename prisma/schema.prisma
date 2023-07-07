@@ -35,6 +35,7 @@ model Server {
   title   String
   enabled Boolean @default(true)
   type    String
+  hasError Boolean @default(false)
 
   host       String
   username   String
@@ -87,13 +88,15 @@ model Drive {
 
   // fields sent from server
   location    String?
-  name        String  @unique
+  name        String
   root        String?
   description String?
   maximumSize String?
   size        String?
 
   usage DriveUsage[]
+
+  @@unique([serverId, name])
 }
 
 model DriveUsage {

@@ -53,7 +53,7 @@ interface DataTableProps<TData, TValue> {
 
 export default function Index() {
   const { servers } = useLoaderData<typeof loader>();
-
+  console.log(servers);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
