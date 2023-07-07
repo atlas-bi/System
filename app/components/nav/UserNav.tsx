@@ -23,9 +23,9 @@ export function UserNav() {
   const [activeUser, setActiveUser] = useState(user);
   const fetcher = useFetcher();
 
-  useEffect(() => {
-    setActiveUser(user);
-  }, [user]);
+  // useEffect(() => {
+  //   setActiveUser(user);
+  // }, [user]);
 
   const initials = (user: userType) => {
     return (user?.firstName?.slice(0, 1) || 'U') + user?.lastName?.slice(0, 1);
