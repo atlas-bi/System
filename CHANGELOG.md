@@ -1,3 +1,8 @@
+## 1.3.0 (2023-07-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([b8f8cef](https://github.com/atlas-bi/System/commit/b8f8cef))
+* feat(error): added error flag ([63b0149](https://github.com/atlas-bi/System/commit/63b0149))
+
 ## <small>1.2.2 (2023-07-07)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([2c6bfde](https://github.com/atlas-bi/System/commit/2c6bfde))
