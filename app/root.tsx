@@ -21,16 +21,6 @@ export const links: LinksFunction = () => [
   // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export const loader = async ({ request }: LoaderArgs) => {
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: `/auth/?returnTo=${encodeURI(
-      new URL(request.url).pathname,
-    )}`,
-  });
-
-  return json({ user });
-};
-
 export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
 
 export default function App() {

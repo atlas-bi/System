@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 
-import type { loader } from '../root';
+import type { loader } from '../routes/_auth/route';
 
 export function UserNav() {
   const { user } = useLoaderData<typeof loader>();
