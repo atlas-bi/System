@@ -1,3 +1,8 @@
+## 1.4.0 (2023-07-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([45e16c5](https://github.com/atlas-bi/System/commit/45e16c5))
+* feat(deps): updated deps, added catch in job ([528300f](https://github.com/atlas-bi/System/commit/528300f))
+
 ## 1.3.0 (2023-07-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([b8f8cef](https://github.com/atlas-bi/System/commit/b8f8cef))
