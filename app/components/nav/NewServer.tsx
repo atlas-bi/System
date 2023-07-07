@@ -142,7 +142,7 @@ export default function NewServer({ className }: { className: string }) {
               type="button"
               onClick={(e) => {
                 fetcher.submit(
-                  { _action: 'new', ...datao },
+                  { _action: 'new', ...data },
                   { method: 'post', action: '/servers/new' },
                 );
               }}
