@@ -1,3 +1,8 @@
+## <small>1.2.2 (2023-07-07)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([2c6bfde](https://github.com/atlas-bi/System/commit/2c6bfde))
+* fix(redirect): fixed auth redirect loop ([354fb1f](https://github.com/atlas-bi/System/commit/354fb1f))
+
 ## <small>1.2.1 (2023-07-07)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([8bff754](https://github.com/atlas-bi/System/commit/8bff754))
