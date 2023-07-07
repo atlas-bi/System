@@ -2,6 +2,7 @@ import { Link } from '@remix-run/react';
 import Image from 'remix-image';
 
 import { Links } from './Links';
+import { UserNav } from './UserNav';
 
 export default function Nav() {
   return (
@@ -36,7 +37,7 @@ export default function Nav() {
           </div>
           <div className="flex space-x-6">
             {/*<Notifications />*/}
-            {/*<UserNav />*/}
+            <UserNav />
           </div>
         </nav>
       </div>

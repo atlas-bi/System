@@ -1,6 +1,6 @@
 // import { cssBundleHref } from "@remix-run/css-bundle";
 import stylesheet from '@/styles/globals.css';
-import type { LinksFunction, MetaFunction } from '@remix-run/node';
+import { LinksFunction, MetaFunction, json } from '@remix-run/node';
 import {
   Links,
   LiveReload,
@@ -12,12 +12,24 @@ import {
 // import prism from 'prismjs/themes/prism.min.css';
 import remixImageStyles from 'remix-image/remix-image.css';
 
+import { authenticator } from './services/auth.server';
+
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: remixImageStyles },
   { rel: 'stylesheet', href: stylesheet },
   // { rel: "stylesheet", href: prism }
   // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const user = await authenticator.isAuthenticated(request, {
+    failureRedirect: `/auth/?returnTo=${encodeURI(
+      new URL(request.url).pathname,
+    )}`,
+  });
+
+  return json({ user });
+};
 
 export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
 

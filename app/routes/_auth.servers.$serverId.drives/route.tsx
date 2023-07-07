@@ -59,7 +59,6 @@ export default function Index() {
       <h5>Name: {server.name}</h5>
       <h5>Title: {server.title}</h5>
 
-      <h5>token: {server.token}</h5>
       <h5>caption: {server.caption}</h5>
       <h5>name: {server.name}</h5>
       <h5>dnsHostName: {server.dnsHostName}</h5>

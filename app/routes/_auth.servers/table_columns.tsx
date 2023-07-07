@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
+import { serverTypes } from '~/components/server_types';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
 
 export const columns: ColumnDef<Task>[] = [
@@ -29,7 +30,17 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
-    cell: ({ row }) => <div className="">{row.getValue('title')}</div>,
+    cell: ({ row }) => {
+      const icon = serverTypes.filter(
+        (type) => type.value == row.original.type,
+      )?.[0]?.icon;
+      return (
+        <div className="flex content-center space-x-2">
+          {icon && <>{icon}</>}
+          <span className="my-auto">{row.getValue('title')}</span>
+        </div>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },

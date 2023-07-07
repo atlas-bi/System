@@ -1,15 +1,10 @@
 import { encrypt } from '@/lib/utils';
 import type { Server, ServerLogs, User } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '~/db.server';
+import monitorServer from '~/queues/monitor.server';
 
 export type { Server } from '@prisma/client';
 
-export function getServerByToken({ token }: Pick<Server, 'token'>) {
-  return prisma.server.findFirst({
-    where: { token },
-  });
-}
 export function getServer({ id }: Pick<Server, 'id'>) {
   return prisma.server.findFirst({
     where: { id },
@@ -75,28 +70,32 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
   });
 }
 
-export function createServer({
+export async function createServer({
   title,
   host,
   username,
   password,
   privateKey,
   port,
+  type,
 }: Pick<
   Server,
-  'title' | 'port' | 'privateKey' | 'username' | 'password' | 'host'
+  'title' | 'port' | 'privateKey' | 'username' | 'password' | 'host' | 'type'
 >) {
-  return prisma.server.create({
+  const server = await prisma.server.create({
     data: {
       title,
-      token: uuidv4(),
       host,
       username,
       password: password ? encrypt(password) : undefined,
       privateKey: privateKey ? encrypt(privateKey) : undefined,
       port,
+      type,
     },
   });
+  // check server as soon as it is added
+  monitorServer.enqueue(server.id);
+  return server;
 }
 
 export function deleteServer({ id }: Pick<Server, 'id'>) {
@@ -121,7 +120,6 @@ export function getServers() {
     select: {
       id: true,
       title: true,
-      token: true,
       host: true,
       caption: true,
       name: true,
@@ -135,6 +133,7 @@ export function getServers() {
       totalPhysicalMemory: true,
       serverName: true,
       enabled: true,
+      type: true,
     },
   });
 }

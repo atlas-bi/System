@@ -23,9 +23,9 @@ export function Links() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+          {/*<NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
             <Link to="/servers">Servers</Link>
-          </NavigationMenuLink>
+          </NavigationMenuLink>*/}
           <NewServer className={navigationMenuTriggerStyle()} />
         </NavigationMenuItem>
       </NavigationMenuList>

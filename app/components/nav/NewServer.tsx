@@ -13,7 +13,16 @@ import {
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 
+import { serverTypes } from '../server_types';
 import { Textarea } from '../ui/textarea';
 
 type Data = {
@@ -23,6 +32,7 @@ type Data = {
   host?: string;
   password?: string;
   privateKey?: string;
+  type?: string;
 };
 
 export default function NewServer({ className }: { className: string }) {
@@ -82,6 +92,25 @@ export default function NewServer({ className }: { className: string }) {
                 className="col-span-3"
                 onChange={(e) => setData({ ...data, name: e.target.value })}
               />
+              <Select
+                onValueChange={(type: string) => setData({ ...data, type })}
+              >
+                <Label htmlFor="name" className="text-right">
+                  Server OS
+                </Label>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="select one" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {serverTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
               <Label htmlFor="host" className="text-right">
                 Host
               </Label>

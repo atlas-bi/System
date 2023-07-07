@@ -24,12 +24,10 @@ const slimUserFields = {
 
 export type FullUserFields = SlimUserFields & {
   profilePhoto: string | null;
-  bio: string | null;
 };
 export const fullUserFields = {
   ...slimUserFields,
   profilePhoto: true,
-  bio: true,
 };
 
 const slugger = (email: string) => {

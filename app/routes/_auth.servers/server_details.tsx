@@ -41,7 +41,7 @@ export function ServerDetails({ server }: { server: Server }) {
               <>
                 Drives
                 {fetcher.data.drives.map((drive) => (
-                  <Label className="text-left">
+                  <Label key={drive.id} className="text-left">
                     {drive.name}:\{drive.location} {bytes(Number(drive.size))}{' '}
                     {bytes(Number(drive.usage?.[0]?.free))} free
                   </Label>

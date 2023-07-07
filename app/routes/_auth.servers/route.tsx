@@ -116,11 +116,10 @@ export default function Index() {
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <Sheet>
+                  <Sheet key={row.id}>
                     <SheetTrigger asChild>
                       <TableRow
                         className="cursor-pointer"
-                        key={row.id}
                         data-state={row.getIsSelected() ? 'selected' : null}
                       >
                         {row.getVisibleCells().map((cell) => (

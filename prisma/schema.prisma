@@ -33,8 +33,8 @@ model Group {
 model Server {
   id      String  @id @default(cuid())
   title   String
-  token   String  @unique
   enabled Boolean @default(true)
+  type    String
 
   host       String
   username   String

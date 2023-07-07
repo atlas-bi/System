@@ -28,6 +28,10 @@ export async function action({ request }: ActionArgs) {
         return json({ form: { error: 'Name is required.' } });
       }
 
+      if (isNullOrEmpty(values.type)) {
+        return json({ form: { error: 'Type is required.' } });
+      }
+
       if (isNullOrEmpty(values.host)) {
         return json({ form: { error: 'Host is required.' } });
       }
@@ -51,6 +55,7 @@ export async function action({ request }: ActionArgs) {
           ? values.privateKey.toString()
           : undefined,
         port: (values.port || 22).toString(),
+        type: values.type.toString(),
       });
 
       return json({ success: 'Server Created' });
@@ -61,6 +66,10 @@ export async function action({ request }: ActionArgs) {
 
       if (isNullOrEmpty(values.name)) {
         return json({ form: { error: 'Name is required.' } });
+      }
+
+      if (isNullOrEmpty(values.type)) {
+        return json({ form: { error: 'Type is required.' } });
       }
 
       if (isNullOrEmpty(values.host)) {
