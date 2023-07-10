@@ -31,6 +31,8 @@ export function serverLog({
 }
 
 export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
+  let lastMonth = new Date();
+  lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
   return prisma.drive.findFirst({
     where: { id },
     select: {
@@ -48,7 +50,11 @@ export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
           used: true,
           createdAt: true,
         },
-        take: 60,
+        where: {
+          createdAt: {
+            gte: lastMonth,
+          },
+        },
         orderBy: { createdAt: 'desc' },
       },
     },
@@ -246,7 +252,6 @@ export function updateServer({
           usage: {
             where: {
               createdAt: {
-                // new Date() creates date with current time and day and etc.
                 gte: lastWeek,
               },
             },

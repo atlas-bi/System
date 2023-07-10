@@ -183,6 +183,9 @@ export function ServerDetails({ server }: { server: Server }) {
         <>
           <H3>Usage Trend</H3>
           <BarChart data={historyFetcher.data?.drive} />
+          <small className="text-muted-foreground">
+            Data grouped into daily buckets.
+          </small>
         </>
       )}
 

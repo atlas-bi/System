@@ -77,7 +77,7 @@ const BarChart = React.forwardRef<
     const chartData = {
       labels: data.usage
         .reverse()
-        .map((x: Usage) => format(new Date(x.createdAt), 'MMM dd, yyyy kk:mm')),
+        .map((x: Usage) => format(new Date(x.createdAt), 'MMM dd, yyyy')),
       datasets: [
         {
           label: 'Used',
