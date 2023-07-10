@@ -125,7 +125,7 @@ const BarChart = React.forwardRef<
   }, [data]);
 
   return (
-    <div ref={ref} className={cn('m-auto', className)} {...props}>
+    <div ref={ref} className={cn('m-auto max-h-[450px]', className)} {...props}>
       <Bar ref={chartRef} options={options} data={chartData} />
     </div>
   );
