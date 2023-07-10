@@ -1,3 +1,8 @@
+## 1.6.0 (2023-07-10)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([3c8f515](https://github.com/atlas-bi/System/commit/3c8f515))
+* feat(charts): updated drive charts ([3194f7a](https://github.com/atlas-bi/System/commit/3194f7a))
+
 ## 1.5.0 (2023-07-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([1074919](https://github.com/atlas-bi/System/commit/1074919))
