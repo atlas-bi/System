@@ -1,3 +1,8 @@
+## 1.5.0 (2023-07-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([1074919](https://github.com/atlas-bi/System/commit/1074919))
+* feat(days): added days till full calc ([9059280](https://github.com/atlas-bi/System/commit/9059280))
+
 ## 1.4.0 (2023-07-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([45e16c5](https://github.com/atlas-bi/System/commit/45e16c5))
