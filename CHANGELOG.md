@@ -1,3 +1,8 @@
+## <small>1.6.1 (2023-07-10)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([dcf20d7](https://github.com/atlas-bi/System/commit/dcf20d7))
+* fix(chart size): added max height ([91ed1a2](https://github.com/atlas-bi/System/commit/91ed1a2))
+
 ## 1.6.0 (2023-07-10)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([3c8f515](https://github.com/atlas-bi/System/commit/3c8f515))
