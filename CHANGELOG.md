@@ -1,3 +1,8 @@
+## 1.7.0 (2023-07-10)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([ad6177f](https://github.com/atlas-bi/System/commit/ad6177f))
+* feat(chart): consolidated data over a month ([698b328](https://github.com/atlas-bi/System/commit/698b328))
+
 ## <small>1.6.1 (2023-07-10)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([dcf20d7](https://github.com/atlas-bi/System/commit/dcf20d7))
