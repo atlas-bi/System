@@ -66,7 +66,9 @@ export default function Index() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: 'title', desc: true },
+  ]);
 
   const table = useReactTable({
     data: servers,

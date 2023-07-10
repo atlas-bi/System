@@ -6,6 +6,7 @@ import {
   serverError,
   serverLog,
   setDriveDays,
+  setDriveGrowth,
   updateServer,
 } from '~/models/server.server';
 
@@ -108,6 +109,7 @@ export default Queue('queues/monitor', async (job, meta) => {
       async (drive: { size: string; usage: string | any[]; id: any }) => {
         if (!drive.usage || drive.usage.length <= 1) {
           await setDriveDays({ id: drive.id, daysTillFull: undefined });
+          await setDriveGrowth({ id: drive.id, growthRate: undefined });
         } else {
           const start = drive.usage[0];
           const end = drive.usage[drive.usage.length - 1];
@@ -121,6 +123,10 @@ export default Queue('queues/monitor', async (job, meta) => {
             Math.max(Math.round((free * diffDays) / usedGrowth), -1) || -1
           ).toString();
           await setDriveDays({ id: drive.id, daysTillFull });
+          await setDriveGrowth({
+            id: drive.id,
+            growthRate: (usedGrowth / diffDays).toString(),
+          });
         }
       },
     );

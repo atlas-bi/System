@@ -9,6 +9,7 @@ module.exports = {
     v2_routeConvention: true,
   },
   ignoredRouteFiles: ['**/.*', '**/*.test.{js,jsx,ts,tsx}'],
+  serverDependencies: ['chartjs-adapter-date-fns'],
   serverModuleFormat: 'cjs',
   tailwind: true,
   postcss: true,

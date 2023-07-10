@@ -1,4 +1,4 @@
-// import { cssBundleHref } from "@remix-run/css-bundle";
+import { cssBundleHref } from '@remix-run/css-bundle';
 import stylesheet from '@/styles/globals.css';
 import { LinksFunction, MetaFunction, json } from '@remix-run/node';
 import {
@@ -15,10 +15,10 @@ import remixImageStyles from 'remix-image/remix-image.css';
 import { authenticator } from './services/auth.server';
 
 export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: remixImageStyles },
+  // { rel: 'stylesheet', href: remixImageStyles },
   { rel: 'stylesheet', href: stylesheet },
   // { rel: "stylesheet", href: prism }
-  // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
 export const meta: MetaFunction = () => [{ title: 'Atlas System' }];

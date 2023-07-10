@@ -92,6 +92,7 @@ model Drive {
   size        String?
 
   daysTillFull String?
+  growthRate String?
 
   usage DriveUsage[]
 

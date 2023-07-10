@@ -49,6 +49,7 @@ export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
           createdAt: true,
         },
         take: 60,
+        orderBy: { createdAt: 'desc' },
       },
     },
   });
@@ -58,6 +59,12 @@ export function getServerLogs({ serverId }: Pick<ServerLogs, 'serverId'>) {
   return prisma.serverLogs.findMany({
     where: {
       serverId,
+      NOT: {
+        message: {
+          contains: 'clientVersion',
+          mode: 'insensitive',
+        },
+      },
     },
     take: 10,
   });
@@ -76,6 +83,7 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
       maximumSize: true,
       size: true,
       daysTillFull: true,
+      growthRate: true,
       usage: {
         select: {
           id: true,
@@ -85,7 +93,7 @@ export function getServerDrives({ serverId }: { serverId: Server['id'] }) {
         take: 1,
       },
     },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { name: 'asc' },
   });
 }
 
@@ -264,6 +272,16 @@ export function setDriveDays({
   return prisma.drive.update({
     where: { id },
     data: { daysTillFull },
+  });
+}
+
+export function setDriveGrowth({
+  id,
+  growthRate,
+}: Pick<Drive, 'id' | 'growthRate'>) {
+  return prisma.drive.update({
+    where: { id },
+    data: { growthRate },
   });
 }
 
