@@ -1,3 +1,8 @@
+## 1.9.0 (2023-07-11)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([5ed7bc8](https://github.com/atlas-bi/System/commit/5ed7bc8))
+* feat(notification ui): added notification ui ([04193c8](https://github.com/atlas-bi/System/commit/04193c8))
+
 ## 1.8.0 (2023-07-10)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([9798d31](https://github.com/atlas-bi/System/commit/9798d31))
