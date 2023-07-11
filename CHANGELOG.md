@@ -1,3 +1,8 @@
+## 1.8.0 (2023-07-10)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([9798d31](https://github.com/atlas-bi/System/commit/9798d31))
+* feat(chart): changed to start of day not week ([8b0271a](https://github.com/atlas-bi/System/commit/8b0271a))
+
 ## 1.7.0 (2023-07-10)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([ad6177f](https://github.com/atlas-bi/System/commit/ad6177f))
