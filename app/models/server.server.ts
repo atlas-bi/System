@@ -30,6 +30,34 @@ export function serverLog({
   });
 }
 
+export function getDriveNotifications({
+  id,
+  serverId,
+}: Pick<Drive, 'id', 'serverId'>) {
+  let lastMonth = new Date();
+  lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+  return prisma.drive.findFirst({
+    where: { id },
+    select: {
+      id: true,
+      serverId: true,
+      location: true,
+      inactive: true,
+      name: true,
+      description: true,
+      size: true,
+      daysTillFull: true,
+      growthRate: true,
+      server: {
+        select: {
+          title: true,
+          id: true,
+        },
+      },
+    },
+  });
+}
+
 export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
   let lastMonth = new Date();
   lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
@@ -42,7 +70,15 @@ export function getDrive({ id, serverId }: Pick<Drive, 'id', 'serverId'>) {
       inactive: true,
       name: true,
       description: true,
-      maximumSize: true,
+      size: true,
+      daysTillFull: true,
+      growthRate: true,
+      server: {
+        select: {
+          title: true,
+          id: true,
+        },
+      },
       usage: {
         select: {
           id: true,
