@@ -1,19 +1,8 @@
 import { cn } from '@/lib/utils';
 
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  plugins,
-  ChartArea,
-  ChartData,
-  Chart,
-} from 'chart.js';
-import { VariantProps } from 'class-variance-authority';
+import { Chart as ChartJS, ArcElement, ChartData } from 'chart.js';
 import React, { useEffect, useRef, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { createConicGradient, darkGradient, lightGradient } from './functions';
 
 ChartJS.register(ArcElement);
@@ -24,9 +13,9 @@ type Data = {
     datasets: {
       label: string;
       data: number[];
-      backgroundColor: string[];
-      borderColor: string[];
-      borderWidth: number;
+      backgroundColor?: string[];
+      borderColor?: string[];
+      borderWidth?: number;
     }[];
   };
 };
@@ -121,9 +110,6 @@ const DoughnutChart = React.forwardRef<
             },
             legend: {
               display: false,
-            },
-            centerText: {
-              value: 'asdf',
             },
           },
           centerText: function () {

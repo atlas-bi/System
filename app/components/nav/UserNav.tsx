@@ -1,8 +1,8 @@
-import type { User as userType } from '@prisma/client';
+import type { UserSerialized } from '~/models/user.server';
 import { useLoaderData } from '@remix-run/react';
 import { Link } from '@remix-run/react';
 import { useFetcher } from '@remix-run/react';
-import { Inbox, LogOut, Settings, Settings2, User } from 'lucide-react';
+import { BellRing, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -16,18 +16,14 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 
-import type { loader } from '../routes/_auth/route';
+import type { loader } from '~/routes/_auth/route';
 
 export function UserNav() {
   const { user } = useLoaderData<typeof loader>();
-  const [activeUser, setActiveUser] = useState(user);
+  const [activeUser, setActiveUser] = useState<UserSerialized>(user);
   const fetcher = useFetcher();
 
-  // useEffect(() => {
-  //   setActiveUser(user);
-  // }, [user]);
-
-  const initials = (user: userType) => {
+  const initials = (user: UserSerialized) => {
     return (user?.firstName?.slice(0, 1) || 'U') + user?.lastName?.slice(0, 1);
   };
 
@@ -72,7 +68,20 @@ export function UserNav() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Configuration</DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link
+                  to="/admin/notifications"
+                  prefetch="intent"
+                  className="flex grow"
+                >
+                  <BellRing className="mr-2 h-4 w-4" />
+                  <span>Notification Methods</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link to="/logout" prefetch="intent" className="flex grow">

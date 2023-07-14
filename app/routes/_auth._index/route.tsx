@@ -1,5 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
+import { getMonitorTypes } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -8,5 +9,16 @@ export const loader = async ({ request }: LoaderArgs) => {
       new URL(request.url).pathname,
     )}`,
   });
-  return redirect('/servers');
+
+  const monitorTypes = await getMonitorTypes();
+
+  if (monitorTypes) {
+    return redirect(`/${monitorTypes[0].type}`);
+  }
+
+  return null;
 };
+
+export default function Index() {
+  return <>Create a monitor to get started.</>;
+}

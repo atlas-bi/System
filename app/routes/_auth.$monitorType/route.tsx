@@ -29,20 +29,22 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getServers } from '~/models/server.server';
+import { getMonitors } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 import { columns } from './table_columns';
+import invariant from 'tiny-invariant';
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   await authenticator.isAuthenticated(request, {
     failureRedirect: `/auth/?returnTo=${encodeURI(
       new URL(request.url).pathname,
     )}`,
   });
 
-  const servers = await getServers();
-  return json({ servers });
+  invariant(params.monitorType, 'Monitor type is required.');
+  const monitors = await getMonitors({ type: params.monitorType });
+  return json({ monitors });
 };
 
 interface DataTableProps<TData, TValue> {
@@ -51,7 +53,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 export default function Index() {
-  const { servers } = useLoaderData<typeof loader>();
+  const { monitors } = useLoaderData<typeof loader>();
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
@@ -70,7 +72,7 @@ export default function Index() {
   ]);
 
   const table = useReactTable({
-    data: servers,
+    data: monitors,
     columns,
     state: {
       sorting,
@@ -123,7 +125,9 @@ export default function Index() {
                     key={row.id}
                     className="cursor-pointer"
                     data-state={row.getIsSelected() ? 'selected' : null}
-                    onClick={() => navigate(`/servers/${row.original.id}`)}
+                    onClick={() =>
+                      navigate(`/${row.original.type}/${row.original.id}`)
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

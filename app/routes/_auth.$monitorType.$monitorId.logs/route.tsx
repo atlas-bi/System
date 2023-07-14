@@ -1,6 +1,7 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { getServerLogs } from '~/models/server.server';
+import invariant from 'tiny-invariant';
+import { getMonitorLogs } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
@@ -9,5 +10,6 @@ export const loader = async ({ params, request }: LoaderArgs) => {
       new URL(request.url).pathname,
     )}`,
   });
-  return json({ logs: await getServerLogs({ serverId: params.serverId }) });
+  invariant(params.monitorId, 'Monitor ID is required.');
+  return json({ logs: await getMonitorLogs({ monitorId: params.monitorId }) });
 };

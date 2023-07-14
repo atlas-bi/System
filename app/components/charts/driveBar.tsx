@@ -3,15 +3,12 @@ import { cn } from '@/lib/utils';
 
 import bytes from 'bytes';
 import {
-  ArcElement,
   BarElement,
   CategoryScale,
   ChartData,
   Chart as ChartJS,
   Legend,
-  LineElement,
   LinearScale,
-  PointElement,
   Title,
   Tooltip,
   TimeScale,
@@ -75,17 +72,15 @@ const BarChart = React.forwardRef<
       return;
     }
     const chartData = {
-      labels: data.usage
-        .reverse()
-        .map((x: Usage) => format(new Date(x.createdAt), 'MMM dd, yyyy')),
+      labels: data.usage.map((x: Usage) =>
+        format(new Date(x.createdAt), 'MMM dd, yyyy'),
+      ),
       datasets: [
         {
           label: 'Used',
-          data: data.usage
-            .reverse()
-            .map((x: Usage) =>
-              bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
-            ),
+          data: data.usage.map((x: Usage) =>
+            bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
+          ),
           borderColor: createLinearGradient(
             chart.ctx,
             chart.chartArea,
@@ -109,11 +104,9 @@ const BarChart = React.forwardRef<
         },
         {
           label: 'Free',
-          data: data.usage
-            .reverse()
-            .map((x: Usage) =>
-              bytes(Number(x.free), { unit: 'GB' }).replace('GB', ''),
-            ),
+          data: data.usage.map((x: Usage) =>
+            bytes(Number(x.free), { unit: 'GB' }).replace('GB', ''),
+          ),
           borderColor: '#cbd5e1',
           backgroundColor: '#e2e8f0',
           borderRadius: { topLeft: 2, topRight: 2 },

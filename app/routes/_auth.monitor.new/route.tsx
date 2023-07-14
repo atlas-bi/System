@@ -1,8 +1,8 @@
 import type { ActionArgs } from '@remix-run/node';
-import { json, redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import { NodeSSH } from 'node-ssh';
 import { namedAction } from 'remix-utils';
-import { createServer } from '~/models/server.server';
+import { createMonitor } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
@@ -46,19 +46,17 @@ export async function action({ request }: ActionArgs) {
         });
       }
 
-      await createServer({
+      await createMonitor({
         title: values.name.toString(),
         host: values.host.toString(),
         username: values.username.toString(),
-        password: values.password ? values.password.toString() : undefined,
-        privateKey: values.privateKey
-          ? values.privateKey.toString()
-          : undefined,
+        password: values.password ? values.password.toString() : null,
+        privateKey: values.privateKey ? values.privateKey.toString() : null,
         port: (values.port || 22).toString(),
         type: values.type.toString(),
       });
 
-      return json({ success: 'Server Created' });
+      return json({ success: 'Monitor Created' });
     },
     async test() {
       const formData = await request.formData();
@@ -95,7 +93,7 @@ export async function action({ request }: ActionArgs) {
       } catch (e) {
         return json({ error: e });
       }
-      return json({ success: 'Connection Successful' });
+      return json({ success: 'Connection successful.' });
     },
   });
 }

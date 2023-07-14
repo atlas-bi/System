@@ -30,11 +30,12 @@ model Group {
   users User[]
 }
 
-model Server {
-  id      String  @id @default(cuid())
-  title   String
-  enabled Boolean @default(true)
-  type    String
+model Monitor {
+  id    String @id @default(cuid())
+  title String
+  type  String
+
+  enabled  Boolean @default(true)
   hasError Boolean @default(false)
 
   host       String
@@ -43,24 +44,24 @@ model Server {
   port       String
   privateKey String?
 
-  // fields sent from server
-  caption             String?
-  name                String?
-  dnsHostName         String?
-  domain              String?
-  manufacturer        String?
-  model               String?
-  os String?
-  osVersion String?
+  // fields sent from monitor
+  caption      String?
+  name         String?
+  dnsHostName  String?
+  domain       String?
+  manufacturer String?
+  model        String?
+  os           String?
+  osVersion    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   drives Drive[]
-  logs   ServerLogs[]
+  logs   MonitorLogs[]
 }
 
-model ServerLogs {
+model MonitorLogs {
   id      String @id @default(cuid())
   message String
   type    String
@@ -68,35 +69,102 @@ model ServerLogs {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId String
+  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitorId String
 }
 
 model Drive {
-  id String @id @default(cuid())
+  id       String  @id @default(cuid())
+  hasError Boolean @default(false)
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId String
+  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitorId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inactive Boolean @default(true)
+  inactive Boolean @default(false)
 
-  // fields sent from server
+  // fields sent from monitor
   location    String?
   name        String
   root        String?
   description String?
-  maximumSize String?
   size        String?
 
   daysTillFull String?
-  growthRate String?
+  growthRate   String?
 
   usage DriveUsage[]
 
-  @@unique([serverId, name])
+  // notifications
+  missingNotify                   Boolean?
+  missingNotifyTypes              Notification[] @relation("missingNotifyTypesTable")
+  missingNotifyResendAfterMinutes Int?
+  missingNotifySentAt             DateTime?
+
+  percFreeNotify                   Boolean?
+  percFreeNotifyTypes              Notification[] @relation("percFreeNotifyTypesTable")
+  percFreeValue                    Int?
+  percFreeNotifyResendAfterMinutes Int?
+  percFreeNotifySentAt             DateTime?
+
+  sizeFreeNotify                   Boolean?
+  sizeFreeNotifyTypes              Notification[] @relation("sizeFreeNotifyTypesTable")
+  sizeFreeValue                    Int?
+  sizeFreeNotifyResendAfterMinutes Int?
+  sizeFreeNotifySentAt             DateTime?
+
+  growthRateNotify                   Boolean?
+  growthRateNotifyTypes              Notification[] @relation("growthRateNotifyTypesTable")
+  growthRateValue                    Int?
+  growthRateNotifyResendAfterMinutes Int?
+  growthRateNotifySentAt             DateTime?
+
+  logs DriveLogs[]
+
+  @@unique([monitorId, name])
+}
+
+model DriveLogs {
+  id      String @id @default(cuid())
+  message String
+  type    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  drive   Drive  @relation(fields: [driveId], references: [id])
+  driveId String
+}
+
+model Notification {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name             String
+  type             String
+  smtpPort         String?
+  smtpUsername     String?
+  smtpHost         String?
+  smtpPassword     String?
+  smtpSecurity     String?
+  ignoreSSLErrors  Boolean?
+  smtpFromName     String?
+  smtpFromEmail    String?
+  smtpToEmail      String?
+  tgBotToken       String?
+  tgChatId         String?
+  tgThreadId       String?
+  tgSendSilently   Boolean?
+  tgProtectMessage Boolean?
+
+  driveMissingNotify    Drive[] @relation("missingNotifyTypesTable")
+  drivePercFreeNotify   Drive[] @relation("percFreeNotifyTypesTable")
+  driveSizeFreeNotify   Drive[] @relation("sizeFreeNotifyTypesTable")
+  driveGrowthRateNotify Drive[] @relation("growthRateNotifyTypesTable")
 }
 
 model DriveUsage {
@@ -107,7 +175,7 @@ model DriveUsage {
 
   createdAt DateTime @default(now())
 
-  // fields sent from server
+  // fields sent from monitor
   used String?
   free String?
 }

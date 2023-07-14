@@ -9,7 +9,7 @@ module.exports = {
     v2_routeConvention: true,
   },
   ignoredRouteFiles: ['**/.*', '**/*.test.{js,jsx,ts,tsx}'],
-  serverDependencies: ['chartjs-adapter-date-fns'],
+  serverDependenciesToBundle: ['axios'],
   serverModuleFormat: 'cjs',
   tailwind: true,
   postcss: true,

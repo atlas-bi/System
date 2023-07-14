@@ -1,9 +1,15 @@
 import type { Group, User } from '@prisma/client';
 import slugify from 'slugify';
-import invariant from 'tiny-invariant';
 import { prisma } from '~/db.server';
 
-const userIndex = 'atlas-requests-users';
+export type { User } from '@prisma/client';
+
+export interface UserSerialized
+  extends Omit<User, 'createdAt' | 'updatedAt' | 'profilePhoto'> {
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  profilePhoto?: string | null;
+}
 
 export type SlimUserFields = {
   id: number;
@@ -95,7 +101,7 @@ export async function updateUserProps(
   lastName: User['lastName'],
   groups: Group['name'][],
   profilePhoto: User['profilePhoto'],
-): Promise<SlimUserFields> {
+): Promise<UserSerialized> {
   await getOrCreateUser(email);
 
   const groupModels = groups

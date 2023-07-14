@@ -1,7 +1,6 @@
-import { cn } from '@/lib/utils';
-import { Form, Link, useFetcher } from '@remix-run/react';
+import { Form, useFetcher } from '@remix-run/react';
 import { useEffect, useState } from 'react';
-import { Button, buttonVariants } from '~/components/ui/button';
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -22,25 +21,18 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 
-import { serverTypes } from '../server_types';
-import { Textarea } from '../ui/textarea';
+import { monitorTypes } from '~/models/monitor';
+import { Textarea } from '~/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 
-type Data = {
-  name?: string;
-  port?: number;
-  username?: string;
-  host?: string;
-  password?: string;
-  privateKey?: string;
-  type?: string;
-};
+import type { Notification } from '~/models/notification.server';
 
-export default function NewServer({ className }: { className: string }) {
+export default function NewMonitor({ className }: { className: string }) {
   const [open, setOpen] = useState(false);
   const fetcher = useFetcher();
   const testFetcher = useFetcher();
 
-  const [data, setData] = useState<Data>({});
+  const [data, setData] = useState<Notification>({});
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data?.success != null) {
@@ -53,13 +45,13 @@ export default function NewServer({ className }: { className: string }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" className={className}>
-          Add Server
+          Add Monitor
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:min-w-[425px] sm:max-w-fit">
         <DialogHeader>
-          <DialogTitle>Add Server</DialogTitle>
-          <DialogDescription>Add a new server for monitoring</DialogDescription>
+          <DialogTitle>Add Monitor</DialogTitle>
+          <DialogDescription>Add a new monitor.</DialogDescription>
         </DialogHeader>
         {testFetcher.data?.error?.code ? (
           <small className="text-red-700">
@@ -79,7 +71,7 @@ export default function NewServer({ className }: { className: string }) {
         {testFetcher.state !== 'submitting' && testFetcher.data?.success ? (
           <small className="text-green-700">{testFetcher.data.success}</small>
         ) : null}
-        <Form method="post" action="/servers/new">
+        <Form method="post" action="/monitors/new">
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
@@ -96,14 +88,14 @@ export default function NewServer({ className }: { className: string }) {
                 onValueChange={(type: string) => setData({ ...data, type })}
               >
                 <Label htmlFor="name" className="text-right">
-                  Server OS
+                  Monitor Type
                 </Label>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="select one" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {serverTypes.map((type) => (
+                    {monitorTypes.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.name}
                       </SelectItem>
@@ -170,25 +162,30 @@ export default function NewServer({ className }: { className: string }) {
             <Button
               type="button"
               onClick={(e) => {
+                testFetcher.submit(
+                  { _action: 'test', ...data },
+                  { method: 'post', action: '/monitors/new' },
+                );
+              }}
+            >
+              {testFetcher.state !== 'submitting' ? (
+                <>Test</>
+              ) : (
+                <>
+                  <Loader2 size={14} className="animate-spin mr-2" /> Testing...
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              onClick={(e) => {
                 fetcher.submit(
                   { _action: 'new', ...data },
-                  { method: 'post', action: '/servers/new' },
+                  { method: 'post', action: '/monitors/new' },
                 );
               }}
             >
               Save
-            </Button>
-
-            <Button
-              type="button"
-              onClick={(e) => {
-                testFetcher.submit(
-                  { _action: 'test', ...data },
-                  { method: 'post', action: '/servers/new' },
-                );
-              }}
-            >
-              {testFetcher.state !== 'submitting' ? <>Test</> : <>Testing...</>}
             </Button>
           </DialogFooter>
         </Form>

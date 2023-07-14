@@ -16,20 +16,31 @@ export function MultiSelect({
   placeholder = 'Select an item',
   parentClassName,
   data,
+  onChange,
+  name,
+  active = [],
 }: {
   label?: string;
   placeholder?: string;
   parentClassName?: string;
   data: DataItem[];
+  onChange?: any;
+  name?: string;
+  active?: DataItem[];
 }) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<DataItem[]>([]);
+  const [selected, setSelected] = React.useState<DataItem[]>(active);
   const [inputValue, setInputValue] = React.useState('');
 
   const handleUnselect = React.useCallback((item: DataItem) => {
     setSelected((prev) => prev.filter((s) => s.value !== item.value));
   }, []);
+
+  React.useEffect(() => {
+    console.log(typeof onChange);
+    if (typeof onChange == 'function') onChange(selected);
+  }, [selected]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -78,6 +89,9 @@ export function MultiSelect({
               }
               return (
                 <Badge key={item.value} variant="secondary">
+                  {name && (
+                    <input type="hidden" name={name} value={item.value} />
+                  )}
                   {item.label}
                   <button
                     className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"

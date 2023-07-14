@@ -2,17 +2,18 @@ import { decrypt } from '@/lib/utils';
 import { NodeSSH } from 'node-ssh';
 import { Queue } from 'quirrel/remix';
 import {
-  getServer,
-  serverError,
-  serverLog,
+  getMonitor,
+  monitorError,
+  monitorLog,
   setDriveDays,
   setDriveGrowth,
-  updateServer,
-} from '~/models/server.server';
+  updateMonitor,
+} from '~/models/monitor.server';
+import Notifier from '~/notifications/notifier';
 
-export default Queue('queues/monitor', async (job, meta) => {
-  const server = await getServer({ id: job });
-  const { username, host, password, port, privateKey } = server;
+export default Queue('queues/monitor', async (job: string, meta) => {
+  const monitor = await getMonitor({ id: job });
+  const { username, host, password, port, privateKey } = monitor;
 
   try {
     const ssh = new NodeSSH();
@@ -66,8 +67,8 @@ export default Queue('queues/monitor', async (job, meta) => {
       return (usedNum + freeNum).toString();
     };
 
-    const data = await updateServer({
-      id: server.id,
+    const data = await updateMonitor({
+      id: monitor.id,
       data: {
         name: i.CsName,
         dnsHostName: i.CsDNSHostName,
@@ -131,15 +132,17 @@ export default Queue('queues/monitor', async (job, meta) => {
       },
     );
 
+    await Notifier({ job });
+
     console.log(`successfully ran ${job}`);
   } catch (e) {
     console.log(e);
-    await serverLog({
-      serverId: job,
+    await monitorLog({
+      monitorId: job,
       type: 'error',
       message: JSON.stringify(e),
     });
-    await serverError({ id: job });
+    await monitorError({ id: job });
     console.log(`${job} monitor failed.`);
   }
 });
