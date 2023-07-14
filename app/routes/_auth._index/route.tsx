@@ -12,7 +12,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
   const monitorTypes = await getMonitorTypes();
 
-  if (monitorTypes) {
+  if (monitorTypes && monitorTypes.length > 0) {
     return redirect(`/${monitorTypes[0].type}`);
   }
 
