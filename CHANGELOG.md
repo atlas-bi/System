@@ -1,3 +1,7 @@
+## 1.10.0 (2023-07-14)
+
+* feat(drives): started added drive notifications ([76bbf60](https://github.com/atlas-bi/System/commit/76bbf60))
+
 ## 1.9.0 (2023-07-11)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([5ed7bc8](https://github.com/atlas-bi/System/commit/5ed7bc8))
