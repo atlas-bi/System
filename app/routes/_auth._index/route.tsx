@@ -4,21 +4,21 @@ import { getMonitorTypes } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: `/auth/?returnTo=${encodeURI(
-      new URL(request.url).pathname,
-    )}`,
-  });
+	await authenticator.isAuthenticated(request, {
+		failureRedirect: `/auth/?returnTo=${encodeURI(
+			new URL(request.url).pathname,
+		)}`,
+	});
 
-  const monitorTypes = await getMonitorTypes();
+	const monitorTypes = await getMonitorTypes();
 
-  if (monitorTypes && monitorTypes.length > 0) {
-    return redirect(`/${monitorTypes[0].type}`);
-  }
+	if (monitorTypes && monitorTypes.length > 0) {
+		return redirect(`/${monitorTypes[0].type}`);
+	}
 
-  return null;
+	return null;
 };
 
 export default function Index() {
-  return <>Create a monitor to get started.</>;
+	return <>Create a monitor to get started.</>;
 }

@@ -5,124 +5,124 @@ import { prisma } from '~/db.server';
 export type { User } from '@prisma/client';
 
 export interface UserSerialized
-  extends Omit<User, 'createdAt' | 'updatedAt' | 'profilePhoto'> {
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-  profilePhoto?: string | null;
+	extends Omit<User, 'createdAt' | 'updatedAt' | 'profilePhoto'> {
+	createdAt?: Date | string;
+	updatedAt?: Date | string;
+	profilePhoto?: string | null;
 }
 
 export type SlimUserFields = {
-  id: number;
-  email: string;
-  lastName: string | null;
-  firstName: string | null;
-  slug: string;
+	id: number;
+	email: string;
+	lastName: string | null;
+	firstName: string | null;
+	slug: string;
 };
 
 // used for the auth user
 const slimUserFields = {
-  id: true,
-  email: true,
-  lastName: true,
-  firstName: true,
-  slug: true,
+	id: true,
+	email: true,
+	lastName: true,
+	firstName: true,
+	slug: true,
 };
 
 export type FullUserFields = SlimUserFields & {
-  profilePhoto: string | null;
+	profilePhoto: string | null;
 };
 export const fullUserFields = {
-  ...slimUserFields,
-  profilePhoto: true,
+	...slimUserFields,
+	profilePhoto: true,
 };
 
 const slugger = (email: string) => {
-  return slugify(email.substring(0, email.indexOf('@')).replace('.', '-'), {
-    lower: true, // convert to lower case, defaults to `false`
-    strict: true,
-  });
+	return slugify(email.substring(0, email.indexOf('@')).replace('.', '-'), {
+		lower: true, // convert to lower case, defaults to `false`
+		strict: true,
+	});
 };
 
 export async function getUserById(id: User['id']) {
-  return prisma.user.findUnique({ where: { id }, include: { groups: true } });
+	return prisma.user.findUnique({ where: { id }, include: { groups: true } });
 }
 
 async function getUserByEmail(email: User['email']) {
-  return prisma.user.findUnique({ where: { email }, select: slimUserFields });
+	return prisma.user.findUnique({ where: { email }, select: slimUserFields });
 }
 
 function createUser(email: User['email']) {
-  return prisma.user.create({
-    data: {
-      email,
-      slug: slugger(email),
-    },
-    select: slimUserFields,
-  });
+	return prisma.user.create({
+		data: {
+			email,
+			slug: slugger(email),
+		},
+		select: slimUserFields,
+	});
 }
 
 function createGroup(name: Group['name']) {
-  return prisma.group.create({
-    data: {
-      name,
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+	return prisma.group.create({
+		data: {
+			name,
+		},
+		select: {
+			id: true,
+			name: true,
+		},
+	});
 }
 function getGroupByName(name: Group['name']) {
-  return prisma.group.findUnique({ where: { name } });
+	return prisma.group.findUnique({ where: { name } });
 }
 
 export async function getUserBySlug(slug: User['slug']) {
-  return prisma.user.findUnique({ where: { slug }, select: fullUserFields });
+	return prisma.user.findUnique({ where: { slug }, select: fullUserFields });
 }
 
 async function getOrCreateGroup(name: Group['name']) {
-  const group = await getGroupByName(name);
+	const group = await getGroupByName(name);
 
-  if (group) return group;
+	if (group) return group;
 
-  return createGroup(name);
+	return createGroup(name);
 }
 
 async function getOrCreateUser(email: User['email']) {
-  const user = await getUserByEmail(email);
-  if (user) return user;
+	const user = await getUserByEmail(email);
+	if (user) return user;
 
-  return createUser(email);
+	return createUser(email);
 }
 
 export async function updateUserProps(
-  email: User['email'],
-  firstName: User['firstName'],
-  lastName: User['lastName'],
-  groups: Group['name'][],
-  profilePhoto: User['profilePhoto'],
+	email: User['email'],
+	firstName: User['firstName'],
+	lastName: User['lastName'],
+	groups: Group['name'][],
+	profilePhoto: User['profilePhoto'],
 ): Promise<UserSerialized> {
-  await getOrCreateUser(email);
+	await getOrCreateUser(email);
 
-  const groupModels = groups
-    ? await Promise.all(groups?.map(async (group) => getOrCreateGroup(group)))
-    : undefined;
+	const groupModels = groups
+		? await Promise.all(groups?.map(async (group) => getOrCreateGroup(group)))
+		: undefined;
 
-  return prisma.user.update({
-    where: { email },
-    data: {
-      firstName,
-      lastName,
-      profilePhoto,
-      groups: {
-        set: groupModels
-          ? groupModels.map((group: { id: number }) => ({
-              id: Number(group.id),
-            }))
-          : [],
-      },
-      slug: slugger(email),
-    },
-    select: slimUserFields,
-  });
+	return prisma.user.update({
+		where: { email },
+		data: {
+			firstName,
+			lastName,
+			profilePhoto,
+			groups: {
+				set: groupModels
+					? groupModels.map((group: { id: number }) => ({
+							id: Number(group.id),
+					  }))
+					: [],
+			},
+			slug: slugger(email),
+		},
+		select: slimUserFields,
+	});
 }

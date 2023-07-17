@@ -5,10 +5,10 @@ import invariant from 'tiny-invariant';
 
 invariant(process.env.HOSTNAME, 'hostname is required.');
 const config = {
-  selfUrl: process.env.HOSTNAME,
-  cache: new MemoryCache(),
-  transformer: sharpTransformer,
+	selfUrl: process.env.HOSTNAME,
+	cache: new MemoryCache(),
+	transformer: sharpTransformer,
 };
 
 export const loader: LoaderFunction = ({ request }: ActionArgs) =>
-  imageLoader(config, request);
+	imageLoader(config, request);

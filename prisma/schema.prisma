@@ -71,6 +71,9 @@ model MonitorLogs {
 
   monitor   Monitor @relation(fields: [monitorId], references: [id])
   monitorId String
+
+  drive   Drive?  @relation(fields: [driveId], references: [id])
+  driveId String?
 }
 
 model Drive {
@@ -121,21 +124,9 @@ model Drive {
   growthRateNotifyResendAfterMinutes Int?
   growthRateNotifySentAt             DateTime?
 
-  logs DriveLogs[]
+  logs MonitorLogs[]
 
   @@unique([monitorId, name])
-}
-
-model DriveLogs {
-  id      String @id @default(cuid())
-  message String
-  type    String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  drive   Drive  @relation(fields: [driveId], references: [id])
-  driveId String
 }
 
 model Notification {

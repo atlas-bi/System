@@ -13,18 +13,18 @@ const DEFAULT_REDIRECT = '/';
  * @param {string} defaultRedirect The redirect to use if the to is unsafe.
  */
 export function safeRedirect(
-  to: FormDataEntryValue | string | null | undefined,
-  defaultRedirect: string = DEFAULT_REDIRECT,
+	to: FormDataEntryValue | string | null | undefined,
+	defaultRedirect: string = DEFAULT_REDIRECT,
 ) {
-  if (!to || typeof to !== 'string') {
-    return defaultRedirect;
-  }
+	if (!to || typeof to !== 'string') {
+		return defaultRedirect;
+	}
 
-  if (!to.startsWith('/') || to.startsWith('//')) {
-    return defaultRedirect;
-  }
+	if (!to.startsWith('/') || to.startsWith('//')) {
+		return defaultRedirect;
+	}
 
-  return to;
+	return to;
 }
 
 // /**
@@ -67,5 +67,5 @@ export function safeRedirect(
 // }
 
 export function validateEmail(email: unknown): email is string {
-  return typeof email === 'string' && email.length > 3 && email.includes('@');
+	return typeof email === 'string' && email.length > 3 && email.includes('@');
 }

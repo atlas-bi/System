@@ -1,3 +1,3 @@
 export default function Denied() {
-  return <div>Access denied.</div>;
+	return <div>Access denied.</div>;
 }

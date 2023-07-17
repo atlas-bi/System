@@ -5,13 +5,13 @@ import { getMonitorDrives } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: `/auth/?returnTo=${encodeURI(
-      new URL(request.url).pathname,
-    )}`,
-  });
-  invariant(params.monitorId, 'Monitor ID is required.');
-  return json({
-    drives: await getMonitorDrives({ monitorId: params.monitorId }),
-  });
+	await authenticator.isAuthenticated(request, {
+		failureRedirect: `/auth/?returnTo=${encodeURI(
+			new URL(request.url).pathname,
+		)}`,
+	});
+	invariant(params.monitorId, 'Monitor ID is required.');
+	return json({
+		drives: await getMonitorDrives({ monitorId: params.monitorId }),
+	});
 };

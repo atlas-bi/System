@@ -2,32 +2,32 @@ import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Link, Outlet, useLoaderData, useNavigate } from '@remix-run/react';
 import type {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+	ColumnDef,
+	ColumnFiltersState,
+	SortingState,
+	VisibilityState,
 } from '@tanstack/react-table';
 import {
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+	flexRender,
+	getCoreRowModel,
+	getFacetedRowModel,
+	getFacetedUniqueValues,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	getSortedRowModel,
+	useReactTable,
 } from '@tanstack/react-table';
 import React from 'react';
 import { DataTablePagination } from '~/components/table/data-table-pagination';
 import { DataTableToolbar } from '~/components/table/data-table-toolbar';
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from '~/components/ui/table';
 import { getMonitors } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -36,125 +36,125 @@ import { columns } from './table_columns';
 import invariant from 'tiny-invariant';
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: `/auth/?returnTo=${encodeURI(
-      new URL(request.url).pathname,
-    )}`,
-  });
+	await authenticator.isAuthenticated(request, {
+		failureRedirect: `/auth/?returnTo=${encodeURI(
+			new URL(request.url).pathname,
+		)}`,
+	});
 
-  invariant(params.monitorType, 'Monitor type is required.');
-  const monitors = await getMonitors({ type: params.monitorType });
-  return json({ monitors });
+	invariant(params.monitorType, 'Monitor type is required.');
+	const monitors = await getMonitors({ type: params.monitorType });
+	return json({ monitors });
 };
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+	columns: ColumnDef<TData, TValue>[];
+	data: TData[];
 }
 
 export default function Index() {
-  const { monitors } = useLoaderData<typeof loader>();
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({
-      caption: false,
-      manufacturer: false,
-      dnsHostName: false,
-      name: false,
-      domain: false,
-      model: false,
-    });
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [sorting, setSorting] = React.useState<SortingState>([
-    { id: 'title', desc: true },
-  ]);
+	const { monitors } = useLoaderData<typeof loader>();
+	const [rowSelection, setRowSelection] = React.useState({});
+	const [columnVisibility, setColumnVisibility] =
+		React.useState<VisibilityState>({
+			caption: false,
+			manufacturer: false,
+			dnsHostName: false,
+			name: false,
+			domain: false,
+			model: false,
+		});
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+		[],
+	);
+	const [sorting, setSorting] = React.useState<SortingState>([
+		{ id: 'title', desc: true },
+	]);
 
-  const table = useReactTable({
-    data: monitors,
-    columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-    },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-  });
+	const table = useReactTable({
+		data: monitors,
+		columns,
+		state: {
+			sorting,
+			columnVisibility,
+			rowSelection,
+			columnFilters,
+		},
+		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
+		onColumnVisibilityChange: setColumnVisibility,
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFacetedRowModel: getFacetedRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
+	});
 
-  const navigate = useNavigate();
-  return (
-    <>
-      <div className="space-y-4">
-        <DataTableToolbar table={table} />
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="cursor-pointer"
-                    data-state={row.getIsSelected() ? 'selected' : null}
-                    onClick={() =>
-                      navigate(`/${row.original.type}/${row.original.id}`)
-                    }
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <DataTablePagination table={table} />
-      </div>
-      <Outlet />
-    </>
-  );
+	const navigate = useNavigate();
+	return (
+		<>
+			<div className="space-y-4">
+				<DataTableToolbar table={table} />
+				<div className="rounded-md border">
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map((header) => {
+										return (
+											<TableHead key={header.id}>
+												{header.isPlaceholder
+													? null
+													: flexRender(
+															header.column.columnDef.header,
+															header.getContext(),
+													  )}
+											</TableHead>
+										);
+									})}
+								</TableRow>
+							))}
+						</TableHeader>
+						<TableBody>
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow
+										key={row.id}
+										className="cursor-pointer"
+										data-state={row.getIsSelected() ? 'selected' : null}
+										onClick={() =>
+											navigate(`/${row.original.type}/${row.original.id}`)
+										}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="h-24 text-center"
+									>
+										No results.
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</div>
+				<DataTablePagination table={table} />
+			</div>
+			<Outlet />
+		</>
+	);
 }
