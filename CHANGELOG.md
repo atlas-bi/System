@@ -1,3 +1,9 @@
+## 1.11.0 (2023-07-18)
+
+* feat(db): fixed for empty db ([499ade8](https://github.com/atlas-bi/System/commit/499ade8))
+* feat(logging): improved logging handlers ([c74441a](https://github.com/atlas-bi/System/commit/c74441a))
+* Merge branch 'master' of github.com:atlas-bi/System ([16deaf9](https://github.com/atlas-bi/System/commit/16deaf9))
+
 ## 1.10.0 (2023-07-14)
 
 * feat(drives): started added drive notifications ([76bbf60](https://github.com/atlas-bi/System/commit/76bbf60))
