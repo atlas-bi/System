@@ -32,9 +32,6 @@ jobs:
 
       - run: npm run build
 
-      - name: Build Archive
-        run: tar -czvf build.tar.gz package.json build app lib prisma public styles .env.example CHANGELOG.md package-lock.json README.md remix.config.js remix.env.d.ts server.ts tailwind.config.ts tsconfig.json postcss.config.js
-
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
 

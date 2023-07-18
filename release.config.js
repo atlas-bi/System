@@ -22,6 +22,13 @@ const config = {
 			},
 		],
 		[
+			'@semantic-release/exec',
+			{
+				prepareCmd:
+					'tar -czvf build.tar.gz package.json build app lib prisma public styles .env.example CHANGELOG.md package-lock.json README.md remix.config.js remix.env.d.ts server.ts tailwind.config.ts tsconfig.json postcss.config.js',
+			},
+		],
+		[
 			'@semantic-release/github',
 			{
 				assets: [{ path: 'build.tar.gz', name: 'build.tar.gz' }],
