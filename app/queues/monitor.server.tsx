@@ -11,6 +11,16 @@ import {
 } from '~/models/monitor.server';
 import Notifier from '~/notifications/notifier';
 
+function disposeSsh(ssh) {
+	if (ssh.connection) {
+		ssh.getConnection().end();
+		ssh.connection.on('error', function () {
+			/* No Op */
+		});
+		ssh.dispose();
+	}
+}
+
 export default Queue('queues/monitor', async (job: string, meta) => {
 	const monitor = await getMonitor({ id: job });
 	const { username, host, password, port, privateKey } = monitor;
@@ -131,6 +141,8 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 				}
 			},
 		);
+
+		disposeSsh(ssh);
 
 		await Notifier({ job });
 

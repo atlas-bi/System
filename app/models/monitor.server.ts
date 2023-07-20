@@ -19,6 +19,19 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 	});
 }
 
+export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
+	return prisma.monitor.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			type: true,
+			host: true,
+			os: true,
+			osVersion: true,
+			title: true,
+		},
+	});
+}
 export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findFirst({
 		where: { id },
