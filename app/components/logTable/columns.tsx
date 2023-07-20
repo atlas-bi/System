@@ -64,8 +64,10 @@ export const columns: ColumnDef<any>[] = [
 							<>
 								{message?.errno} {message?.code}
 							</>
-						) : (
-							message
+						) :
+						message?.stderr ? (<>{message.stderr}</>) :
+						(
+							JSON.stringify(message)
 						)}
 					</span>
 				</div>

@@ -3,18 +3,19 @@ import { useEffect } from 'react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { DoughnutChart } from '~/components/charts/driveDoughnut';
 import { H1, H3 } from '~/components/ui/typography';
-import type { LoaderArgs } from '@remix-run/node';
+import { LoaderArgs, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
-import { MoveLeft } from 'lucide-react';
+import { BellRing, MoveLeft, MoveRight } from 'lucide-react';
 import { Skeleton } from '~/components/ui/skeleton';
 import invariant from 'tiny-invariant';
 
 import type { Drive, DriveUsage, MonitorLogs } from '~/models/monitor.server';
 import { LogTable } from '~/components/logTable/table';
+import { monitorTypes } from '~/models/monitor';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -24,6 +25,11 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	});
 
 	invariant(params.monitorId, 'Monitor ID is required.');
+	invariant(params.monitorType, 'Monitor Type is required.');
+
+	if (monitorTypes.filter((x) => x.value === params.monitorType).length === 0){
+		return redirect("/")
+	}
 	const monitor = await getMonitorPublic({ id: params.monitorId });
 	invariant(monitor, 'Monitor not found.');
 	return json({
@@ -43,6 +49,7 @@ export default function Index() {
 
 	return (
 		<>
+		<div className="flex justify-between">
 			<Link
 				to={`/${monitor.type}`}
 				className="flex content-center space-x-2 pb-4 text-slate-700"
@@ -51,7 +58,16 @@ export default function Index() {
 				<MoveLeft size={16} className="my-auto" />
 				<span className="my-auto">Back to Monitors</span>
 			</Link>
-
+			<Link
+					to={`/${monitor.type}/${monitor.id}/notifications`}
+					className="flex content-center space-x-2 pb-4 text-slate-600"
+					prefetch="intent"
+				>
+					<BellRing size={16} className="my-auto" />
+					<span className="my-auto">Manage Notifications</span>
+					<MoveRight size={16} className="my-auto" />
+				</Link>
+			</div>
 			<H1>{monitor.title}</H1>
 			<div className="text-muted-foreground">
 				{monitor.host}

@@ -25,8 +25,8 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 	const monitor = await getMonitor({ id: job });
 	const { username, host, password, port, privateKey } = monitor;
 
+	const ssh = new NodeSSH();
 	try {
-		const ssh = new NodeSSH();
 		await ssh.connect({
 			username,
 			host,
@@ -34,6 +34,26 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			port,
 			privateKey: privateKey ? decrypt(privateKey) : undefined,
 		});
+
+		let pwshVersionCheck = await ssh.execCommand(
+			'powershell -command "Get-Host | Select-Object Version|ConvertTo-Json"',
+		);
+
+		let pwshCommand = 'powershell'
+
+		let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
+
+		if(pwshVersion?.Version?.Major < 5) {
+			pwshVersionCheck = await ssh.execCommand(
+			'pwsh -command "Get-Host | Select-Object Version|ConvertTo-Json"',
+			);
+
+			let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
+
+			if(pwshVersion?.Version?.Major > 4) {
+				pwshCommand = 'pwsh'
+			}
+		}
 
 		// $body = @{}
 		// $body.storage=(gdr -PSProvider 'FileSystem')
@@ -43,23 +63,24 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		// -Uri http://localhost:3000 -Method POST -Body ($body|ConvertTo-Json) -ContentType application/json
 
 		const storage = await ssh.execCommand(
-			'powershell -command "gdr -PSProvider \'FileSystem\'|ConvertTo-Json"',
+			`${pwshCommand} -command "gdr -PSProvider \'FileSystem\'|ConvertTo-Json"`,
 		);
+
 		const info = await ssh.execCommand(
-			'powershell -command "Get-ComputerInfo -property OsName,OsVersion,CsName,CsDNSHostName,CsDomain,CsManufacturer,CsModel|ConvertTo-Json"',
-		);
+			`${pwshCommand} -command "Get-ComputerInfo -property OsName,OsVersion,CsName,CsDNSHostName,CsDomain,CsManufacturer,CsModel|ConvertTo-Json"`,
+				);
 
 		if (info.code !== 0) {
 			throw info;
 		}
 
-		const i = JSON.parse(info.stdout);
+		const i = JSON.parse(info.stdout.replace("WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n", ""));
 
 		if (storage.code !== 0) {
 			throw storage;
 		}
 
-		const s = JSON.parse(storage.stdout);
+		const s = JSON.parse(storage.stdout.replace("WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n", ""));
 
 		const sum = (
 			used: string | null | undefined,
@@ -156,5 +177,7 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		});
 		await monitorError({ id: job });
 		console.log(`${job} monitor failed.`);
+		// try to kill ssh again if there was an error.
+		disposeSsh(ssh);
 	}
 });
