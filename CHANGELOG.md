@@ -1,3 +1,9 @@
+## <small>1.11.1 (2023-07-20)</small>
+
+* fix(ssh): try to force windows ssh connections to close ([d15e215](https://github.com/atlas-bi/System/commit/d15e215))
+* Merge branch 'master' of github.com:atlas-bi/System ([4ba3bc7](https://github.com/atlas-bi/System/commit/4ba3bc7))
+* build(release): moved zip step to get correct version number ([f25e275](https://github.com/atlas-bi/System/commit/f25e275))
+
 ## 1.11.0 (2023-07-18)
 
 * feat(db): fixed for empty db ([499ade8](https://github.com/atlas-bi/System/commit/499ade8))
