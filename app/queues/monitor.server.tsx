@@ -39,19 +39,18 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			'powershell -command "Get-Host | Select-Object Version|ConvertTo-Json"',
 		);
 
-		let pwshCommand = 'powershell'
+		let pwshCommand = 'powershell';
 
 		let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
 
-		if(pwshVersion?.Version?.Major < 5) {
+		if (pwshVersion?.Version?.Major < 5) {
 			pwshVersionCheck = await ssh.execCommand(
-			'pwsh -command "Get-Host | Select-Object Version|ConvertTo-Json"',
+				'pwsh -command "Get-Host | Select-Object Version|ConvertTo-Json"',
 			);
 
 			let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
-
-			if(pwshVersion?.Version?.Major > 4) {
-				pwshCommand = 'pwsh'
+			if (pwshVersion?.Version?.Major > 4) {
+				pwshCommand = 'pwsh';
 			}
 		}
 
@@ -66,21 +65,45 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			`${pwshCommand} -command "gdr -PSProvider \'FileSystem\'|ConvertTo-Json"`,
 		);
 
-		const info = await ssh.execCommand(
-			`${pwshCommand} -command "Get-ComputerInfo -property OsName,OsVersion,CsName,CsDNSHostName,CsDomain,CsManufacturer,CsModel|ConvertTo-Json"`,
-				);
+		const osRaw = await ssh.execCommand(
+			`${pwshCommand} -command "Get-CIMInstance win32_operatingsystem | Select-Object Caption,Version,LastBootUpTime | ConvertTo-Json"`,
+		);
 
-		if (info.code !== 0) {
-			throw info;
+		const csRaw = await ssh.execCommand(
+			`${pwshCommand} -command "Get-CIMInstance win32_computersystem | Select-Object Name,DNSHostName,Domain,Manufacturer,Model | ConvertTo-Json"`,
+		);
+
+		if (csRaw.code !== 0) {
+			throw { host, pwshCommand, csRaw };
 		}
 
-		const i = JSON.parse(info.stdout.replace("WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n", ""));
+		if (osRaw.code !== 0) {
+			throw osRaw;
+		}
+
+		const cs = JSON.parse(
+			csRaw.stdout.replace(
+				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
+				'',
+			),
+		);
+		const os = JSON.parse(
+			osRaw.stdout.replace(
+				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
+				'',
+			),
+		);
 
 		if (storage.code !== 0) {
 			throw storage;
 		}
 
-		const s = JSON.parse(storage.stdout.replace("WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n", ""));
+		const s = JSON.parse(
+			storage.stdout.replace(
+				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
+				'',
+			),
+		);
 
 		const sum = (
 			used: string | null | undefined,
@@ -98,16 +121,31 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			return (usedNum + freeNum).toString();
 		};
 
+		let lastBoot = null;
+
+		// dates come in two formats depending on ps version.
+		// /Date(1689124841494)/
+		// 2023-01-22T00:23:47.493832-06:00
+		if (/Date.+?/.test(os.LastBootUpTime)) {
+			const stripedString = Number(
+				os.LastBootUpTime.replace('/Date(', '').replace(')/', ''),
+			);
+			lastBoot = new Date(stripedString);
+		} else {
+			lastBoot = new Date(os.LastBootUpTime);
+		}
+
 		const data = await updateMonitor({
 			id: monitor.id,
 			data: {
-				name: i.CsName,
-				dnsHostName: i.CsDNSHostName,
-				domain: i.CsDomain,
-				manufacturer: i.CsManufacturer,
-				model: i.CsModel,
-				os: i.OsName,
-				osVersion: i.OsVersion,
+				name: cs.Name,
+				dnsHostName: cs.DNSHostName,
+				domain: cs.Domain,
+				manufacturer: cs.Manufacturer,
+				model: cs.Model,
+				os: os.Caption,
+				osVersion: os.Version,
+				lastBootTime: lastBoot,
 			},
 			drives: s.map(
 				(drive: {
@@ -140,8 +178,8 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		data.drives?.map(
 			async (drive: { size: string; usage: string | any[]; id: any }) => {
 				if (!drive.usage || drive.usage.length <= 1) {
-					await setDriveDays({ id: drive.id, daysTillFull: undefined });
-					await setDriveGrowth({ id: drive.id, growthRate: undefined });
+					await setDriveDays({ id: drive.id, daysTillFull: null });
+					await setDriveGrowth({ id: drive.id, growthRate: null });
 				} else {
 					const start = drive.usage[0];
 					const end = drive.usage[drive.usage.length - 1];
@@ -170,11 +208,8 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		console.log(`successfully ran ${job}`);
 	} catch (e) {
 		console.log(e);
-		await monitorLog({
-			monitorId: job,
-			type: 'error',
-			message: JSON.stringify(e),
-		});
+		await Notifier({ job, message: JSON.stringify(e) });
+
 		await monitorError({ id: job });
 		console.log(`${job} monitor failed.`);
 		// try to kill ssh again if there was an error.

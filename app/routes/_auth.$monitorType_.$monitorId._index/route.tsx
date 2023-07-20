@@ -16,6 +16,7 @@ import invariant from 'tiny-invariant';
 import type { Drive, DriveUsage, MonitorLogs } from '~/models/monitor.server';
 import { LogTable } from '~/components/logTable/table';
 import { monitorTypes } from '~/models/monitor';
+import { format } from 'date-fns';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -27,8 +28,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	invariant(params.monitorId, 'Monitor ID is required.');
 	invariant(params.monitorType, 'Monitor Type is required.');
 
-	if (monitorTypes.filter((x) => x.value === params.monitorType).length === 0){
-		return redirect("/")
+	if (monitorTypes.filter((x) => x.value === params.monitorType).length === 0) {
+		return redirect('/');
 	}
 	const monitor = await getMonitorPublic({ id: params.monitorId });
 	invariant(monitor, 'Monitor not found.');
@@ -49,16 +50,16 @@ export default function Index() {
 
 	return (
 		<>
-		<div className="flex justify-between">
-			<Link
-				to={`/${monitor.type}`}
-				className="flex content-center space-x-2 pb-4 text-slate-700"
-				prefetch="intent"
-			>
-				<MoveLeft size={16} className="my-auto" />
-				<span className="my-auto">Back to Monitors</span>
-			</Link>
-			<Link
+			<div className="flex justify-between">
+				<Link
+					to={`/${monitor.type}`}
+					className="flex content-center space-x-2 pb-4 text-slate-700"
+					prefetch="intent"
+				>
+					<MoveLeft size={16} className="my-auto" />
+					<span className="my-auto">Back to Monitors</span>
+				</Link>
+				<Link
 					to={`/${monitor.type}/${monitor.id}/notifications`}
 					className="flex content-center space-x-2 pb-4 text-slate-600"
 					prefetch="intent"
@@ -69,23 +70,42 @@ export default function Index() {
 				</Link>
 			</div>
 			<H1>{monitor.title}</H1>
-			<div className="text-muted-foreground">
-				{monitor.host}
-				{monitor.os && (
-					<>
-						{monitor.host && <> · </>}
-						{monitor.os}
-					</>
-				)}
-				{monitor.osVersion && (
-					<>
-						{(monitor.host || monitor.os) && <> · </>}
-						{monitor.osVersion}
-					</>
-				)}
-			</div>
-
 			<div className="space-y-4 pb-4">
+				<div className="text-muted-foreground">
+					{monitor.host}
+					{monitor.os && (
+						<>
+							{monitor.host && <> · </>}
+							{monitor.os}
+						</>
+					)}
+					{monitor.osVersion && (
+						<>
+							{(monitor.host || monitor.os) && <> · </>}
+							{monitor.osVersion}
+						</>
+					)}
+				</div>
+
+				<div className="space-y-2 flex-grow">
+					<Table>
+						<TableBody>
+							<TableRow>
+								<TableCell className="py-1 font-medium">Last Reboot</TableCell>
+								<TableCell className="py-1 text-slate-700">
+									{monitor.lastBootTime && (
+										<>
+											{format(
+												new Date(monitor.lastBootTime),
+												'MMM dd, yyyy k:mm',
+											)}
+										</>
+									)}
+								</TableCell>
+							</TableRow>
+						</TableBody>
+					</Table>
+				</div>
 				{drivesFetcher.data?.drives ? (
 					<>
 						<div className="grid gap-4 py-4 grid-cols-2">

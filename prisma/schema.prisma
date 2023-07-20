@@ -53,12 +53,24 @@ model Monitor {
   model        String?
   os           String?
   osVersion    String?
+  lastBootTime String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   drives Drive[]
   logs   MonitorLogs[]
+
+  // notifications
+  connectionNotify                   Boolean?
+  connectionNotifyTypes              Notification[] @relation("connectionNotifyTypesTable")
+  connectionNotifyResendAfterMinutes Int?
+  connectionNotifySentAt             DateTime?
+
+  rebootNotify                   Boolean?
+  rebootNotifyTypes              Notification[] @relation("rebootNotifyTypesTable")
+  rebootNotifySentAt             DateTime?
+
 }
 
 model MonitorLogs {
@@ -156,6 +168,9 @@ model Notification {
   drivePercFreeNotify   Drive[] @relation("percFreeNotifyTypesTable")
   driveSizeFreeNotify   Drive[] @relation("sizeFreeNotifyTypesTable")
   driveGrowthRateNotify Drive[] @relation("growthRateNotifyTypesTable")
+
+  monitorConnectionNotify    Monitor[] @relation("connectionNotifyTypesTable")
+  monitorRebootNotify    Monitor[] @relation("rebootNotifyTypesTable")
 }
 
 model DriveUsage {

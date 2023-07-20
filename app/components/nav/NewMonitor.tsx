@@ -1,4 +1,4 @@
-import { Form, useFetcher } from '@remix-run/react';
+import { Form, useFetcher, useNavigate } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
@@ -31,13 +31,15 @@ export default function NewMonitor({ className }: { className: string }) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 	const testFetcher = useFetcher();
+	const navigate = useNavigate();
 
 	const [data, setData] = useState<Notification>({});
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.success != null) {
+		if (fetcher.state === 'idle' && fetcher.data?.monitor != null) {
 			setData({});
 			setOpen(false);
+			navigate(`/${fetcher.data.monitor.type}/${fetcher.data.monitor.id}`);
 		}
 	}, [fetcher]);
 

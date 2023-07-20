@@ -4,6 +4,7 @@ import {
 	getDriveNotifications,
 	getMonitorNotifications,
 	updateDriveNotifications,
+	updateMonitorNotifications,
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Form, Link, useLoaderData, useParams } from '@remix-run/react';
@@ -27,7 +28,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
-	const monitor = await getMonitorNotifications({ id: params.driveId });
+	const monitor = await getMonitorNotifications({ id: params.monitorId });
 	if (!monitor) {
 		throw new Response('Not Found', { status: 404 });
 	}
@@ -45,41 +46,20 @@ export async function action({ request, params }: ActionArgs) {
 	});
 	const formData = await request.formData();
 	const { ...values } = Object.fromEntries(formData);
+	console.log(values);
+	await updateMonitorNotifications({
+		id: params.monitorId,
 
-	// await updateDriveNotifications({
-	// 	id: params.driveId,
+		connectionNotify: values.connectionNotify == 'on',
+		connectionNotifyTypes: formData.getAll('connectionNotifyTypes'),
+		connectionNotifyResendAfterMinutes:
+			values.connectionNotifyResend == 'on'
+				? Number(values.connectionNotifyResendAfterMinutes || '0')
+				: 0,
 
-	// 	missingNotify: values.missingNotify == 'on',
-	// 	missingNotifyTypes: formData.getAll('missingNotifyTypes'),
-	// 	missingNotifyResendAfterMinutes:
-	// 		values.missingNotifyResend == 'on'
-	// 			? Number(values.missingNotifyResendAfterMinutes || '0')
-	// 			: 0,
-
-	// 	percFreeNotify: values.percFreeNotify == 'on',
-	// 	percFreeNotifyTypes: formData.getAll('percFreeNotifyTypes'),
-	// 	percFreeNotifyResendAfterMinutes:
-	// 		values.percFreeNotifyResend == 'on'
-	// 			? Number(values.percFreeNotifyResendAfterMinutes || '0')
-	// 			: 0,
-	// 	percFreeValue: Number(values.percFreeValue || 0),
-
-	// 	sizeFreeNotify: values.sizeFreeNotify == 'on',
-	// 	sizeFreeNotifyTypes: formData.getAll('sizeFreeNotifyTypes'),
-	// 	sizeFreeNotifyResendAfterMinutes:
-	// 		values.sizeFreeNotifyResend == 'on'
-	// 			? Number(values.sizeFreeNotifyResendAfterMinutes || '0')
-	// 			: 0,
-	// 	sizeFreeValue: Number(values.sizeFreeValue || 0),
-
-	// 	growthRateNotify: values.growthRateNotify == 'on',
-	// 	growthRateNotifyTypes: formData.getAll('growthRateNotifyTypes'),
-	// 	growthRateNotifyResendAfterMinutes:
-	// 		values.growthRateNotifyResend == 'on'
-	// 			? Number(values.growthRateNotifyResendAfterMinutes || '0')
-	// 			: 0,
-	// 	growthRateValue: Number(values.growthRateValue || 0),
-	// });
+		rebootNotify: values.rebootNotify == 'on',
+		rebootNotifyTypes: formData.getAll('rebootNotifyTypes'),
+	});
 
 	return null;
 }
@@ -98,40 +78,18 @@ export default function Index() {
 
 	const form = useRef<HTMLFormElement>(null);
 
-	// const [perc, setPerc] = useState(drive.percFreeNotify == true);
-	// const [size, setSize] = useState(drive.sizeFreeNotify == true);
-	// const [growth, setGrowth] = useState(drive.growthRateNotify == true);
-	// const [missing, setMissing] = useState(drive.missingNotify == true);
+	const [connection, setConnection] = useState(
+		monitor.connectionNotify == true,
+	);
+	const [reboot, setReboot] = useState(monitor.rebootNotify == true);
 
-	// const [percValue, setPercValue] = useState(drive.percFreeValue);
-	// const [sizeValue, setSizeValue] = useState(drive.sizeFreeValue);
-	// const [growthValue, setGrowthValue] = useState(drive.growthRateValue);
+	const [connectionResendValue, setConnectionResendValue] = useState(
+		monitor.connectionNotifyResendAfterMinutes,
+	);
 
-	// const [percResendValue, setPercResendValue] = useState(
-	// 	drive.percFreeNotifyResendAfterMinutes,
-	// );
-	// const [missingResendValue, setMissingResendValue] = useState(
-	// 	drive.missingNotifyResendAfterMinutes,
-	// );
-	// const [sizeResendValue, setSizeResendValue] = useState(
-	// 	drive.sizeFreeNotifyResendAfterMinutes,
-	// );
-	// const [growthResendValue, setGrowthResendValue] = useState(
-	// 	drive.growthRateNotifyResendAfterMinutes,
-	// );
-
-	// const [percFreeNotifyResend, setPercFreeNotifyResend] = useState(
-	// 	drive.percFreeNotifyResendAfterMinutes !== 0,
-	// );
-	// const [sizeFreeNotifyResend, setSizeFreeNotifyResend] = useState(
-	// 	drive.sizeFreeNotifyResendAfterMinutes !== 0,
-	// );
-	// const [growthRateNotifyResend, setGrowthRateNotifyResend] = useState(
-	// 	drive.growthRateNotifyResendAfterMinutes !== 0,
-	// );
-	// const [missingNotifyResend, setMissingNotifyResend] = useState(
-	// 	drive.missingNotifyResendAfterMinutes !== 0,
-	// );
+	const [connectionNotifyResend, setConnectionNotifyResend] = useState(
+		monitor.connectionNotifyResendAfterMinutes !== 0,
+	);
 
 	function handleChange(event: { currentTarget: HTMLFormElement }) {
 		submit(event.currentTarget);
@@ -156,308 +114,34 @@ export default function Index() {
 					<Loader2 size={14} className="animate-spin my-auto" />
 				) : null}
 			</div>
-			<H1>Notifications for {monitor.title}</H1>- notify on reboot - notify on
-			connection failure
-			{/*<Form ref={form} method="post" onChange={handleChange}>
+			<H1>Notifications for {monitor.title}</H1>
+			<Form ref={form} method="post" onChange={handleChange}>
 				<div className="space-y-4">
 					<div className=" rounded-lg border p-4 max-w-[500px]">
 						<div className="space-y-2">
-							<H3 className="text-2xl">General</H3>
-							<div className="text-muted-foreground pb-2">
-								Recieve notification when drive dissapears.
-							</div>
-							<Separator />
-							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-									missing ? '' : 'opacity-50 text-slate-600'
-								}`}
-							>
+							<div className="space-y-2 flex justify-between">
 								<div className="flex-grow">
-									<Label className="text-base">Missing</Label>
+									<H3 className="text-2xl">Data Collection</H3>
 									<div className="text-muted-foreground pb-2">
-										When server is online but the drive is not found.
-									</div>
-								</div>
-								<div className="self-start pt-3">
-									<Switch
-										name="missingNotify"
-										checked={missing}
-										onCheckedChange={(check) => {
-											setMissing(check);
-										}}
-									/>
-								</div>
-							</div>
-							<Collapsible open={missing}>
-								<CollapsibleContent className="space-y-2">
-									<div>
-										<MultiSelect
-											label="Notification Methods"
-											placeholder="choose"
-											data={notificationsMap}
-											active={notificationsMap.filter(
-												(x: { value: string }) =>
-													drive.missingNotifyTypes.filter(
-														(t: { id: string }) => t.id == x.value,
-													).length > 0,
-											)}
-											name="missingNotifyTypes"
-											onChange={() => {
-												submit(form.current);
-											}}
-										/>
-										<Link
-											to="/admin/notifications"
-											className="text-sm text-sky-600/80"
-										>
-											Manage notification types.
-										</Link>
-									</div>
-									<div
-										className={`space-y-2 ${
-											missingNotifyResend ? '' : 'opacity-50 text-slate-600'
-										}`}
-									>
-										<div className={`flex justify-between `}>
-											<div className='flex-grow"'>
-												<Label className="text-slate-700">
-													Resend Frequency (Minutes)
-												</Label>
-											</div>
-											<Switch
-												checked={missingNotifyResend}
-												onCheckedChange={setMissingNotifyResend}
-												name="missingNotifyResend"
-											/>
-										</div>
-										<Input
-											disabled={missingNotifyResend != true}
-											type="number"
-											name="missingNotifyResendAfterMinutes"
-											value={missingResendValue || undefined}
-											onChange={(e) => setMissingResendValue(e.target.value)}
-											placeholder="60"
-										/>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-						</div>
-					</div>
-					<div className=" rounded-lg border p-4 max-w-[500px]">
-						<div className="space-y-2">
-							<H3 className="text-2xl">Free Space</H3>
-							<div className="text-muted-foreground pb-2">
-								Recieve notification when free space meets certain criteria.
-							</div>
-							<Separator />
-							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-									perc ? '' : 'opacity-50 text-slate-600'
-								}`}
-							>
-								<div className="flex-grow">
-									<Label className="text-base">Percentage</Label>
-
-									<div className="text-muted-foreground pb-2">
-										When free space falls below a percentage (%).
-									</div>
-								</div>
-								<div className="self-start  pt-3">
-									<Switch
-										name="percFreeNotify"
-										checked={perc}
-										onCheckedChange={setPerc}
-									/>
-								</div>
-							</div>
-							<Collapsible open={perc}>
-								<CollapsibleContent className="space-y-2">
-									<div>
-										<Label className="text-slate-700">Percentage</Label>
-										<Input
-											name="percFreeValue"
-											type="number"
-											placeholder="10"
-											value={percValue}
-											onChange={(e) => setPercValue(e.target.value)}
-										/>
-									</div>
-									<div>
-										<MultiSelect
-											label="Notification Methods"
-											placeholder="choose"
-											data={notificationsMap}
-											active={notificationsMap.filter(
-												(x: { value: string }) =>
-													drive.percFreeNotifyTypes.filter(
-														(t) => t.id == x.value,
-													).length > 0,
-											)}
-											name="percFreeNotifyTypes"
-											onChange={() => {
-												submit(form.current);
-											}}
-										/>
-										<Link
-											to="/admin/notifications"
-											className="text-sm text-sky-600/80"
-										>
-											Manage notification types.
-										</Link>
-									</div>
-									<div
-										className={`space-y-2 ${
-											percFreeNotifyResend ? '' : 'opacity-50 text-slate-600'
-										}`}
-									>
-										<div className={`flex justify-between `}>
-											<div className='flex-grow"'>
-												<Label className="text-slate-700">
-													Resend Frequency (Minutes)
-												</Label>
-											</div>
-											<Switch
-												checked={percFreeNotifyResend}
-												onCheckedChange={setPercFreeNotifyResend}
-												name="percFreeNotifyResend"
-											/>
-										</div>
-										<Input
-											disabled={percFreeNotifyResend != true}
-											type="number"
-											name="percFreeNotifyResendAfterMinutes"
-											value={percResendValue || undefined}
-											onChange={(e) => setPercResendValue(e.target.value)}
-											placeholder="60"
-										/>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-
-							<Separator />
-							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors  ${
-									size ? '' : 'opacity-50 text-slate-600'
-								}`}
-							>
-								<div className="flex-grow">
-									<Label className="text-base">Fixed Size</Label>
-									<div className="text-muted-foreground pb-2">
-										When free space falls below a specific size (GB).
-									</div>
-								</div>
-								<div className="self-start pt-3">
-									<Switch
-										name="sizeFreeNotify"
-										checked={size}
-										onCheckedChange={setSize}
-									/>
-								</div>
-							</div>
-							<Collapsible open={size}>
-								<CollapsibleContent className="space-y-2">
-									<div className="space-y-1.5">
-										<Label className="text-slate-700">GB</Label>
-										<Input
-											name="sizeFreeValue"
-											type="number"
-											placeholder="10"
-											value={sizeValue}
-											onChange={(e) => setSizeValue(e.target.value)}
-										/>
-									</div>
-									<div>
-										<MultiSelect
-											label="Notification Methods"
-											placeholder="choose"
-											data={notificationsMap}
-											active={notificationsMap.filter(
-												(x: { value: string }) =>
-													drive.sizeFreeNotifyTypes.filter(
-														(t: { id: string }) => t.id == x.value,
-													).length > 0,
-											)}
-											name="sizeFreeNotifyTypes"
-											onChange={() => {
-												submit(form.current);
-											}}
-										/>
-										<Link
-											to="/admin/notifications"
-											className="text-sm text-sky-600/80"
-										>
-											Manage notification types.
-										</Link>
-									</div>
-									<div
-										className={`space-y-2 ${
-											sizeFreeNotifyResend ? '' : 'opacity-50 text-slate-600'
-										}`}
-									>
-										<div className={`flex justify-between `}>
-											<div className='flex-grow"'>
-												<Label className="text-slate-700">
-													Resend Frequency (Minutes)
-												</Label>
-											</div>
-											<Switch
-												checked={sizeFreeNotifyResend}
-												onCheckedChange={setSizeFreeNotifyResend}
-												name="sizeFreeNotifyResend"
-											/>
-										</div>
-										<Input
-											disabled={sizeFreeNotifyResend != true}
-											type="number"
-											name="sizeFreeNotifyResendAfterMinutes"
-											value={sizeResendValue || undefined}
-											onChange={(e) => setSizeResendValue(e.target.value)}
-											placeholder="60"
-										/>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-							<div></div>
-						</div>
-					</div>
-
-					<div className=" rounded-lg border p-4 max-w-[500px]">
-						<div className="space-y-2">
-							<H3 className="text-2xl">Growth</H3>
-							<div className="text-muted-foreground pb-2">
-								Recieve notification when drive grows at a specified rate.
-							</div>
-							<Separator />
-							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-									growth ? '' : 'opacity-50 text-slate-600'
-								}`}
-							>
-								<div className="flex-grow">
-									<div className="text-muted-foreground py-2">
-										When growth rate is greater than x GB/day.
+										Recieve notification when data collection fails.
 									</div>
 								</div>
 								<div className="self-start pt-2">
 									<Switch
-										name="growthRateNotify"
-										checked={growth}
-										onCheckedChange={setGrowth}
+										name="connectionNotify"
+										checked={connection}
+										onCheckedChange={setConnection}
 									/>
 								</div>
 							</div>
-							<Collapsible open={growth}>
+
+							<div
+								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+									connection ? '' : 'opacity-50 text-slate-600'
+								}`}
+							></div>
+							<Collapsible open={connection}>
 								<CollapsibleContent className="space-y-2">
-									<div>
-										<Label className="text-slate-700">GB</Label>
-										<Input
-											name="growthRateValue"
-											type="number"
-											placeholder="10"
-											value={growthValue}
-											onChange={(e) => setGrowthValue(e.target.value)}
-										/>
-									</div>
 									<div>
 										<MultiSelect
 											label="Notification Methods"
@@ -465,11 +149,11 @@ export default function Index() {
 											data={notificationsMap}
 											active={notificationsMap.filter(
 												(x: { value: string }) =>
-													drive.growthRateNotifyTypes.filter(
+													monitor.connectionNotifyTypes.filter(
 														(t) => t.id == x.value,
 													).length > 0,
 											)}
-											name="growthRateNotifyTypes"
+											name="connectionNotifyTypes"
 											onChange={() => {
 												submit(form.current);
 											}}
@@ -483,7 +167,7 @@ export default function Index() {
 									</div>
 									<div
 										className={`space-y-2 ${
-											growthRateNotifyResend ? '' : 'opacity-50 text-slate-600'
+											connectionNotifyResend ? '' : 'opacity-50 text-slate-600'
 										}`}
 									>
 										<div className={`flex justify-between `}>
@@ -493,26 +177,78 @@ export default function Index() {
 												</Label>
 											</div>
 											<Switch
-												checked={growthRateNotifyResend}
-												onCheckedChange={setGrowthRateNotifyResend}
-												name="growthRateNotifyResend"
+												checked={connectionNotifyResend}
+												onCheckedChange={setConnectionNotifyResend}
+												name="connectionNotifyResend"
 											/>
 										</div>
 										<Input
-											disabled={growthRateNotifyResend != true}
+											disabled={connectionNotifyResend != true}
 											type="number"
-											name="growthRateNotifyResendAfterMinutes"
-											value={sizeResendValue || undefined}
-											onChange={(e) => setGrowthResendValue(e.target.value)}
+											name="connectionNotifyResendAfterMinutes"
+											value={connectionResendValue || undefined}
+											onChange={(e) => setConnectionResendValue(e.target.value)}
 											placeholder="60"
 										/>
+									</div>
+								</CollapsibleContent>
+							</Collapsible>
+						</div>
+					</div>
+
+					<div className=" rounded-lg border p-4 max-w-[500px]">
+						<div className="space-y-2">
+							<div className="space-y-2 flex justify-between">
+								<div className="flex-grow">
+									<H3 className="text-2xl">Reboot</H3>
+									<div className="text-muted-foreground pb-2">
+										Recieve notification when server reboots.
+									</div>
+								</div>
+								<div className="self-start pt-2">
+									<Switch
+										name="rebootNotify"
+										checked={reboot}
+										onCheckedChange={setReboot}
+									/>
+								</div>
+							</div>
+							<div
+								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+									reboot ? '' : 'opacity-50 text-slate-600'
+								}`}
+							></div>
+							<Collapsible open={reboot}>
+								<CollapsibleContent className="space-y-2">
+									<div>
+										<MultiSelect
+											label="Notification Methods"
+											placeholder="choose"
+											data={notificationsMap}
+											active={notificationsMap.filter(
+												(x: { value: string }) =>
+													monitor.rebootNotifyTypes.filter(
+														(t) => t.id == x.value,
+													).length > 0,
+											)}
+											name="rebootNotifyTypes"
+											onChange={() => {
+												submit(form.current);
+											}}
+										/>
+										<Link
+											to="/admin/notifications"
+											className="text-sm text-sky-600/80"
+										>
+											Manage notification types.
+										</Link>
 									</div>
 								</CollapsibleContent>
 							</Collapsible>
 						</div>
 					</div>
 				</div>
-			</Form>*/}
+			</Form>
 		</>
 	);
 }

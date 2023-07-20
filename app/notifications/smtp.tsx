@@ -33,7 +33,6 @@ export default async function SMTP({
 
 	let transporter = nodemailer.createTransport(config);
 
-	console.log(notification);
 	await transporter.sendMail({
 		from: notification.smtpFromName
 			? `"${notification.smtpFromName}" ${notification.smtpFromEmail}`

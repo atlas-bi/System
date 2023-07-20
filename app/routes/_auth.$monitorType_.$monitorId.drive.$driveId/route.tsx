@@ -8,19 +8,12 @@ import { H1, H3 } from '~/components/ui/typography';
 import { AlertTriangle, MoveLeft } from 'lucide-react';
 import { BellRing } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '~/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import bytes from 'bytes';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '~/components/ui/skeleton';
-import { format } from 'date-fns';
 import { LogTable } from '~/components/logTable/table';
+
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -28,16 +21,41 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
-	const drive = await getDriveNotifications({ id: params.driveId });
+	const driveLoad = await getDriveNotifications({ id: params.driveId });
 
-	return json({ drive });
+	return json({ driveLoad });
 };
 
 export default function Index() {
-	const { drive } = useLoaderData<typeof loader>();
+	const { driveLoad } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType } = useParams();
 	const usageFetcher = useFetcher();
-	const logsFetcher = useFetcher();
+	const dataFetcher = useFetcher();
+
+	const [drive, setDrive] = useState(driveLoad);
+
+	// Get fresh header data every 30 seconds.
+	useEffect(() => setDrive(driveLoad), [driveLoad]);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			if (document.visibilityState === 'visible') {
+				dataFetcher.load(window.location.pathname);
+			}
+			if (document.visibilityState === 'visible') {
+				usageFetcher.load(
+					`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
+				);
+			}
+		}, 30 * 1000);
+		return () => clearInterval(interval);
+	}, []);
+
+	useEffect(() => {
+		if (dataFetcher.data?.driveLoad) {
+			setDrive(dataFetcher.data.driveLoad);
+		}
+	}, [dataFetcher.data]);
 
 	useEffect(() => {
 		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
@@ -46,13 +64,6 @@ export default function Index() {
 			);
 		}
 	}, [usageFetcher]);
-
-	// useEffect(() => {
-	// 	console.log(logsFetcher)
-	//   if (logsFetcher.state === 'idle' && logsFetcher.data == null) {
-	//     logsFetcher.load(`/${monitorType}/${monitorId}/drive/${drive.id}/logs`);
-	//   }
-	// }, [logsFetcher]);
 
 	return (
 		<>

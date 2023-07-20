@@ -185,9 +185,7 @@ export default function Index() {
 									<Switch
 										name="missingNotify"
 										checked={missing}
-										onCheckedChange={(check) => {
-											setMissing(check);
-										}}
+										// onCheckedChange={setMissing}
 									/>
 								</div>
 							</div>
@@ -254,7 +252,7 @@ export default function Index() {
 							</div>
 							<Separator />
 							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+								className={`space-x-6 flex flex-row items-center justify-between transition-colors border-l-2 pl-2 border-green-400 ${
 									perc ? '' : 'opacity-50 text-slate-600'
 								}`}
 							>
@@ -353,7 +351,7 @@ export default function Index() {
 									<Switch
 										name="sizeFreeNotify"
 										checked={size}
-										onCheckedChange={setSize}
+										// onCheckedChange={setSize}
 									/>
 								</div>
 							</div>
@@ -445,7 +443,7 @@ export default function Index() {
 									<Switch
 										name="growthRateNotify"
 										checked={growth}
-										onCheckedChange={setGrowth}
+										// onCheckedChange={setGrowth}
 									/>
 								</div>
 							</div>

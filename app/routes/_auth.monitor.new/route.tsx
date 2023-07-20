@@ -46,7 +46,7 @@ export async function action({ request }: ActionArgs) {
 				});
 			}
 
-			await createMonitor({
+			const monitor = await createMonitor({
 				title: values.name.toString(),
 				host: values.host.toString(),
 				username: values.username.toString(),
@@ -56,7 +56,7 @@ export async function action({ request }: ActionArgs) {
 				type: values.type.toString(),
 			});
 
-			return json({ success: 'Monitor Created' });
+			return json({ monitor });
 		},
 		async test() {
 			const formData = await request.formData();

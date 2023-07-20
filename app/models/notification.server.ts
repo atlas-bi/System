@@ -13,6 +13,12 @@ export function getNotifications() {
 	});
 }
 
+export function getNotificationConnection({ id }: Pick<Notification, 'id'>) {
+	return prisma.notification.findUnique({
+		where: { id },
+	});
+}
+
 export function createNotification({
 	name,
 	type,

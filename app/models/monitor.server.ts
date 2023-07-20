@@ -15,6 +15,7 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			os: true,
 			osVersion: true,
 			title: true,
+			lastBootTime: true,
 		},
 	});
 }
@@ -29,6 +30,24 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 			os: true,
 			osVersion: true,
 			title: true,
+			connectionNotify: true,
+			connectionNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			connectionNotifyResendAfterMinutes: true,
+			connectionNotifySentAt: true,
+			rebootNotify: true,
+			rebootNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
 		},
 	});
 }
@@ -42,6 +61,19 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			password: true,
 			port: true,
 			privateKey: true,
+			connectionNotify: true,
+			connectionNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			connectionNotifyResendAfterMinutes: true,
+			connectionNotifySentAt: true,
+			rebootNotify: true,
+			rebootNotifyTypes: true,
+			rebootNotifySentAt: true,
 			drives: {
 				select: {
 					id: true,
@@ -62,20 +94,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							id: true,
 							type: true,
 							name: true,
-							smtpPort: true,
-							smtpUsername: true,
-							smtpHost: true,
-							smtpPassword: true,
-							smtpSecurity: true,
-							ignoreSSLErrors: true,
-							smtpFromName: true,
-							smtpFromEmail: true,
-							smtpToEmail: true,
-							tgBotToken: true,
-							tgChatId: true,
-							tgThreadId: true,
-							tgSendSilently: true,
-							tgProtectMessage: true,
 						},
 					},
 					percFreeNotify: true,
@@ -87,20 +105,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							id: true,
 							type: true,
 							name: true,
-							smtpPort: true,
-							smtpUsername: true,
-							smtpHost: true,
-							smtpPassword: true,
-							smtpSecurity: true,
-							ignoreSSLErrors: true,
-							smtpFromName: true,
-							smtpFromEmail: true,
-							smtpToEmail: true,
-							tgBotToken: true,
-							tgChatId: true,
-							tgThreadId: true,
-							tgSendSilently: true,
-							tgProtectMessage: true,
 						},
 					},
 					sizeFreeNotify: true,
@@ -112,20 +116,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							id: true,
 							type: true,
 							name: true,
-							smtpPort: true,
-							smtpUsername: true,
-							smtpHost: true,
-							smtpPassword: true,
-							smtpSecurity: true,
-							ignoreSSLErrors: true,
-							smtpFromName: true,
-							smtpFromEmail: true,
-							smtpToEmail: true,
-							tgBotToken: true,
-							tgChatId: true,
-							tgThreadId: true,
-							tgSendSilently: true,
-							tgProtectMessage: true,
 						},
 					},
 					growthRateNotify: true,
@@ -137,20 +127,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							id: true,
 							type: true,
 							name: true,
-							smtpPort: true,
-							smtpUsername: true,
-							smtpHost: true,
-							smtpPassword: true,
-							smtpSecurity: true,
-							ignoreSSLErrors: true,
-							smtpFromName: true,
-							smtpFromEmail: true,
-							smtpToEmail: true,
-							tgBotToken: true,
-							tgChatId: true,
-							tgThreadId: true,
-							tgSendSilently: true,
-							tgProtectMessage: true,
 						},
 					},
 					usage: {
@@ -214,6 +190,7 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 				select: {
 					id: true,
 					type: true,
+					name: true,
 				},
 			},
 			missingNotifyResendAfterMinutes: true,
@@ -222,6 +199,7 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 				select: {
 					id: true,
 					type: true,
+					name: true,
 				},
 			},
 			percFreeNotifyResendAfterMinutes: true,
@@ -231,6 +209,7 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 				select: {
 					id: true,
 					type: true,
+					name: true,
 				},
 			},
 			sizeFreeNotifyResendAfterMinutes: true,
@@ -240,6 +219,7 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 				select: {
 					id: true,
 					type: true,
+					name: true,
 				},
 			},
 			growthRateNotifyResendAfterMinutes: true,
@@ -249,7 +229,16 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 					title: true,
 					id: true,
 					type: true,
+					name: true,
 				},
+			},
+			usage: {
+				select: {
+					id: true,
+					used: true,
+					free: true,
+				},
+				take: 1,
 			},
 		},
 	});
@@ -295,15 +284,14 @@ export function getDrive({ id }: Pick<Drive, 'id'>) {
 	});
 }
 
-export function getLatestMonitorErrorLog({
+export function getLatestMonitorLog({
 	driveId,
 	monitorId,
-}: Pick<MonitorLogs, 'driveId' | 'monitorId'>) {
+}: Pick<MonitorLogs, 'monitorId'> & { driveId?: string }) {
 	return prisma.monitorLogs.findFirst({
 		where: {
 			driveId,
 			monitorId,
-			type: 'error',
 		},
 		orderBy: {
 			createdAt: 'desc',
@@ -427,6 +415,10 @@ export async function createMonitor({
 			port,
 			type,
 		},
+		select: {
+			id: true,
+			type: true,
+		},
 	});
 	// check monitor as soon as it is added
 	monitorMonitor.enqueue(monitor.id);
@@ -545,6 +537,39 @@ export function updateDriveNotifications({
 				: undefined,
 			growthRateNotifyResendAfterMinutes,
 			growthRateValue,
+		},
+	});
+}
+
+export function updateMonitorNotifications({
+	id,
+	connectionNotify,
+	connectionNotifyTypes,
+	connectionNotifyResendAfterMinutes,
+	rebootNotify,
+	rebootNotifyTypes,
+}: Pick<
+	Drive,
+	| 'id'
+	| 'connectionNotify'
+	| 'connectionNotifyTypes'
+	| 'connectionNotifyResendAfterMinutes'
+	| 'rebootNotify'
+	| 'rebootNotifyTypes'
+>) {
+	return prisma.monitor.update({
+		where: { id },
+		data: {
+			connectionNotify,
+			connectionNotifyTypes: connectionNotifyTypes
+				? { set: connectionNotifyTypes.map((x) => ({ id: x })) }
+				: undefined,
+			connectionNotifyResendAfterMinutes,
+
+			rebootNotify,
+			rebootNotifyTypes: rebootNotifyTypes
+				? { set: rebootNotifyTypes.map((x: string) => ({ id: x })) }
+				: undefined,
 		},
 	});
 }
@@ -668,5 +693,25 @@ export function setDrivePercFreeSentAt({
 	return prisma.drive.update({
 		where: { id },
 		data: { percFreeNotifySentAt },
+	});
+}
+
+export function setMonitorConnectionSentAt({
+	id,
+	connectionNotifySentAt,
+}: Pick<Monitor, 'id' | 'connectionNotifySentAt'>) {
+	return prisma.monitor.update({
+		where: { id },
+		data: { connectionNotifySentAt },
+	});
+}
+
+export function setMonitorRebootSentAt({
+	id,
+	rebootNotifySentAt,
+}: Pick<Monitor, 'id' | 'rebootNotifySentAt'>) {
+	return prisma.monitor.update({
+		where: { id },
+		data: { rebootNotifySentAt },
 	});
 }

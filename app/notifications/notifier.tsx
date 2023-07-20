@@ -1,21 +1,31 @@
-import {
-	getMonitor,
-	monitorLog,
-	setDrivePercFreeSentAt,
-	driveLog,
-	getLatestMonitorErrorLog,
-} from '~/models/monitor.server';
+import { getMonitor } from '~/models/monitor.server';
 import type { Drive, DriveUsage } from '~/models/monitor.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
-import type { Notification } from '~/models/notification.server';
+import {
+	Notification,
+	getNotificationConnection,
+} from '~/models/notification.server';
 import percentFreeNotifier from './checks/drives/percentFree';
+import rebootNotifier from './checks/monitors/reboot';
 
-export default async function Notifier({ job }: { job: string }) {
+// 1. send error notification
+// 2. when error clears send an "all clear"
+
+// message is only included for monitor failures like server offline etc.
+export default async function Notifier({
+	job,
+	message,
+}: {
+	job: string;
+	message?: string;
+}) {
 	const monitor = await getMonitor({ id: job });
 
-	// drive notifications
+	// reboot notifier
+	await rebootNotifier({ monitor });
 
+	// drive notifications
 	monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
 		// don't report inactive drives.
 		if (drive.inactive) return;
@@ -46,9 +56,11 @@ export const sendNotification = async ({
 	subject: string;
 	message: string;
 }) => {
-	if (notification.type == 'smtp') {
-		await SMTP({ notification, subject, message });
-	} else if (notification.type == 'telegram') {
-		await Telegram({ notification, message: subject });
+	const meta = await getNotificationConnection({ id: notification.id });
+
+	if (meta.type == 'smtp') {
+		await SMTP({ notification: meta, subject, message });
+	} else if (meta.type == 'telegram') {
+		await Telegram({ notification: meta, message: subject });
 	}
 };
