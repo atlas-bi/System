@@ -1,3 +1,8 @@
+## 1.12.0 (2023-07-20)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([b80ae94](https://github.com/atlas-bi/System/commit/b80ae94))
+* feat(powershell 7): added support for powershell7 ([209ff5c](https://github.com/atlas-bi/System/commit/209ff5c))
+
 ## <small>1.11.1 (2023-07-20)</small>
 
 * fix(ssh): try to force windows ssh connections to close ([d15e215](https://github.com/atlas-bi/System/commit/d15e215))
