@@ -1,3 +1,8 @@
+## 1.14.0 (2023-07-21)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([1933dfc](https://github.com/atlas-bi/System/commit/1933dfc))
+* feat(monitors): added ram and cpu monitor, added reponsive chart ([73b46af](https://github.com/atlas-bi/System/commit/73b46af))
+
 ## 1.13.0 (2023-07-20)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([a447852](https://github.com/atlas-bi/System/commit/a447852))
