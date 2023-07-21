@@ -1,5 +1,4 @@
 import type { Usage } from '@prisma/client';
-import { cn } from '@/lib/utils';
 
 import bytes from 'bytes';
 import {
@@ -13,10 +12,12 @@ import {
 	Tooltip,
 	TimeScale,
 } from 'chart.js';
-import React, { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { format } from 'date-fns';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
+import { useFetcher } from '@remix-run/react';
+import { DateFilter } from './DateFilter';
+import { dateOptions } from '~/models/dates';
 
 ChartJS.register([
 	CategoryScale,
@@ -28,42 +29,97 @@ ChartJS.register([
 	TimeScale,
 ]);
 
-export const options = {
-	responsive: true,
-	plugins: {
-		title: {
-			display: true,
-			text: 'Storage Usage',
-		},
-	},
-	scales: {
-		y: {
-			type: 'linear' as const,
-			display: true,
-			position: 'left' as const,
-			beginAtZero: true,
-			ticks: {
-				callback: function (value: string) {
-					return value + 'GB';
+import 'chartjs-adapter-date-fns';
+import { H2, H3 } from '../ui/typography';
+import { Circle, Loader, RefreshCw } from 'lucide-react';
+import { Button } from '../ui/button';
+
+export const StorageChart = ({ url }: { url: string }) => {
+	const usageFetcher = useFetcher();
+	const [unit, setUnit] = useState('last_24_hours');
+	const chartRef = useRef<ChartJS>(null);
+	const getOptions = useCallback(() => {
+		return {
+			responsive: true,
+			maintainAspectRatio: false,
+			animation: {
+				duration: 300,
+				resize: {
+					duration: 0,
+				},
+				active: {
+					duration: 0,
 				},
 			},
-			stacked: true,
-		},
-		x: {
-			stacked: true,
-		},
-	},
-};
+			plugins: {
+				title: {
+					display: false,
+				},
+				legend: {
+					display: false,
+				},
+				tooltip: {
+					callbacks: {
+						label: function (context) {
+							if (context.dataset.label) {
+								return context.datset.label + 'GB';
+							}
+							return '';
+						},
+					},
+				},
+			},
+			scales: {
+				y: {
+					type: 'linear' as const,
+					display: true,
+					position: 'left' as const,
+					beginAtZero: true,
+					ticks: {
+						callback: function (value: string) {
+							return value + 'GB';
+						},
+					},
+					stacked: true,
+				},
+				x: {
+					stacked: true,
+					type: 'time',
+					min: () => usageFetcher.data?.drive?.startDate,
+					max: () => usageFetcher.data?.drive?.endDate,
+					time: {
+						unit: () =>
+							dateOptions.filter((x) => x.value === unit)?.[0]?.unit ||
+							undefined,
+					},
+					grid: {
+						display: false,
+					},
+				},
+			},
+		};
+	}, [unit, usageFetcher.data]);
 
-const BarChart = React.forwardRef<
-	HTMLDivElement,
-	React.HTMLAttributes<HTMLDivElement> & any
->(({ className, data, ...props }, ref) => {
-	const chartRef = useRef<ChartJS>(null);
+	const [options, setOptions] = useState(getOptions());
 
-	const [chartData, setChartData] = useState<ChartData<'bar'>>({
+	useEffect(() => {
+		usageFetcher.load(
+			url +
+				`?range=${unit}&unit=${dateOptions.filter((x) => x.value === unit)?.[0]
+					?.unit}`,
+		);
+	}, [unit]);
+
+	useEffect(() => {
+		if (usageFetcher.state === 'loading') {
+			setChartData(emptyDataset);
+		}
+	}, [usageFetcher]);
+
+	const emptyDataset = {
 		datasets: [],
-	});
+	};
+	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
 
 	useEffect(() => {
 		const chart = chartRef.current;
@@ -72,13 +128,11 @@ const BarChart = React.forwardRef<
 			return;
 		}
 		const chartData = {
-			labels: data.usage.map((x: Usage) =>
-				format(new Date(x.createdAt), 'MMM dd, yyyy'),
-			),
+			labels: usageFetcher.data?.drive?.usage?.map((x: Usage) => x.createdAt),
 			datasets: [
 				{
 					label: 'Used',
-					data: data.usage.map((x: Usage) =>
+					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
 						bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
 					),
 					borderColor: createLinearGradient(
@@ -104,7 +158,7 @@ const BarChart = React.forwardRef<
 				},
 				{
 					label: 'Free',
-					data: data.usage.map((x: Usage) =>
+					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
 						bytes(Number(x.free), { unit: 'GB' }).replace('GB', ''),
 					),
 					borderColor: '#cbd5e1',
@@ -113,17 +167,58 @@ const BarChart = React.forwardRef<
 				},
 			],
 		};
-
+		setOptions(getOptions());
 		setChartData(chartData);
-	}, [data]);
+	}, [usageFetcher.data]);
 
 	return (
-		<div ref={ref} className={cn('m-auto max-h-[450px]', className)} {...props}>
-			<Bar ref={chartRef} options={options} data={chartData} />
-		</div>
+		<>
+			<div className="w-full space-y-5">
+				<div className="flex space-x-2 justify-between">
+					<H3 className="text-3xl">Storage History</H3>
+					<div className="space-x-2 flex">
+						<Button
+							variant="outline"
+							className="h-8"
+							onClick={() =>
+								usageFetcher.load(
+									url +
+										`?range=${unit}&unit=${dateOptions.filter(
+											(x) => x.value === unit,
+										)?.[0]?.unit}`,
+								)
+							}
+						>
+							<RefreshCw size={14} />
+						</Button>
+						<DateFilter value={unit} onChange={setUnit} />
+					</div>
+				</div>
+				<div className="h-[450px] relative">
+					<Bar ref={chartRef} options={options} data={chartData} />
+					{usageFetcher.state === 'loading' && (
+						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
+							<Loader className="m-auto animate-spin" />
+						</div>
+					)}
+				</div>
+				<div className="flex space-x-4 text-muted-foreground">
+					<div className="flex space-x-2 items-center">
+						<Circle
+							className={`fill-[#e2e8f0] text-[#cbd5e1] h-3 w-3`}
+							size={10}
+						/>
+						<span>Free</span>
+					</div>
+					<div className="flex space-x-2 items-center">
+						<Circle
+							className={`fill-[#7dd3fc] text-[#0ea5e9] h-3 w-3`}
+							size={10}
+						/>
+						<span>Used</span>
+					</div>
+				</div>
+			</div>
+		</>
 	);
-});
-
-BarChart.displayName = 'Line Chart';
-
-export { BarChart };
+};

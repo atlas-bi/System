@@ -50,8 +50,8 @@ export function createLinearGradient(
 	const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.height);
 
 	gradient.addColorStop(0, colors[3]);
-	gradient.addColorStop(0.15, colors[2]);
-	gradient.addColorStop(0.2, colors[1]);
-	gradient.addColorStop(0.25, colors[0]);
+	gradient.addColorStop(0.05, colors[2]);
+	gradient.addColorStop(0.1, colors[1]);
+	gradient.addColorStop(0.15, colors[0]);
 	return gradient;
 }

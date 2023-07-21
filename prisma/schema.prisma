@@ -55,11 +55,19 @@ model Monitor {
   osVersion    String?
   lastBootTime String?
 
+  // cpu details
+  cpuManufacturer String?
+  cpuModel        String?
+  cpuCores        String?
+  cpuProcessors   String?
+  cpuMaxSpeed     String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   drives Drive[]
   logs   MonitorLogs[]
+  feeds  MonitorFeeds[]
 
   // notifications
   connectionNotify                   Boolean?
@@ -67,10 +75,22 @@ model Monitor {
   connectionNotifyResendAfterMinutes Int?
   connectionNotifySentAt             DateTime?
 
-  rebootNotify                   Boolean?
-  rebootNotifyTypes              Notification[] @relation("rebootNotifyTypesTable")
-  rebootNotifySentAt             DateTime?
+  rebootNotify       Boolean?
+  rebootNotifyTypes  Notification[] @relation("rebootNotifyTypesTable")
+  rebootNotifySentAt DateTime?
+}
 
+model MonitorFeeds {
+  id        String  @id @default(cuid())
+  createdAt DateTime @default(now())
+  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitorId String
+
+  memoryFree  String?
+  memoryTotal String?
+
+  cpuLoad  String?
+  cpuSpeed String?
 }
 
 model MonitorLogs {
@@ -169,8 +189,8 @@ model Notification {
   driveSizeFreeNotify   Drive[] @relation("sizeFreeNotifyTypesTable")
   driveGrowthRateNotify Drive[] @relation("growthRateNotifyTypesTable")
 
-  monitorConnectionNotify    Monitor[] @relation("connectionNotifyTypesTable")
-  monitorRebootNotify    Monitor[] @relation("rebootNotifyTypesTable")
+  monitorConnectionNotify Monitor[] @relation("connectionNotifyTypesTable")
+  monitorRebootNotify     Monitor[] @relation("rebootNotifyTypesTable")
 }
 
 model DriveUsage {

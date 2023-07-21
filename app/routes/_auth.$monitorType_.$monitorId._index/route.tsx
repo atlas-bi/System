@@ -18,6 +18,8 @@ import { LogTable } from '~/components/logTable/table';
 import { monitorTypes } from '~/models/monitor';
 import { format } from 'date-fns';
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -103,101 +105,144 @@ export default function Index() {
 									)}
 								</TableCell>
 							</TableRow>
+							{monitor.feeds && (
+								<TableRow>
+									<TableCell className="py-1 font-medium">Memory</TableCell>
+									<TableCell className="py-1 text-slate-700">
+										{bytes(Number(monitor.feeds?.[0]?.memoryTotal || 0))}
+									</TableCell>
+								</TableRow>
+							)}
+							{monitor.cpuModel && (
+								<TableRow>
+									<TableCell className="py-1 font-medium">CPU</TableCell>
+									<TableCell className="py-1 text-slate-700">
+										{monitor.cpuModel}
+										{monitor.cpuCores && <>, {monitor.cpuCores} cores</>}
+										{monitor.cpuProcessors && (
+											<>, {monitor.cpuProcessors} processors</>
+										)}
+										{monitor.cpuMaxSpeed && (
+											<>
+												, {Math.round(Number(monitor.cpuMaxSpeed) / 10) / 100}{' '}
+												Ghz
+											</>
+										)}
+									</TableCell>
+								</TableRow>
+							)}
 						</TableBody>
 					</Table>
 				</div>
-				{drivesFetcher.data?.drives ? (
-					<>
-						<div className="grid gap-4 py-4 grid-cols-2">
-							{drivesFetcher.data.drives.map(
-								(drive: Drive & { usage: DriveUsage[] }) => (
-									<Link
-										to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
-										prefetch="intent"
-										key={drive.id}
-										className="flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200"
-									>
-										<DoughnutChart
-											className="w-36 h-36"
-											data={{
-												labels: [
-													`Used ${bytes(Number(drive.usage?.[0]?.used))}`,
-													`Free ${bytes(Number(drive.usage?.[0]?.free))}`,
-												],
-												datasets: [
-													{
-														label: 'Drive Usage',
-														data: [
-															Number(drive.usage?.[0]?.used),
-															Number(drive.usage?.[0]?.used) +
-																Number(drive.usage?.[0]?.free) ==
-															0
-																? 100
-																: Number(drive.usage?.[0]?.free),
+
+				<Tabs defaultValue="storage" className="w-full">
+					<TabsList className="grid max-w-[400px] grid-cols-3">
+						<TabsTrigger value="storage">Storage</TabsTrigger>
+						<TabsTrigger value="cpu">CPU</TabsTrigger>
+						<TabsTrigger value="memory">Memory</TabsTrigger>
+					</TabsList>
+					<TabsContent value="storage">
+						{drivesFetcher.data?.drives ? (
+							<>
+								<div className="grid gap-4 py-4 grid-cols-2">
+									{drivesFetcher.data.drives.map(
+										(drive: Drive & { usage: DriveUsage[] }) => (
+											<Link
+												to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
+												prefetch="intent"
+												key={drive.id}
+												className="flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200"
+											>
+												<DoughnutChart
+													className="w-36 h-36"
+													data={{
+														labels: [
+															`Used ${bytes(Number(drive.usage?.[0]?.used))}`,
+															`Free ${bytes(Number(drive.usage?.[0]?.free))}`,
 														],
-													},
-												],
-											}}
-										/>
+														datasets: [
+															{
+																label: 'Drive Usage',
+																data: [
+																	Number(drive.usage?.[0]?.used),
+																	Number(drive.usage?.[0]?.used) +
+																		Number(drive.usage?.[0]?.free) ==
+																	0
+																		? 100
+																		: Number(drive.usage?.[0]?.free),
+																],
+															},
+														],
+													}}
+												/>
 
-										<div className="space-y-2 flex-grow">
-											<H3>
-												{drive.name}:\{drive.location}
-											</H3>
+												<div className="space-y-2 flex-grow">
+													<H3>
+														{drive.name}:\{drive.location}
+													</H3>
 
-											<Table>
-												<TableBody>
-													<TableRow>
-														<TableCell className="py-1 font-medium">
-															Size
-														</TableCell>
-														<TableCell className="py-1 text-slate-700">
-															{' '}
-															{bytes(Number(drive.size))}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Used</TableCell>
-														<TableCell className="py-1">
-															{' '}
-															{bytes(Number(drive.usage?.[0]?.used)) || '-1'}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Free</TableCell>
-														<TableCell className="py-1">
-															{' '}
-															{bytes(Number(drive.usage?.[0]?.free)) || '-1'}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">
-															Days Till Full
-														</TableCell>
-														<TableCell className="py-1">
-															{drive.daysTillFull}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Growth Rate</TableCell>
-														<TableCell className="py-1">
-															{bytes(Number(drive.growthRate))} / day
-														</TableCell>
-													</TableRow>
-												</TableBody>
-											</Table>
-										</div>
-									</Link>
-								),
-							)}
-						</div>
-					</>
-				) : (
-					<div className="grid gap-4 py-4 grid-cols-2">
-						<Skeleton className="border rounded-md min-h-[200px]" />
-						<Skeleton className="border rounded-md min-h-[200px]" />
-					</div>
-				)}
+													<Table>
+														<TableBody>
+															<TableRow>
+																<TableCell className="py-1 font-medium">
+																	Size
+																</TableCell>
+																<TableCell className="py-1 text-slate-700">
+																	{' '}
+																	{bytes(Number(drive.size))}
+																</TableCell>
+															</TableRow>
+															<TableRow>
+																<TableCell className="py-1">Used</TableCell>
+																<TableCell className="py-1">
+																	{' '}
+																	{bytes(Number(drive.usage?.[0]?.used)) ||
+																		'-1'}
+																</TableCell>
+															</TableRow>
+															<TableRow>
+																<TableCell className="py-1">Free</TableCell>
+																<TableCell className="py-1">
+																	{' '}
+																	{bytes(Number(drive.usage?.[0]?.free)) ||
+																		'-1'}
+																</TableCell>
+															</TableRow>
+															<TableRow>
+																<TableCell className="py-1">
+																	Days Till Full
+																</TableCell>
+																<TableCell className="py-1">
+																	{drive.daysTillFull}
+																</TableCell>
+															</TableRow>
+															<TableRow>
+																<TableCell className="py-1">
+																	Growth Rate
+																</TableCell>
+																<TableCell className="py-1">
+																	{bytes(Number(drive.growthRate))} / day
+																</TableCell>
+															</TableRow>
+														</TableBody>
+													</Table>
+												</div>
+											</Link>
+										),
+									)}
+								</div>
+							</>
+						) : (
+							<div className="grid gap-4 py-4 grid-cols-2">
+								<Skeleton className="border rounded-md min-h-[200px]" />
+								<Skeleton className="border rounded-md min-h-[200px]" />
+							</div>
+						)}
+					</TabsContent>
+					<TabsContent value="cpu"></TabsContent>
+					<TabsContent value="memory"></TabsContent>
+				</Tabs>
+
 				<LogTable url={`/${monitor.type}/${monitor.id}/logs`} />
 			</div>
 		</>

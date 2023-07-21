@@ -1,10 +1,8 @@
 import { decrypt } from '@/lib/utils';
 import { NodeSSH } from 'node-ssh';
-import { Queue } from 'quirrel/remix';
 import {
-	getMonitor,
+	Monitor,
 	monitorError,
-	monitorLog,
 	setDriveDays,
 	setDriveGrowth,
 	updateMonitor,
@@ -21,8 +19,42 @@ function disposeSsh(ssh) {
 	}
 }
 
-export default Queue('queues/monitor', async (job: string, meta) => {
-	const monitor = await getMonitor({ id: job });
+function cpuBuilder(data) {
+	// list of cpu
+
+	if (data.length === undefined) return data;
+
+	let calcData = data[0];
+
+	const dataClone = structuredClone(data);
+	const totalPercentage = dataClone.reduce(
+		(sum, key) => sum + (key.LoadPercentage || 0) * (key.NumberOfCores || 0),
+		0,
+	);
+	const totalSpeed = dataClone.reduce(
+		(sum, key) => sum + (key.CurrentClockSpeed || 0),
+		0,
+	);
+
+	calcData.NumberOfCores = dataClone.reduce(
+		(sum, key) => sum + (key.NumberOfCores || 0),
+		0,
+	);
+	calcData.NumberOfLogicalProcessors = dataClone.reduce(
+		(sum, key) => sum + (key.NumberOfLogicalProcessors || 0),
+		0,
+	);
+	calcData.LoadPercentage = totalPercentage / calcData.NumberOfCores;
+	calcData.CurrentClockSpeed = totalSpeed / data.length;
+
+	return calcData;
+}
+
+export default async function WindowsMonitor({
+	monitor,
+}: {
+	monitor: Monitor;
+}) {
 	const { username, host, password, port, privateKey } = monitor;
 
 	const ssh = new NodeSSH();
@@ -31,7 +63,7 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			username,
 			host,
 			password: password ? decrypt(password) : undefined,
-			port,
+			port: Number(port),
 			privateKey: privateKey ? decrypt(privateKey) : undefined,
 		});
 
@@ -66,11 +98,15 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		);
 
 		const osRaw = await ssh.execCommand(
-			`${pwshCommand} -command "Get-CIMInstance win32_operatingsystem | Select-Object Caption,Version,LastBootUpTime | ConvertTo-Json"`,
+			`${pwshCommand} -command "Get-CIMInstance win32_operatingsystem | Select-Object Caption,Version,LastBootUpTime,FreePhysicalMemory,TotalVisibleMemorySize | ConvertTo-Json"`,
 		);
 
 		const csRaw = await ssh.execCommand(
 			`${pwshCommand} -command "Get-CIMInstance win32_computersystem | Select-Object Name,DNSHostName,Domain,Manufacturer,Model | ConvertTo-Json"`,
+		);
+
+		const pcRaw = await ssh.execCommand(
+			`${pwshCommand} -command "Get-CIMInstance win32_processor | Select-Object LoadPercentage,Manufacturer,Caption,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed,CurrentClockSpeed | ConvertTo-Json"`,
 		);
 
 		if (csRaw.code !== 0) {
@@ -79,6 +115,10 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 
 		if (osRaw.code !== 0) {
 			throw osRaw;
+		}
+
+		if (pcRaw.code !== 0) {
+			throw pcRaw;
 		}
 
 		const cs = JSON.parse(
@@ -94,6 +134,15 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			),
 		);
 
+		const pc = cpuBuilder(
+			JSON.parse(
+				pcRaw.stdout.replace(
+					'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
+					'',
+				),
+			),
+		);
+
 		if (storage.code !== 0) {
 			throw storage;
 		}
@@ -105,7 +154,7 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 			),
 		);
 
-		const sum = (
+		const driveSum = (
 			used: string | null | undefined,
 			free: string | null | undefined,
 		) => {
@@ -146,6 +195,19 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 				os: os.Caption,
 				osVersion: os.Version,
 				lastBootTime: lastBoot,
+				cpuManufacturer: pc.Manufacturer,
+				cpuModel: pc.Caption,
+				cpuCores: pc.NumberOfCores.toString(),
+				cpuProcessors: pc.NumberOfLogicalProcessors.toString(),
+				cpuMaxSpeed: pc.MaxClockSpeed.toString(),
+			},
+			feed: {
+				// units are in kb and need to be converted to bytes.
+				memoryFree: (os.FreePhysicalMemory * 1000).toString(),
+				memoryTotal: (os.TotalVisibleMemorySize * 1000).toString(),
+
+				cpuLoad: pc.LoadPercentage.toString(),
+				cpuSpeed: pc.CurrentClockSpeed.toString(),
 			},
 			drives: s.map(
 				(drive: {
@@ -164,7 +226,7 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 							root: drive.Root,
 							description: drive.Description,
 							maximumSize: drive.MaximumSize?.toString(),
-							size: sum(drive.Used, drive.Free),
+							size: driveSum(drive.Used, drive.Free),
 						},
 						used: drive.Used?.toString(),
 						free: drive.Free?.toString(),
@@ -203,16 +265,16 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 
 		disposeSsh(ssh);
 
-		await Notifier({ job });
+		await Notifier({ job: monitor.id });
 
-		console.log(`successfully ran ${job}`);
+		console.log(`successfully ran ${monitor.id}`);
 	} catch (e) {
 		console.log(e);
-		await Notifier({ job, message: JSON.stringify(e) });
+		await Notifier({ job: monitor.id, message: JSON.stringify(e) });
 
-		await monitorError({ id: job });
-		console.log(`${job} monitor failed.`);
+		await monitorError({ id: monitor.id });
+		console.log(`${monitor.id} monitor failed.`);
 		// try to kill ssh again if there was an error.
 		disposeSsh(ssh);
 	}
-});
+}

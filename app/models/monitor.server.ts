@@ -16,6 +16,24 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			osVersion: true,
 			title: true,
 			lastBootTime: true,
+			cpuManufacturer: true,
+			cpuModel: true,
+			cpuCores: true,
+			cpuProcessors: true,
+			cpuMaxSpeed: true,
+			feeds: {
+				select: {
+					id: true,
+					memoryFree: true,
+					memoryTotal: true,
+					cpuLoad: true,
+					cpuSpeed: true,
+				},
+				orderBy: {
+					createdAt: 'desc',
+				},
+				take: 1,
+			},
 		},
 	});
 }
@@ -56,6 +74,9 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 		where: { id },
 		select: {
 			id: true,
+			type: true,
+			enabled: true,
+			hasError: true,
 			username: true,
 			host: true,
 			password: true,
@@ -244,7 +265,11 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 	});
 }
 
-export function getDrive({ id }: Pick<Drive, 'id'>) {
+export function getDriveUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Drive, 'id'> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.drive.findUnique({
@@ -275,7 +300,8 @@ export function getDrive({ id }: Pick<Drive, 'id'>) {
 				},
 				where: {
 					createdAt: {
-						gte: lastMonth,
+						gte: startDate,
+						lt: endDate,
 					},
 				},
 				orderBy: { createdAt: 'desc' },
@@ -577,6 +603,7 @@ export function updateMonitorNotifications({
 export function updateMonitor({
 	id,
 	data,
+	feed,
 	drives,
 }: Pick<Monitor, 'id'> & {
 	data: {
@@ -589,7 +616,11 @@ export function updateMonitor({
 		os?: string;
 		osVersion?: string;
 	};
-	drives: {
+	feed?: {
+		memoryFree?: string;
+		memoryTotal?: string;
+	};
+	drives?: {
 		data: {
 			location?: string;
 			name?: string;
@@ -609,36 +640,48 @@ export function updateMonitor({
 		data: {
 			...data,
 			hasError: false,
-			drives: {
-				upsert: drives.map((drive) => {
-					return {
-						update: {
-							...drive.data,
-							usage: {
-								create: {
-									used: drive.used,
-									free: drive.free,
-								},
-							},
-						},
+			feeds: feed
+				? {
 						create: {
-							...drive.data,
-							usage: {
-								create: {
-									used: drive.used,
-									free: drive.free,
+							memoryFree: feed.memoryFree,
+							memoryTotal: feed.memoryTotal,
+							cpuLoad: feed.cpuLoad,
+							cpuSpeed: feed.cpuSpeed,
+						},
+				  }
+				: undefined,
+			drives: drives
+				? {
+						upsert: drives.map((drive) => {
+							return {
+								update: {
+									...drive.data,
+									usage: {
+										create: {
+											used: drive.used,
+											free: drive.free,
+										},
+									},
 								},
-							},
-						},
-						where: {
-							monitorId_name: {
-								name: drive.data.name,
-								monitorId: id,
-							},
-						},
-					};
-				}),
-			},
+								create: {
+									...drive.data,
+									usage: {
+										create: {
+											used: drive.used,
+											free: drive.free,
+										},
+									},
+								},
+								where: {
+									monitorId_name: {
+										name: drive.data.name,
+										monitorId: id,
+									},
+								},
+							};
+						}),
+				  }
+				: undefined,
 		},
 		select: {
 			drives: {

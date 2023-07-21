@@ -3,7 +3,7 @@ import { json } from '@remix-run/node';
 import { MonitorLogs, getDriveNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
-import { BarChart } from '~/components/charts/driveBar';
+import { BarChart, StorageChart } from '~/components/charts/driveBar';
 import { H1, H3 } from '~/components/ui/typography';
 import { AlertTriangle, MoveLeft } from 'lucide-react';
 import { BellRing } from 'lucide-react';
@@ -42,11 +42,11 @@ export default function Index() {
 			if (document.visibilityState === 'visible') {
 				dataFetcher.load(window.location.pathname);
 			}
-			if (document.visibilityState === 'visible') {
-				usageFetcher.load(
-					`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
-				);
-			}
+			// if (document.visibilityState === 'visible') {
+			// 	usageFetcher.load(
+			// 		`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
+			// 	);
+			// }
 		}, 30 * 1000);
 		return () => clearInterval(interval);
 	}, []);
@@ -133,18 +133,9 @@ export default function Index() {
 					</Table>
 				</div>
 
-				{usageFetcher.data?.drive ? (
-					<>
-						<BarChart data={usageFetcher.data.drive} />
-						<small className="text-muted-foreground">
-							Data grouped into daily buckets.
-						</small>
-					</>
-				) : (
-					<div className="py-4">
-						<Skeleton className="border rounded-md min-h-[450px]" />
-					</div>
-				)}
+				<StorageChart
+					url={`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`}
+				/>
 				<LogTable url={`/${monitorType}/${monitorId}/drive/${drive.id}/logs`} />
 			</div>
 		</>
