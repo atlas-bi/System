@@ -60,11 +60,8 @@ export const StorageChart = ({ url }: { url: string }) => {
 				},
 				tooltip: {
 					callbacks: {
-						label: function (context) {
-							if (context.dataset.label) {
-								return context.datset.label + 'GB';
-							}
-							return '';
+						label: function (tooltipItem) {
+								return tooltipItem.formattedValue + 'GB';
 						},
 					},
 				},
