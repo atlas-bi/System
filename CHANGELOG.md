@@ -1,3 +1,8 @@
+## 1.13.0 (2023-07-20)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([a447852](https://github.com/atlas-bi/System/commit/a447852))
+* feat(monitor): added reboot and bad connection notification options ([5e23a5c](https://github.com/atlas-bi/System/commit/5e23a5c))
+
 ## 1.12.0 (2023-07-20)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([b80ae94](https://github.com/atlas-bi/System/commit/b80ae94))
