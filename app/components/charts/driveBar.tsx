@@ -2,18 +2,18 @@ import type { Usage } from '@prisma/client';
 
 import bytes from 'bytes';
 import {
-	BarElement,
+	LineElement,
 	CategoryScale,
 	ChartData,
 	Chart as ChartJS,
-	Legend,
 	LinearScale,
-	Title,
+	PointElement,
 	Tooltip,
+	Filler,
 	TimeScale,
 } from 'chart.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
 import { DateFilter } from './DateFilter';
@@ -22,11 +22,11 @@ import { dateOptions } from '~/models/dates';
 ChartJS.register([
 	CategoryScale,
 	LinearScale,
-	BarElement,
-	Title,
-	Tooltip,
-	Legend,
+	LineElement,
+	PointElement,
 	TimeScale,
+	Filler,
+	Tooltip,
 ]);
 
 import 'chartjs-adapter-date-fns';
@@ -61,7 +61,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 				tooltip: {
 					callbacks: {
 						label: function (tooltipItem) {
-								return tooltipItem.formattedValue + 'GB';
+							return tooltipItem.formattedValue + 'GB';
 						},
 					},
 				},
@@ -128,6 +128,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 			labels: usageFetcher.data?.drive?.usage?.map((x: Usage) => x.createdAt),
 			datasets: [
 				{
+					fill: true,
 					label: 'Used',
 					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
 						bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
@@ -155,6 +156,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 				},
 				{
 					label: 'Free',
+					fill: true,
 					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
 						bytes(Number(x.free), { unit: 'GB' }).replace('GB', ''),
 					),
@@ -192,7 +194,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 					</div>
 				</div>
 				<div className="h-[450px] relative">
-					<Bar ref={chartRef} options={options} data={chartData} />
+					<Line ref={chartRef} options={options} data={chartData} />
 					{usageFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />

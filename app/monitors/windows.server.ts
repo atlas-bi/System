@@ -224,7 +224,7 @@ export default async function WindowsMonitor({
 							location: drive.CurrentLocation,
 							name: drive.Name,
 							root: drive.Root,
-							description: drive.Description,
+							systemDescription: drive.Description,
 							maximumSize: drive.MaximumSize?.toString(),
 							size: driveSum(drive.Used, drive.Free),
 						},

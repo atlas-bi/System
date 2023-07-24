@@ -31,9 +31,10 @@ model Group {
 }
 
 model Monitor {
-  id    String @id @default(cuid())
-  title String
-  type  String
+  id          String  @id @default(cuid())
+  title       String
+  type        String
+  description String?
 
   enabled  Boolean @default(true)
   hasError Boolean @default(false)
@@ -81,9 +82,9 @@ model Monitor {
 }
 
 model MonitorFeeds {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitor   Monitor  @relation(fields: [monitorId], references: [id])
   monitorId String
 
   memoryFree  String?
@@ -109,7 +110,10 @@ model MonitorLogs {
 }
 
 model Drive {
-  id       String  @id @default(cuid())
+  id          String  @id @default(cuid())
+  title       String?
+  description String?
+
   hasError Boolean @default(false)
 
   monitor   Monitor @relation(fields: [monitorId], references: [id])
@@ -121,11 +125,11 @@ model Drive {
   inactive Boolean @default(false)
 
   // fields sent from monitor
-  location    String?
-  name        String
-  root        String?
-  description String?
-  size        String?
+  location          String?
+  name              String
+  root              String?
+  systemDescription String?
+  size              String?
 
   daysTillFull String?
   growthRate   String?

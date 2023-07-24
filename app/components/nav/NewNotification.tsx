@@ -22,8 +22,8 @@ import {
 } from '~/components/ui/select';
 
 import { notificationTypes } from '~/models/notification';
-import { SmtpForm } from './notificationForms/smpt';
-import { TelegramForm } from './notificationForms/telegram';
+import { SmtpForm } from '~/components/notificationForms/smpt';
+import { TelegramForm } from '~/components/notificationForms/telegram';
 import { Loader2 } from 'lucide-react';
 import type { Notification } from '~/models/notification.server';
 

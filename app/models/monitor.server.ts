@@ -5,6 +5,39 @@ import monitorMonitor from '~/queues/monitor.server';
 
 export type { Monitor, Drive, DriveUsage, MonitorLogs } from '@prisma/client';
 
+export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
+	// delete drive usage
+	await prisma.driveUsage.deleteMany({
+		where: {
+			drive: { monitorId: id },
+		},
+	});
+
+	// delete drive logs
+	await prisma.monitorLogs.deleteMany({
+		where: {
+			drive: { monitorId: id },
+		},
+	});
+
+	// delete drives
+	await prisma.drive.deleteMany({
+		where: { monitorId: id },
+	});
+	// delete logs
+	await prisma.monitorLogs.deleteMany({
+		where: { monitorId: id },
+	});
+	// delete feeds
+	await prisma.monitorFeeds.deleteMany({
+		where: { monitorId: id },
+	});
+
+	return prisma.monitor.deleteMany({
+		where: { id },
+	});
+}
+
 export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findUnique({
 		where: { id },
@@ -12,10 +45,15 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			id: true,
 			type: true,
 			host: true,
+			password: true,
+			username: true,
+			port: true,
+			privateKey: true,
 			os: true,
 			osVersion: true,
 			title: true,
 			lastBootTime: true,
+			description: true,
 			cpuManufacturer: true,
 			cpuModel: true,
 			cpuCores: true,
@@ -45,6 +83,7 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 			id: true,
 			type: true,
 			host: true,
+			description: true,
 			os: true,
 			osVersion: true,
 			title: true,
@@ -75,6 +114,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 		select: {
 			id: true,
 			type: true,
+			description: true,
 			enabled: true,
 			hasError: true,
 			username: true,
@@ -98,12 +138,14 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			drives: {
 				select: {
 					id: true,
+					title: true,
 					hasError: true,
 					inactive: true,
 					location: true,
 					name: true,
 					root: true,
 					description: true,
+					systemDescription: true,
 					size: true,
 					daysTillFull: true,
 					growthRate: true,
@@ -198,10 +240,12 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 		where: { id },
 		select: {
 			id: true,
+			title: true,
 			monitorId: true,
 			location: true,
 			inactive: true,
 			name: true,
+			systemDescription: true,
 			description: true,
 			size: true,
 			daysTillFull: true,
@@ -276,11 +320,13 @@ export function getDriveUsage({
 		where: { id },
 		select: {
 			id: true,
+			title: true,
 			monitorId: true,
 			location: true,
 			inactive: true,
 			name: true,
 			description: true,
+			systemDescription: true,
 			size: true,
 			daysTillFull: true,
 			growthRate: true,
@@ -398,11 +444,13 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 		where: { monitorId },
 		select: {
 			id: true,
+			title: true,
 			monitorId: true,
 			location: true,
 			inactive: true,
 			name: true,
 			description: true,
+			systemDescription: true,
 			size: true,
 			daysTillFull: true,
 			growthRate: true,
@@ -427,9 +475,17 @@ export async function createMonitor({
 	privateKey,
 	port,
 	type,
+	description,
 }: Pick<
 	Monitor,
-	'title' | 'port' | 'privateKey' | 'username' | 'password' | 'host' | 'type'
+	| 'title'
+	| 'port'
+	| 'privateKey'
+	| 'username'
+	| 'password'
+	| 'host'
+	| 'type'
+	| 'description'
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
@@ -440,6 +496,7 @@ export async function createMonitor({
 			privateKey: privateKey ? encrypt(privateKey) : undefined,
 			port,
 			type,
+			description,
 		},
 		select: {
 			id: true,
@@ -451,10 +508,48 @@ export async function createMonitor({
 	return monitor;
 }
 
-export function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
-	return prisma.monitor.deleteMany({
+export async function editMonitor({
+	id,
+	title,
+	host,
+	username,
+	password,
+	privateKey,
+	port,
+	type,
+	description,
+}: Pick<
+	Monitor,
+	| 'id'
+	| 'title'
+	| 'port'
+	| 'privateKey'
+	| 'username'
+	| 'password'
+	| 'host'
+	| 'type'
+	| 'description'
+>) {
+	const monitor = await prisma.monitor.update({
 		where: { id },
+		data: {
+			title,
+			host,
+			username,
+			password: password ? encrypt(password) : undefined,
+			privateKey: privateKey ? encrypt(privateKey) : undefined,
+			port,
+			type,
+			description,
+		},
+		select: {
+			id: true,
+			type: true,
+		},
 	});
+	// check monitor as soon as it is added
+	monitorMonitor.enqueue(monitor.id);
+	return monitor;
 }
 
 export function getEnabledMonitors() {
@@ -474,6 +569,7 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 		select: {
 			id: true,
 			title: true,
+			description: true,
 			host: true,
 			caption: true,
 			name: true,
@@ -625,7 +721,7 @@ export function updateMonitor({
 			location?: string;
 			name?: string;
 			root?: string;
-			description?: string;
+			systemDescription?: string;
 			size: string;
 		};
 		used?: string;

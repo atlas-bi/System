@@ -9,7 +9,7 @@ import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
-import { BellRing, MoveLeft, MoveRight } from 'lucide-react';
+import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
 import { Skeleton } from '~/components/ui/skeleton';
 import invariant from 'tiny-invariant';
 
@@ -18,7 +18,19 @@ import { LogTable } from '~/components/logTable/table';
 import { monitorTypes } from '~/models/monitor';
 import { format } from 'date-fns';
 
+import Monitor from '~/components/monitorForms/base';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Button } from '~/components/ui/button';
+import { decrypt } from '@/lib/utils';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '/components/ui/dropdown-menu';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -36,7 +48,11 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	const monitor = await getMonitorPublic({ id: params.monitorId });
 	invariant(monitor, 'Monitor not found.');
 	return json({
-		monitor,
+		monitor: {
+			...monitor,
+			password: decrypt(monitor.password),
+			privateKey: monitor.privateKey ? decrypt(monitor.privateKey) : undefined,
+		},
 	});
 };
 
@@ -52,59 +68,74 @@ export default function Index() {
 
 	return (
 		<>
-			<div className="flex justify-between">
+			<div className="flex justify-between pb-4">
 				<Link
 					to={`/${monitor.type}`}
-					className="flex content-center space-x-2 pb-4 text-slate-700"
+					className="flex content-center space-x-2 text-slate-700"
 					prefetch="intent"
 				>
 					<MoveLeft size={16} className="my-auto" />
 					<span className="my-auto">Back to Monitors</span>
 				</Link>
-				<Link
-					to={`/${monitor.type}/${monitor.id}/notifications`}
-					className="flex content-center space-x-2 pb-4 text-slate-600"
-					prefetch="intent"
-				>
-					<BellRing size={16} className="my-auto" />
-					<span className="my-auto">Manage Notifications</span>
-					<MoveRight size={16} className="my-auto" />
-				</Link>
+				<div className="flex divide-x">
+					<Monitor monitor={monitor}>
+						<Button variant="link" className="text-slate-700 h-6 ">
+							<Settings size={16} />
+						</Button>
+					</Monitor>
+					<Link
+						to={`/${monitor.type}/${monitor.id}/notifications`}
+						className="flex content-center space-x-2 pl-3 text-slate-600"
+						prefetch="intent"
+					>
+						<BellRing size={16} className="my-auto" />
+						<span className="my-auto">Manage Notifications</span>
+						<MoveRight size={16} className="my-auto" />
+					</Link>
+				</div>
 			</div>
 			<H1>{monitor.title}</H1>
 			<div className="space-y-4 pb-4">
-				<div className="text-muted-foreground">
-					{monitor.host}
-					{monitor.os && (
-						<>
-							{monitor.host && <> · </>}
-							{monitor.os}
-						</>
-					)}
-					{monitor.osVersion && (
-						<>
-							{(monitor.host || monitor.os) && <> · </>}
-							{monitor.osVersion}
-						</>
-					)}
-				</div>
+				<div className="text-muted-foreground">{monitor.description}</div>
 
 				<div className="space-y-2 flex-grow">
 					<Table>
 						<TableBody>
 							<TableRow>
-								<TableCell className="py-1 font-medium">Last Reboot</TableCell>
+								<TableCell className="py-1 font-medium">Host</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{monitor.lastBootTime && (
-										<>
-											{format(
-												new Date(monitor.lastBootTime),
-												'MMM dd, yyyy k:mm',
-											)}
-										</>
-									)}
+									{monitor.host}
 								</TableCell>
 							</TableRow>
+							{monitor.os && (
+								<TableRow>
+									<TableCell className="py-1 font-medium">OS</TableCell>
+									<TableCell className="py-1 text-slate-700">
+										{monitor.os}
+									</TableCell>
+								</TableRow>
+							)}
+							{monitor.osVersion && (
+								<TableRow>
+									<TableCell className="py-1 font-medium">OS Version</TableCell>
+									<TableCell className="py-1 text-slate-700">
+										{monitor.osVersion}
+									</TableCell>
+								</TableRow>
+							)}
+							{monitor.lastBootTime && (
+								<TableRow>
+									<TableCell className="py-1 font-medium">
+										Last Reboot
+									</TableCell>
+									<TableCell className="py-1 text-slate-700">
+										{format(
+											new Date(monitor.lastBootTime),
+											'MMM dd, yyyy k:mm',
+										)}
+									</TableCell>
+								</TableRow>
+							)}
 							{monitor.feeds && (
 								<TableRow>
 									<TableCell className="py-1 font-medium">Memory</TableCell>
