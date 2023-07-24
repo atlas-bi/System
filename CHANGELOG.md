@@ -1,3 +1,8 @@
+## <small>1.14.1 (2023-07-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([71ac382](https://github.com/atlas-bi/System/commit/71ac382))
+* fix(tooltip): fixed units on tooltip ([38fcf4f](https://github.com/atlas-bi/System/commit/38fcf4f))
+
 ## 1.14.0 (2023-07-21)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([1933dfc](https://github.com/atlas-bi/System/commit/1933dfc))
