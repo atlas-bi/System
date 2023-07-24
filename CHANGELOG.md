@@ -1,3 +1,8 @@
+## 1.15.0 (2023-07-24)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([523abf1](https://github.com/atlas-bi/System/commit/523abf1))
+* feat(edit): added ability to edit/delete monitors ([faefcc0](https://github.com/atlas-bi/System/commit/faefcc0))
+
 ## <small>1.14.1 (2023-07-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([71ac382](https://github.com/atlas-bi/System/commit/71ac382))
