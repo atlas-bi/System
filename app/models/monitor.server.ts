@@ -140,7 +140,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 					id: true,
 					title: true,
 					hasError: true,
-					inactive: true,
+					enabled: true,
 					location: true,
 					name: true,
 					root: true,
@@ -241,10 +241,12 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 		select: {
 			id: true,
 			title: true,
+			enabled: true,
 			monitorId: true,
 			location: true,
-			inactive: true,
+			enabled: true,
 			name: true,
+			root: true,
 			systemDescription: true,
 			description: true,
 			size: true,
@@ -323,7 +325,7 @@ export function getDriveUsage({
 			title: true,
 			monitorId: true,
 			location: true,
-			inactive: true,
+			enabled: true,
 			name: true,
 			description: true,
 			systemDescription: true,
@@ -439,6 +441,23 @@ export async function getMonitorLogs({
 	};
 }
 
+export function getMonitorDisabledDrives({
+	monitorId,
+}: {
+	monitorId: Monitor['id'];
+}) {
+	return prisma.drive.findMany({
+		where: { monitorId, enabled: false },
+		select: {
+			id: true,
+			monitorId: true,
+			location: true,
+			name: true,
+			root: true,
+		},
+	});
+}
+
 export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 	return prisma.drive.findMany({
 		where: { monitorId },
@@ -447,8 +466,9 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 			title: true,
 			monitorId: true,
 			location: true,
-			inactive: true,
+			enabled: true,
 			name: true,
+			root: true,
 			description: true,
 			systemDescription: true,
 			size: true,
@@ -463,7 +483,7 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 				take: 1,
 			},
 		},
-		orderBy: { name: 'asc' },
+		orderBy: [{ enabled: 'desc' }, { size: 'desc' }, { name: 'asc' }],
 	});
 }
 
@@ -506,6 +526,25 @@ export async function createMonitor({
 	// check monitor as soon as it is added
 	monitorMonitor.enqueue(monitor.id);
 	return monitor;
+}
+
+export function editDrive({
+	id,
+	title,
+	description,
+	enabled,
+}: Pick<Drive, 'id' | 'title' | 'description' | 'enabled'>) {
+	return prisma.drive.update({
+		where: { id },
+		data: {
+			title,
+			description,
+			enabled,
+		},
+		select: {
+			id: true,
+		},
+	});
 }
 
 export async function editMonitor({

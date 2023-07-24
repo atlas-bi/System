@@ -60,6 +60,7 @@ export async function action({ request }: ActionArgs) {
 			}
 
 			let monitor = {};
+			console.log(values);
 			if (values.id) {
 				monitor = await editMonitor({
 					id: values.id.toString(),
@@ -67,12 +68,16 @@ export async function action({ request }: ActionArgs) {
 					host: values.host.toString(),
 					username: values.username.toString(),
 					password: values.password ? values.password.toString() : null,
-					privateKey: values.privateKey ? values.privateKey.toString() : null,
+					privateKey:
+						values.privateKey && values.privateKey.toString() != 'null'
+							? values.privateKey.toString()
+							: null,
 					port: (values.port || 22).toString(),
 					type: values.type.toString(),
-					description: values.description
-						? values.description.toString()
-						: undefined,
+					description:
+						values.description && values.description.toString() != 'null'
+							? values.description.toString()
+							: null,
 				});
 
 				return json({ monitor });
@@ -82,12 +87,16 @@ export async function action({ request }: ActionArgs) {
 					host: values.host.toString(),
 					username: values.username.toString(),
 					password: values.password ? values.password.toString() : null,
-					privateKey: values.privateKey ? values.privateKey.toString() : null,
+					privateKey:
+						values.privateKey && values.privateKey.toString() != 'null'
+							? values.privateKey.toString()
+							: null,
 					port: (values.port || 22).toString(),
 					type: values.type.toString(),
-					description: values.description
-						? values.description.toString()
-						: undefined,
+					description:
+						values.description && values.description.toString() != 'null'
+							? values.description.toString()
+							: null,
 				});
 			}
 

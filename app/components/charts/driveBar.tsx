@@ -130,6 +130,8 @@ export const StorageChart = ({ url }: { url: string }) => {
 				{
 					fill: true,
 					label: 'Used',
+					cubicInterpolationMode: 'monotone',
+					tension: 0.4,
 					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
 						bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
 					),
@@ -153,6 +155,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 						chart.chartArea,
 						darkGradient,
 					),
+					pointStyle: false,
 				},
 				{
 					label: 'Free',
@@ -163,6 +166,9 @@ export const StorageChart = ({ url }: { url: string }) => {
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },
+					cubicInterpolationMode: 'monotone',
+					pointStyle: false,
+					tension: 0.4,
 				},
 			],
 		};

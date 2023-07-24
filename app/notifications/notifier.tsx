@@ -28,7 +28,7 @@ export default async function Notifier({
 	// drive notifications
 	monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
 		// don't report inactive drives.
-		if (drive.inactive) return;
+		if (drive.enabled == false) return;
 
 		// drive has no usages, ignore.
 		if (drive.usage.length <= 0) return;

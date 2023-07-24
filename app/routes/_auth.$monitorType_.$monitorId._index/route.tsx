@@ -9,7 +9,13 @@ import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
-import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
+import {
+	BellRing,
+	MoveLeft,
+	MoveRight,
+	Settings,
+	ToggleRight,
+} from 'lucide-react';
 import { Skeleton } from '~/components/ui/skeleton';
 import invariant from 'tiny-invariant';
 
@@ -31,6 +37,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '/components/ui/dropdown-menu';
+import { ToggleLeft } from 'lucide-react';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -94,7 +101,10 @@ export default function Index() {
 					</Link>
 				</div>
 			</div>
-			<H1>{monitor.title}</H1>
+			<H1 className="space-x-2">
+				<span>{monitor.title}</span>
+				{monitor.host && <span>({monitor.host})</span>}
+			</H1>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{monitor.description}</div>
 
@@ -182,34 +192,56 @@ export default function Index() {
 												to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
 												prefetch="intent"
 												key={drive.id}
-												className="flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200"
+												className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200 ${
+													drive.enabled ? '' : 'opacity-50 hover:opacity-100'
+												}`}
 											>
-												<DoughnutChart
-													className="w-36 h-36"
-													data={{
-														labels: [
-															`Used ${bytes(Number(drive.usage?.[0]?.used))}`,
-															`Free ${bytes(Number(drive.usage?.[0]?.free))}`,
-														],
-														datasets: [
-															{
-																label: 'Drive Usage',
-																data: [
-																	Number(drive.usage?.[0]?.used),
-																	Number(drive.usage?.[0]?.used) +
-																		Number(drive.usage?.[0]?.free) ==
-																	0
-																		? 100
-																		: Number(drive.usage?.[0]?.free),
-																],
-															},
-														],
-													}}
-												/>
+												<div>
+													{drive.enabled ? (
+														<ToggleRight size={20} className="text-slate-400" />
+													) : (
+														<ToggleLeft
+															size={20}
+															className="fill-slate-200 text-slate-400"
+														/>
+													)}
+													<DoughnutChart
+														className="w-36 h-36"
+														data={{
+															labels: [
+																`Used ${bytes(Number(drive.usage?.[0]?.used))}`,
+																`Free ${bytes(Number(drive.usage?.[0]?.free))}`,
+															],
+															datasets: [
+																{
+																	label: 'Drive Usage',
+																	data: [
+																		Number(drive.usage?.[0]?.used),
+																		Number(drive.usage?.[0]?.used) +
+																			Number(drive.usage?.[0]?.free) ==
+																		0
+																			? 100
+																			: Number(drive.usage?.[0]?.free),
+																	],
+																},
+															],
+														}}
+													/>
+												</div>
 
 												<div className="space-y-2 flex-grow">
-													<H3>
-														{drive.name}:\{drive.location}
+													<H3 className="space-x-2">
+														{drive.title ? (
+															<>
+																<span>{drive.title}</span>
+																<span>({drive.root})</span>
+															</>
+														) : (
+															<>
+																{drive.root}
+																{drive.location}
+															</>
+														)}
 													</H3>
 
 													<Table>

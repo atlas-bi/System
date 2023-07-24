@@ -5,7 +5,7 @@ import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
 import { BarChart, StorageChart } from '~/components/charts/driveBar';
 import { H1, H3 } from '~/components/ui/typography';
-import { AlertTriangle, MoveLeft } from 'lucide-react';
+import { AlertTriangle, MoveLeft, Settings } from 'lucide-react';
 import { BellRing } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
@@ -13,6 +13,8 @@ import bytes from 'bytes';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '~/components/ui/skeleton';
 import { LogTable } from '~/components/logTable/table';
+import { Button } from '~/components/ui/button';
+import Drive from '~/components/driveForms/base';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -42,11 +44,6 @@ export default function Index() {
 			if (document.visibilityState === 'visible') {
 				dataFetcher.load(window.location.pathname);
 			}
-			// if (document.visibilityState === 'visible') {
-			// 	usageFetcher.load(
-			// 		`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
-			// 	);
-			// }
 		}, 30 * 1000);
 		return () => clearInterval(interval);
 	}, []);
@@ -67,10 +64,10 @@ export default function Index() {
 
 	return (
 		<>
-			<div className="flex justify-between">
+			<div className="flex justify-between pb-4">
 				<Link
 					to={`/${monitorType}/${monitorId}`}
-					className="flex content-center space-x-2 pb-4 text-slate-600"
+					className="flex content-center space-x-2 text-slate-600"
 					prefetch="intent"
 				>
 					<MoveLeft size={16} className="my-auto" />
@@ -78,23 +75,42 @@ export default function Index() {
 						Back to <strong>{drive.monitor.title}</strong>
 					</span>
 				</Link>
-
-				<Link
-					to={`/${monitorType}/${monitorId}/drive/${drive.id}/notifications`}
-					className="flex content-center space-x-2 pb-4 text-slate-600"
-					prefetch="intent"
-				>
-					<BellRing size={16} className="my-auto" />
-					<span className="my-auto">Manage Notifications</span>
-					<MoveRight size={16} className="my-auto" />
-				</Link>
+				<div className="flex divide-x">
+					<Drive drive={drive}>
+						<Button variant="link" className="text-slate-700 h-6 ">
+							<Settings size={16} />
+						</Button>
+					</Drive>
+					<Link
+						to={`/${monitorType}/${monitorId}/drive/${drive.id}/notifications`}
+						className="flex content-center space-x-2 pl-3 text-slate-600"
+						prefetch="intent"
+					>
+						<BellRing size={16} className="my-auto" />
+						<span className="my-auto">Manage Notifications</span>
+						<MoveRight size={16} className="my-auto" />
+					</Link>
+				</div>
 			</div>
 
-			<H1>
-				{drive.name}:\{drive.location}
+			<H1 className="space-x-2">
+				{drive.enabled === false && (
+					<span className="!text-slate-400">(Disabled)</span>
+				)}
+				{drive.title ? (
+					<>
+						<span>{drive.title}</span>
+						<span>({drive.root})</span>
+					</>
+				) : (
+					<>
+						{drive.name}:\{drive.location}
+					</>
+				)}
 			</H1>
 
 			<div className="space-y-4 pb-4">
+				<div className="text-muted-foreground">{drive.description}</div>
 				<div className="space-y-2 flex-grow">
 					<Table>
 						<TableBody>

@@ -2,6 +2,7 @@ import { decrypt } from '@/lib/utils';
 import { NodeSSH } from 'node-ssh';
 import {
 	Monitor,
+	getMonitorDisabledDrives,
 	monitorError,
 	setDriveDays,
 	setDriveGrowth,
@@ -184,6 +185,20 @@ export default async function WindowsMonitor({
 			lastBoot = new Date(os.LastBootUpTime);
 		}
 
+		const disabledDrives = await getMonitorDisabledDrives({ id: monitor.id });
+
+		// only update drives that are enabled.
+		const updateableDrives = s.filter((drive) => {
+			const l =
+				disabledDrives.filter(
+					(d) =>
+						d.name == drive.Name &&
+						d.root == drive.Root &&
+						d.location == drive.CurrentLocation,
+				).length == 0;
+			return l;
+		});
+
 		const data = await updateMonitor({
 			id: monitor.id,
 			data: {
@@ -209,7 +224,7 @@ export default async function WindowsMonitor({
 				cpuLoad: pc.LoadPercentage.toString(),
 				cpuSpeed: pc.CurrentClockSpeed.toString(),
 			},
-			drives: s.map(
+			drives: updateableDrives.map(
 				(drive: {
 					CurrentLocation: any;
 					Name: any;
