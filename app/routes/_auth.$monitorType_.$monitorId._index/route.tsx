@@ -8,7 +8,7 @@ import { json } from '@remix-run/node';
 import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
-import { Link, useFetcher, useLoaderData } from '@remix-run/react';
+import { Link, useFetcher, useLoaderData, useLocation } from '@remix-run/react';
 import {
 	BellRing,
 	MoveLeft,
@@ -66,12 +66,20 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function Index() {
 	const { monitor } = useLoaderData<typeof loader>();
 	const drivesFetcher = useFetcher();
+	// if we redirect to another monitor we need to reload drives
+	const location = useLocation();
 
 	useEffect(() => {
 		if (drivesFetcher.state === 'idle' && drivesFetcher.data == null) {
 			drivesFetcher.load(`/${monitor.type}/${monitor.id}/drives`);
 		}
 	}, [drivesFetcher, monitor]);
+
+	useEffect(() => {
+		if (drivesFetcher.state === 'idle' && drivesFetcher.data == null) {
+			drivesFetcher.load(`/${monitor.type}/${monitor.id}/drives`);
+		}
+	}, [location]);
 
 	return (
 		<>

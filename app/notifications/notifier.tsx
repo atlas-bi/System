@@ -8,6 +8,7 @@ import {
 } from '~/models/notification.server';
 import percentFreeNotifier from './checks/drives/percentFree';
 import rebootNotifier from './checks/monitors/reboot';
+import collectionNotifier from './checks/monitors/collection';
 
 // 1. send error notification
 // 2. when error clears send an "all clear"
@@ -21,6 +22,10 @@ export default async function Notifier({
 	message?: string;
 }) {
 	const monitor = await getMonitor({ id: job });
+
+	if (message) {
+		collectionNotifier({ monitor, message });
+	}
 
 	// reboot notifier
 	await rebootNotifier({ monitor });

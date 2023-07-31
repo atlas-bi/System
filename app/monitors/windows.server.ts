@@ -74,6 +74,10 @@ export default async function WindowsMonitor({
 
 		let pwshCommand = 'powershell';
 
+		if (pwshVersionCheck.stderr) {
+			throw pwshVersionCheck.stderr.toString();
+		}
+
 		let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
 
 		if (pwshVersion?.Version?.Major < 5) {
@@ -285,7 +289,7 @@ export default async function WindowsMonitor({
 		console.log(`successfully ran ${monitor.id}`);
 	} catch (e) {
 		console.log(e);
-		await Notifier({ job: monitor.id, message: JSON.stringify(e) });
+		await Notifier({ job: monitor.id, message: e.toString() });
 
 		await monitorError({ id: monitor.id });
 		console.log(`${monitor.id} monitor failed.`);

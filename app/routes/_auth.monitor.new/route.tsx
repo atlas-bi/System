@@ -99,7 +99,6 @@ export async function action({ request }: ActionArgs) {
 							: null,
 				});
 			}
-
 			return json({ monitor });
 		},
 		async delete() {

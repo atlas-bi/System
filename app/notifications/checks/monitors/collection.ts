@@ -1,7 +1,7 @@
 import { Monitor, setMonitorConnectionSentAt } from '~/models/monitor.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
-export default async function percentFreeNotifier({
+export default async function collectionNotifier({
 	monitor,
 	message,
 }: {
