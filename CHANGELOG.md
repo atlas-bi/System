@@ -1,3 +1,8 @@
+## <small>1.16.1 (2023-07-31)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([31ed214](https://github.com/atlas-bi/System/commit/31ed214))
+* fix(monitor): added monitor collection error reporting ([84f7d8a](https://github.com/atlas-bi/System/commit/84f7d8a))
+
 ## 1.16.0 (2023-07-24)
 
 * Merge branch 'master' of github.com:atlas-bi/System # ([6244b26](https://github.com/atlas-bi/System/commit/6244b26))
