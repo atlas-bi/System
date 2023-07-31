@@ -1,3 +1,8 @@
+## 1.16.0 (2023-07-24)
+
+* Merge branch 'master' of github.com:atlas-bi/System # ([6244b26](https://github.com/atlas-bi/System/commit/6244b26))
+* feat(drive): added ability to disable drives and add names ([6650e8c](https://github.com/atlas-bi/System/commit/6650e8c))
+
 ## 1.15.0 (2023-07-24)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([523abf1](https://github.com/atlas-bi/System/commit/523abf1))
