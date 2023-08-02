@@ -1,17 +1,17 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { MonitorLogs, getDriveNotifications } from '~/models/monitor.server';
+import { getDriveNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
-import { BarChart, StorageChart } from '~/components/charts/driveBar';
+import { DriveChart } from '~/components/charts/driveChart';
 import { H1, H3 } from '~/components/ui/typography';
-import { AlertTriangle, MoveLeft, Settings } from 'lucide-react';
+import { MoveLeft, Settings } from 'lucide-react';
 import { BellRing } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import bytes from 'bytes';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '~/components/ui/skeleton';
+
 import { LogTable } from '~/components/logTable/table';
 import { Button } from '~/components/ui/button';
 import Drive from '~/components/driveForms/base';
@@ -149,7 +149,7 @@ export default function Index() {
 					</Table>
 				</div>
 
-				<StorageChart
+				<DriveChart
 					url={`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`}
 				/>
 				<LogTable url={`/${monitorType}/${monitorId}/drive/${drive.id}/logs`} />

@@ -1,4 +1,4 @@
-import type { Usage } from '@prisma/client';
+import type { MonitorFeeds } from '@prisma/client';
 
 import bytes from 'bytes';
 import {
@@ -34,14 +34,23 @@ import { H2, H3 } from '../ui/typography';
 import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
-export const StorageChart = ({ url }: { url: string }) => {
+export const CpuChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
 	const [unit, setUnit] = useState('last_24_hours');
 	const chartRef = useRef<ChartJS>(null);
+
+	Tooltip.positioners.mouse = function (items, evtPos) {
+		return evtPos;
+	};
+
 	const getOptions = useCallback(() => {
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
+			interaction: {
+				intersect: false,
+				mode: 'index',
+			},
 			animation: {
 				duration: 300,
 				resize: {
@@ -59,9 +68,13 @@ export const StorageChart = ({ url }: { url: string }) => {
 					display: false,
 				},
 				tooltip: {
+					position: 'mouse',
 					callbacks: {
 						label: function (tooltipItem) {
-							return tooltipItem.formattedValue + 'GB';
+							if (tooltipItem.datasetIndex === 0) {
+								return tooltipItem.formattedValue + '% Used';
+							}
+							return tooltipItem.raw / 1000 + 'GHz';
 						},
 					},
 				},
@@ -74,10 +87,23 @@ export const StorageChart = ({ url }: { url: string }) => {
 					beginAtZero: true,
 					ticks: {
 						callback: function (value: string) {
-							return value + 'GB';
+							return value + '%';
 						},
 					},
-					stacked: true,
+					stacked: false,
+					max: 100,
+				},
+				y2: {
+					type: 'linear' as const,
+					display: true,
+					position: 'right' as const,
+					beginAtZero: true,
+					ticks: {
+						callback: function (value: string) {
+							return Number(value) / 1000 + 'GHz';
+						},
+					},
+					stacked: false,
 				},
 				x: {
 					stacked: true,
@@ -86,7 +112,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 					max: () => usageFetcher.data?.drive?.endDate,
 					time: {
 						unit: () =>
-							dateOptions.filter((x) => x.value === unit)?.[0]?.unit ||
+							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
 							undefined,
 					},
 					grid: {
@@ -101,9 +127,9 @@ export const StorageChart = ({ url }: { url: string }) => {
 
 	useEffect(() => {
 		usageFetcher.load(
-			url +
-				`?range=${unit}&unit=${dateOptions.filter((x) => x.value === unit)?.[0]
-					?.unit}`,
+			url + `?range=${unit}`,
+			//&unit=${dateOptions.filter((x) => x.value === unit)?.[0]
+			//?.unit}`,
 		);
 	}, [unit]);
 
@@ -124,16 +150,19 @@ export const StorageChart = ({ url }: { url: string }) => {
 		if (!chart) {
 			return;
 		}
+
 		const chartData = {
-			labels: usageFetcher.data?.drive?.usage?.map((x: Usage) => x.createdAt),
+			labels: usageFetcher.data?.monitor?.feeds?.map(
+				(x: MonitorFeeds) => x.createdAt,
+			),
 			datasets: [
 				{
 					fill: true,
-					label: 'Used',
+					label: 'Load',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
-						bytes(Number(x.used), { unit: 'GB' }).replace('GB', ''),
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
+						Number(x.cpuLoad),
 					),
 					borderColor: createLinearGradient(
 						chart.ctx,
@@ -158,10 +187,10 @@ export const StorageChart = ({ url }: { url: string }) => {
 					pointStyle: false,
 				},
 				{
-					label: 'Free',
-					fill: true,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
-						bytes(Number(x.free), { unit: 'GB' }).replace('GB', ''),
+					label: 'Speed',
+					fill: false,
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
+						Number(x.cpuSpeed),
 					),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
@@ -169,6 +198,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 					cubicInterpolationMode: 'monotone',
 					pointStyle: false,
 					tension: 0.4,
+					yAxisID: 'y2',
 				},
 			],
 		};
@@ -180,7 +210,7 @@ export const StorageChart = ({ url }: { url: string }) => {
 		<>
 			<div className="w-full space-y-5">
 				<div className="flex space-x-2 justify-between">
-					<H3 className="text-3xl">Storage History</H3>
+					<H3 className="text-3xl">CPU Load History</H3>
 					<div className="space-x-2 flex">
 						<Button
 							variant="outline"
@@ -213,16 +243,17 @@ export const StorageChart = ({ url }: { url: string }) => {
 							className={`fill-[#e2e8f0] text-[#cbd5e1] h-3 w-3`}
 							size={10}
 						/>
-						<span>Free</span>
+						<span>Speed</span>
 					</div>
 					<div className="flex space-x-2 items-center">
 						<Circle
 							className={`fill-[#7dd3fc] text-[#0ea5e9] h-3 w-3`}
 							size={10}
 						/>
-						<span>Used</span>
+						<span>Load</span>
 					</div>
 				</div>
+				<small className="text-muted-foreground">*Peak values shown.</small>
 			</div>
 		</>
 	);

@@ -1,6 +1,7 @@
 import { Queue } from 'quirrel/remix';
 import { getMonitor } from '~/models/monitor.server';
 import WindowsMonitor from '~/monitors/windows.server';
+import UbuntuMonitor from '~/monitors/ubuntu.server';
 
 export default Queue('queues/monitor', async (job: string, meta) => {
 	const monitor = await getMonitor({ id: job });
@@ -10,6 +11,10 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 	}
 
 	if (monitor.type == 'windows') {
-		await WindowsMonitor({ monitor });
+		return WindowsMonitor({ monitor });
+	}
+
+	if (monitor.type == 'ubuntu') {
+		return UbuntuMonitor({ monitor });
 	}
 });

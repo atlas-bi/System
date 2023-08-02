@@ -38,6 +38,8 @@ import {
 	DropdownMenuTrigger,
 } from '/components/ui/dropdown-menu';
 import { ToggleLeft } from 'lucide-react';
+import { CpuChart } from '~/components/charts/cpuChart';
+import { MemoryChart } from '~/components/charts/memoryChart';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -310,8 +312,12 @@ export default function Index() {
 							</div>
 						)}
 					</TabsContent>
-					<TabsContent value="cpu"></TabsContent>
-					<TabsContent value="memory"></TabsContent>
+					<TabsContent value="cpu">
+						<CpuChart url={`/${monitor.type}/${monitor.id}/cpu-usage`} />
+					</TabsContent>
+					<TabsContent value="memory">
+						<MemoryChart url={`/${monitor.type}/${monitor.id}/memory-usage`} />
+					</TabsContent>
 				</Tabs>
 
 				<LogTable url={`/${monitor.type}/${monitor.id}/logs`} />

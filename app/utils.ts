@@ -1,6 +1,20 @@
 // import { useMatches } from "@remix-run/react";
 // import { useMemo } from "react";
 
+import {
+	endOfDay,
+	endOfToday,
+	endOfWeek,
+	startOfDay,
+	startOfMonth,
+	startOfToday,
+	startOfWeek,
+	startOfYear,
+	subDays,
+	subHours,
+	subYears,
+} from 'date-fns';
+
 // import type { User } from "~/models/user.server";
 
 const DEFAULT_REDIRECT = '/';
@@ -68,4 +82,44 @@ export function safeRedirect(
 
 export function validateEmail(email: unknown): email is string {
 	return typeof email === 'string' && email.length > 3 && email.includes('@');
+}
+
+export function dateRange(key: string) {
+	const today = new Date();
+	switch (key) {
+		case 'today':
+			return { startDate: startOfToday(), endDate: endOfToday() };
+			break;
+		case 'last_24_hours':
+		default:
+			return { startDate: subHours(today, 24), endDate: today };
+			break;
+		case 'yesterday':
+			return {
+				startDate: startOfDay(subDays(today, 1)),
+				endDate: endOfDay(subDays(today, 1)),
+			};
+			break;
+		case 'this_week':
+			return { startDate: startOfWeek(today), endDate: endOfWeek(today) };
+			break;
+		case 'last_7_days':
+			return { startDate: subDays(today, 7), endDate: endOfToday() };
+			break;
+		case 'this_month':
+			return { startDate: startOfMonth(today), endDate: endOfToday() };
+			break;
+		case 'last_30_days':
+			return { startDate: subDays(today, 30), endDate: endOfToday() };
+			break;
+		case 'last_90_days':
+			return { startDate: subDays(today, 90), endDate: endOfToday() };
+			break;
+		case 'this_year':
+			return { startDate: startOfYear(today), endDate: endOfToday() };
+			break;
+		case 'all_time':
+			return { startDate: subYears(today, 50), endDate: endOfToday() };
+			break;
+	}
 }

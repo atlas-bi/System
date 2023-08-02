@@ -16,7 +16,7 @@ import {
 	subYears,
 } from 'date-fns';
 import { dateOptions } from '~/models/dates';
-import { getDriveUsage } from '~/models/monitor.server';
+import { getMemoryUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
 
@@ -35,8 +35,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		url.searchParams.get('range'),
 	);
 
-	const drive = await getDriveUsage({ id: params.driveId, startDate, endDate });
-	if (!drive) {
+	const monitor = await getMemoryUsage({
+		id: params.monitorId,
+		startDate,
+		endDate,
+	});
+	if (!monitor) {
 		throw new Response('Not Found', { status: 404 });
 	}
 
@@ -54,28 +58,28 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	switch (groupSize) {
 		case 'minute':
 			// minute is db default
-			return json({ drive: { ...drive, startDate, endDate } });
+			return json({ monitor: { ...monitor, startDate, endDate } });
 		case 'hour':
-			grouped = drive.usage.reduce((a, e) => {
+			grouped = monitor.feeds.reduce((a, e) => {
 				if (!a[startOfHour(e.createdAt).toISOString()]) {
 					a[startOfHour(e.createdAt).toISOString()] = [];
 				}
 				a[startOfHour(e.createdAt).toISOString()].push({
-					free: e.free,
-					used: e.used,
+					memoryTotal: e.memoryTotal,
+					memoryFree: e.memoryFree,
 				});
 				return a;
 			}, {});
 			break;
 		case 'day':
 		default:
-			grouped = drive.usage.reduce((a, e) => {
+			grouped = monitor.feeds.reduce((a, e) => {
 				if (!a[startOfDay(e.createdAt).toISOString()]) {
 					a[startOfDay(e.createdAt).toISOString()] = [];
 				}
 				a[startOfDay(e.createdAt).toISOString()].push({
-					free: e.free,
-					used: e.used,
+					memoryTotal: e.memoryTotal,
+					memoryFree: e.memoryFree,
 				});
 				return a;
 			}, {});
@@ -83,15 +87,21 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	}
 
 	// return max value for the period.
-	const usage = Object.entries(grouped)
+	const feeds = Object.entries(grouped)
 		.map(([k, v]) => {
 			return {
 				createdAt: k,
-				free: v.reduce((a, e) => Math.max(Number(a), Number(e.free)), 0), //a + Number(e.free), 0) / v.length,
-				used: v.reduce((a, e) => Math.max(Number(a), Number(e.used)), 0), //a + Number(e.used), 0) / v.length,
+				memoryTotal: v.reduce(
+					(a, e) => Math.max(Number(a), Number(e.memoryTotal)),
+					0,
+				), //a + Number(e.memoryTotal), 0) / v.length,
+				memoryFree: v.reduce(
+					(a, e) => Math.max(Number(a), Number(e.memoryFree)),
+					0,
+				), // a + Number(e.memoryFree), 0) / v.length,
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
 
-	return json({ drive: { ...drive, usage, startDate, endDate } });
+	return json({ monitor: { ...monitor, feeds, startDate, endDate } });
 };

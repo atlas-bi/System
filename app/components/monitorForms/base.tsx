@@ -126,7 +126,7 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 									</SelectGroup>
 								</SelectContent>
 							</Select>
-							{data.type === 'windows' && (
+							{(data.type === 'windows' || data.type === 'ubuntu') && (
 								<SshForm data={data} setData={setData} />
 							)}
 						</div>

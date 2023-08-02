@@ -9,16 +9,7 @@ import {
 	updateMonitor,
 } from '~/models/monitor.server';
 import Notifier from '~/notifications/notifier';
-
-function disposeSsh(ssh) {
-	if (ssh.connection) {
-		ssh.getConnection().end();
-		ssh.connection.on('error', function () {
-			/* No Op */
-		});
-		ssh.dispose();
-	}
-}
+import { disposeSsh } from './helpers.server';
 
 function cpuBuilder(data) {
 	// list of cpu

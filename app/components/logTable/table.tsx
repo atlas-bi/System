@@ -59,6 +59,12 @@ export function LogTable({ url }: { url: string }) {
 	const [data, setData] = React.useState([]);
 	const [pages, setPages] = React.useState(-1);
 
+	// rerun on url change
+	useEffect(
+		() => logsFetcher.load(`${url}?page=${pageIndex}&size=${pageSize}`),
+		[url],
+	);
+
 	// Get fresh data every 30 seconds.
 	useEffect(() => {
 		const interval = setInterval(() => {

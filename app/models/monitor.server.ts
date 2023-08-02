@@ -358,6 +358,70 @@ export function getDriveUsage({
 	});
 }
 
+export function getCpuUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.monitor.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			type: true,
+			feeds: {
+				select: {
+					id: true,
+					cpuLoad: true,
+					cpuSpeed: true,
+					createdAt: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+			},
+		},
+	});
+}
+
+export function getMemoryUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.monitor.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			type: true,
+			feeds: {
+				select: {
+					id: true,
+					memoryFree: true,
+					memoryTotal: true,
+					createdAt: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+			},
+		},
+	});
+}
+
 export function getLatestMonitorLog({
 	driveId,
 	monitorId,
