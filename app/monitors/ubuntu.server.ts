@@ -37,9 +37,12 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		// const fullSpecs = await getStdout(ssh, 'sudo dmidecode')
 		const manufacturer = await getStdout(
 			ssh,
-			'dmidecode -s system-manufacturer',
+			'cat /sys/devices/virtual/dmi/id/sys_vendor',
 		);
-		const model = await getStdout(ssh, 'dmidecode -s system-version');
+		const model = await getStdout(
+			ssh,
+			'cat /sys/devices/virtual/dmi/id/product_version',
+		);
 		const os = await getStdout(ssh, 'lsb_release -ds');
 		const osVersion = await getStdout(ssh, 'lsb_release -rs');
 		const lastBoot = await getStdout(ssh, 'uptime -s');
