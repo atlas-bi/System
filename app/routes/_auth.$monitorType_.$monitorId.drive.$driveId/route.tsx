@@ -104,7 +104,8 @@ export default function Index() {
 					</>
 				) : (
 					<>
-						{drive.name}:\{drive.location}
+						{drive.root}
+						{drive.location}
 					</>
 				)}
 			</H1>

@@ -814,10 +814,18 @@ export function updateMonitor({
 		model?: string;
 		os?: string;
 		osVersion?: string;
+		cpuManufacturer?: string;
+		cpuModel?: string;
+		cpuCores?: string | null;
+		cpuProcessors?: string;
+		lastBootTime?: string | null | Date;
+		cpuMaxSpeed?: string | null;
 	};
 	feed?: {
 		memoryFree?: string;
 		memoryTotal?: string;
+		cpuLoad?: string;
+		cpuSpeed?: string;
 	};
 	drives?: {
 		data: {

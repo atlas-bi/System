@@ -180,7 +180,9 @@ export default async function WindowsMonitor({
 			lastBoot = new Date(os.LastBootUpTime);
 		}
 
-		const disabledDrives = await getMonitorDisabledDrives({ id: monitor.id });
+		const disabledDrives = await getMonitorDisabledDrives({
+			monitorId: monitor.id,
+		});
 
 		// only update drives that are enabled.
 		const updateableDrives = s.filter((drive) => {
