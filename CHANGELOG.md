@@ -1,3 +1,8 @@
+## 1.18.0 (2023-08-03)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([2d55942](https://github.com/atlas-bi/System/commit/2d55942))
+* feat(ubuntu): added ubuntu drive monitor ([ee20b0e](https://github.com/atlas-bi/System/commit/ee20b0e))
+
 ## 1.17.0 (2023-08-02)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([7098e9b](https://github.com/atlas-bi/System/commit/7098e9b))
