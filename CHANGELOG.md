@@ -1,3 +1,8 @@
+## 1.17.0 (2023-08-02)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([7098e9b](https://github.com/atlas-bi/System/commit/7098e9b))
+* feat(charts): added cpu and memory charts ([d8df184](https://github.com/atlas-bi/System/commit/d8df184))
+
 ## <small>1.16.1 (2023-07-31)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([31ed214](https://github.com/atlas-bi/System/commit/31ed214))
