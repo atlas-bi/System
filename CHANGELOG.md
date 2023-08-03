@@ -1,3 +1,8 @@
+## <small>1.18.1 (2023-08-03)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([2c6676e](https://github.com/atlas-bi/System/commit/2c6676e))
+* fix(sudo): removed sudo from ubuntu commands, they must login as root to run ([5714dbb](https://github.com/atlas-bi/System/commit/5714dbb))
+
 ## 1.18.0 (2023-08-03)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([2d55942](https://github.com/atlas-bi/System/commit/2d55942))
