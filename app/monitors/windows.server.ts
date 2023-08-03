@@ -282,7 +282,12 @@ export default async function WindowsMonitor({
 		console.log(`successfully ran ${monitor.id}`);
 	} catch (e) {
 		console.log(e);
-		await Notifier({ job: monitor.id, message: e.toString() });
+		let message = e.toString();
+		try {
+			message = JSON.stringify(e);
+		} catch (e) {}
+
+		await Notifier({ job: monitor.id, message });
 
 		await monitorError({ id: monitor.id });
 		console.log(`${monitor.id} monitor failed.`);

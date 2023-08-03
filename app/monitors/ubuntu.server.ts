@@ -37,13 +37,13 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		// const fullSpecs = await getStdout(ssh, 'sudo dmidecode')
 		const manufacturer = await getStdout(
 			ssh,
-			'sudo dmidecode -s system-manufacturer',
+			'dmidecode -s system-manufacturer',
 		);
-		const model = await getStdout(ssh, 'sudo dmidecode -s system-version');
+		const model = await getStdout(ssh, 'dmidecode -s system-version');
 		const os = await getStdout(ssh, 'lsb_release -ds');
 		const osVersion = await getStdout(ssh, 'lsb_release -rs');
 		const lastBoot = await getStdout(ssh, 'uptime -s');
-		const cpuInfo = JSON.parse(await getStdout(ssh, 'sudo lscpu --json')).lscpu;
+		const cpuInfo = JSON.parse(await getStdout(ssh, 'lscpu --json')).lscpu;
 		// escape the back slashes!
 		const cpuLoad = await getStdout(
 			ssh,
@@ -204,7 +204,12 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		console.log(`successfully ran ${monitor.id}`);
 	} catch (e) {
 		console.log(e);
-		await Notifier({ job: monitor.id, message: e.toString() });
+		let message = e.toString();
+		try {
+			message = JSON.stringify(e);
+		} catch (e) {}
+
+		await Notifier({ job: monitor.id, message });
 
 		await monitorError({ id: monitor.id });
 		console.log(`${monitor.id} monitor failed.`);
