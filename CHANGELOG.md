@@ -1,3 +1,8 @@
+## 1.19.0 (2023-08-04)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([9fb1166](https://github.com/atlas-bi/System/commit/9fb1166))
+* feat(cpu): monitor individual cpus, fix drive growth calc ([9ceee94](https://github.com/atlas-bi/System/commit/9ceee94))
+
 ## <small>1.18.2 (2023-08-03)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([794eee4](https://github.com/atlas-bi/System/commit/794eee4))
