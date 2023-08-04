@@ -1,3 +1,8 @@
+## <small>1.18.2 (2023-08-03)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([794eee4](https://github.com/atlas-bi/System/commit/794eee4))
+* fix(ubuntu): removed sudo only command ([d9f9240](https://github.com/atlas-bi/System/commit/d9f9240))
+
 ## <small>1.18.1 (2023-08-03)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([2c6676e](https://github.com/atlas-bi/System/commit/2c6676e))
