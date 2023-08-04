@@ -136,16 +136,6 @@ export default function Index() {
 									{bytes(Number(drive.usage?.[0]?.free)) || '-1'}
 								</TableCell>
 							</TableRow>
-							<TableRow>
-								<TableCell className="py-1">Days Till Full</TableCell>
-								<TableCell className="py-1">{drive.daysTillFull}</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell className="py-1">Growth Rate</TableCell>
-								<TableCell className="py-1">
-									{bytes(Number(drive.growthRate))} / day
-								</TableCell>
-							</TableRow>
 						</TableBody>
 					</Table>
 				</div>

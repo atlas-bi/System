@@ -10,6 +10,7 @@ import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
 import { NodeSSH } from 'node-ssh';
 import { decrypt } from '@/lib/utils';
+import { differenceInDays } from 'date-fns';
 
 async function getStdout(ssh, command) {
 	const out = await ssh.execCommand(command);
@@ -50,7 +51,11 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		// escape the back slashes!
 		const cpuLoad = await getStdout(
 			ssh,
-			'top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'',
+			'top -bn1 -w512 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'',
+		);
+		const allCpuLoad = await getStdout(
+			ssh,
+			'top -bn1 -1 -w512 | grep \'%Cpu\' | sed "s/.\\(%Cpu[0-9]*.*\\)/\\n\\1/" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'',
 		);
 		const memoryTotal = await getStdout(
 			ssh,
@@ -170,6 +175,9 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 					free: (Number(drive.avail) * 1000).toString(),
 				};
 			}),
+			cpus: allCpuLoad
+				.split(/\r?\n/)
+				.map((x: string, i: number) => ({ name: i.toString(), used: x })),
 		});
 
 		const oneDay = 24 * 60 * 60 * 1000;
@@ -180,12 +188,9 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 					await setDriveDays({ id: drive.id, daysTillFull: null });
 					await setDriveGrowth({ id: drive.id, growthRate: null });
 				} else {
-					const start = drive.usage[0];
-					const end = drive.usage[drive.usage.length - 1];
-					const diffDays = Math.max(
-						Math.round(Math.abs((start.createdAt - end.createdAt) / oneDay)),
-						1,
-					);
+					const end = drive.usage[0];
+					const start = drive.usage[drive.usage.length - 1];
+					const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
 					const usedGrowth = end.used - start.used;
 					const free = Number(drive.size) - end.used;
 					const daysTillFull = (

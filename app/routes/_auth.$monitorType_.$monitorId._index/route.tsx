@@ -112,6 +112,9 @@ export default function Index() {
 				</div>
 			</div>
 			<H1 className="space-x-2">
+				{monitor.enabled === false && (
+					<span className="!text-slate-400">(Disabled)</span>
+				)}
 				<span>{monitor.title}</span>
 				{monitor.host && <span>({monitor.host})</span>}
 			</H1>

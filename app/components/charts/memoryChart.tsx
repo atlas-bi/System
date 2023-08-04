@@ -95,8 +95,8 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				x: {
 					stacked: true,
 					type: 'time',
-					min: () => usageFetcher.data?.drive?.startDate,
-					max: () => usageFetcher.data?.drive?.endDate,
+					min: () => usageFetcher.data?.monitor?.startDate,
+					max: () => usageFetcher.data?.monitor?.endDate,
 					time: {
 						unit: () =>
 							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||

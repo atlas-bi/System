@@ -44,6 +44,7 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 		select: {
 			id: true,
 			type: true,
+			enabled: true,
 			host: true,
 			password: true,
 			username: true,
@@ -386,6 +387,27 @@ export function getCpuUsage({
 				},
 				orderBy: { createdAt: 'desc' },
 			},
+			cpus: {
+				select: {
+					id: true,
+					title: true,
+					usage: {
+						select: {
+							id: true,
+							load: true,
+							speed: true,
+							createdAt: true,
+						},
+						where: {
+							createdAt: {
+								gte: startDate,
+								lt: endDate,
+							},
+						},
+						orderBy: { createdAt: 'desc' },
+					},
+				},
+			},
 		},
 	});
 }
@@ -560,6 +582,7 @@ export async function createMonitor({
 	port,
 	type,
 	description,
+	enabled,
 }: Pick<
 	Monitor,
 	| 'title'
@@ -570,6 +593,7 @@ export async function createMonitor({
 	| 'host'
 	| 'type'
 	| 'description'
+	| 'enabled'
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
@@ -581,6 +605,7 @@ export async function createMonitor({
 			port,
 			type,
 			description,
+			enabled,
 		},
 		select: {
 			id: true,
@@ -621,6 +646,7 @@ export async function editMonitor({
 	port,
 	type,
 	description,
+	enabled,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -632,6 +658,7 @@ export async function editMonitor({
 	| 'host'
 	| 'type'
 	| 'description'
+	| 'enabled'
 >) {
 	const monitor = await prisma.monitor.update({
 		where: { id },
@@ -644,6 +671,7 @@ export async function editMonitor({
 			port,
 			type,
 			description,
+			enabled,
 		},
 		select: {
 			id: true,
@@ -804,6 +832,7 @@ export function updateMonitor({
 	data,
 	feed,
 	drives,
+	cpus,
 }: Pick<Monitor, 'id'> & {
 	data: {
 		caption?: string;
@@ -837,6 +866,11 @@ export function updateMonitor({
 		};
 		used?: string;
 		free?: string;
+	}[];
+	cpus?: {
+		name: string;
+		used: string;
+		speed?: string;
 	}[];
 }) {
 	let lastWeek = new Date();
@@ -882,6 +916,38 @@ export function updateMonitor({
 								where: {
 									monitorId_name: {
 										name: drive.data.name,
+										monitorId: id,
+									},
+								},
+							};
+						}),
+				  }
+				: undefined,
+			cpus: cpus
+				? {
+						upsert: cpus.map((cpu) => {
+							return {
+								update: {
+									title: cpu.name,
+									usage: {
+										create: {
+											load: cpu.used,
+											speed: cpu.speed ? cpu.speed : undefined,
+										},
+									},
+								},
+								create: {
+									title: cpu.name,
+									usage: {
+										create: {
+											load: cpu.used,
+											speed: cpu.speed ? cpu.speed : undefined,
+										},
+									},
+								},
+								where: {
+									monitorId_title: {
+										title: cpu.name,
 										monitorId: id,
 									},
 								},

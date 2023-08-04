@@ -60,12 +60,13 @@ export async function action({ request }: ActionArgs) {
 			}
 
 			let monitor = {};
-			console.log(values);
+
 			if (values.id) {
 				monitor = await editMonitor({
 					id: values.id.toString(),
 					title: values.title.toString(),
 					host: values.host.toString(),
+					enabled: values.enabled.toString() == 'true',
 					username: values.username.toString(),
 					password: values.password ? values.password.toString() : null,
 					privateKey:
@@ -86,6 +87,7 @@ export async function action({ request }: ActionArgs) {
 					title: values.title.toString(),
 					host: values.host.toString(),
 					username: values.username.toString(),
+					enabled: values.enabled.toString() == 'true',
 					password: values.password ? values.password.toString() : null,
 					privateKey:
 						values.privateKey && values.privateKey.toString() != 'null'

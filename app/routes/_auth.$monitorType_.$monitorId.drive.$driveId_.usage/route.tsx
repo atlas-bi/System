@@ -2,6 +2,7 @@ import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import {
 	addDays,
+	differenceInDays,
 	endOfDay,
 	endOfToday,
 	endOfWeek,
@@ -19,6 +20,32 @@ import { dateOptions } from '~/models/dates';
 import { getDriveUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
+
+function calcGrowth({ usage }) {
+	if (!usage) {
+		return { daysTillFull: -1, growthRage: -1 };
+	}
+
+	const end = usage[0];
+	const start = usage[usage.length - 1];
+
+	const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
+
+	console.log(diffDays);
+
+	const usedGrowth = Number(end.used) - Number(start.used);
+
+	if (usedGrowth === 0) {
+		return { daysTillFull: -1, growthRate: 0 };
+	}
+
+	const daysTillFull =
+		Math.max(Math.round((Number(end.free) * diffDays) / usedGrowth), -1) || -1;
+
+	const growthRate = usedGrowth / diffDays;
+
+	return { daysTillFull, growthRate };
+}
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -50,11 +77,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	}
 
 	let grouped = {};
+	const { daysTillFull, growthRate } = calcGrowth({ usage: drive.usage });
 
 	switch (groupSize) {
 		case 'minute':
 			// minute is db default
-			return json({ drive: { ...drive, startDate, endDate } });
+			return json({
+				drive: { ...drive, daysTillFull, growthRate, startDate, endDate },
+			});
 		case 'hour':
 			grouped = drive.usage.reduce((a, e) => {
 				if (!a[startOfHour(e.createdAt).toISOString()]) {
@@ -93,5 +123,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
 
-	return json({ drive: { ...drive, usage, startDate, endDate } });
+	return json({
+		drive: { ...drive, usage, daysTillFull, growthRate, startDate, endDate },
+	});
 };

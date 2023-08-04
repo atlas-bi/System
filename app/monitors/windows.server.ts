@@ -10,9 +10,11 @@ import {
 } from '~/models/monitor.server';
 import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
+import { cp } from 'fs';
+import { differenceInDays } from 'date-fns';
 
 function cpuBuilder(data) {
-	// list of cpu
+	// list of cpu for each socket
 
 	if (data.length === undefined) return data;
 
@@ -105,6 +107,10 @@ export default async function WindowsMonitor({
 			`${pwshCommand} -command "Get-CIMInstance win32_processor | Select-Object LoadPercentage,Manufacturer,Caption,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed,CurrentClockSpeed | ConvertTo-Json"`,
 		);
 
+		const cpuRaw = await ssh.execCommand(
+			`${pwshCommand} -command "(Get-CimInstance -Query \\"select Name, PercentProcessorTime from Win32_PerfFormattedData_PerfOS_Processor\\") | foreach-object { write-host \\"$($_.Name): $($_.PercentProcessorTime)\\" };"`,
+		);
+
 		if (csRaw.code !== 0) {
 			throw { host, pwshCommand, csRaw };
 		}
@@ -115,6 +121,10 @@ export default async function WindowsMonitor({
 
 		if (pcRaw.code !== 0) {
 			throw pcRaw;
+		}
+
+		if (cpuRaw.code !== 0) {
+			throw cpuRaw;
 		}
 
 		const cs = JSON.parse(
@@ -138,6 +148,14 @@ export default async function WindowsMonitor({
 				),
 			),
 		);
+
+		const cpus = cpuRaw.stdout
+			.split(/\r?\n/)
+			.map((cpu: string) => cpu.split(': '))
+			.map((cpu: string[]) => {
+				return { name: cpu[0], used: cpu[1] };
+			})
+			.filter((cpu) => cpu.name !== '_Total');
 
 		if (storage.code !== 0) {
 			throw storage;
@@ -245,6 +263,7 @@ export default async function WindowsMonitor({
 					};
 				},
 			),
+			cpus,
 		});
 
 		const oneDay = 24 * 60 * 60 * 1000;
@@ -255,12 +274,9 @@ export default async function WindowsMonitor({
 					await setDriveDays({ id: drive.id, daysTillFull: null });
 					await setDriveGrowth({ id: drive.id, growthRate: null });
 				} else {
-					const start = drive.usage[0];
-					const end = drive.usage[drive.usage.length - 1];
-					const diffDays = Math.max(
-						Math.round(Math.abs((start.createdAt - end.createdAt) / oneDay)),
-						1,
-					);
+					const end = drive.usage[0];
+					const start = drive.usage[drive.usage.length - 1];
+					const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
 					const usedGrowth = end.used - start.used;
 					const free = Number(drive.size) - end.used;
 					const daysTillFull = (

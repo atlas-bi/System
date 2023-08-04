@@ -31,8 +31,9 @@ ChartJS.register([
 
 import 'chartjs-adapter-date-fns';
 import { H3 } from '../ui/typography';
-import { Circle, Loader, RefreshCw } from 'lucide-react';
+import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
+import { TrendingUp } from 'lucide-react';
 
 export const DriveChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
@@ -197,6 +198,22 @@ export const DriveChart = ({ url }: { url: string }) => {
 						</Button>
 						<DateFilter value={unit} onChange={setUnit} />
 					</div>
+				</div>
+				<div className="space-x-4 text-sm h-5 flex content-center">
+					{usageFetcher.data?.drive?.daysTillFull && (
+						<span className="flex my-auto space-x-2">
+							<CalendarDays size={14} className="text-slate-400 " />
+							<span>{usageFetcher.data.drive.daysTillFull} days till full</span>
+						</span>
+					)}
+					{usageFetcher.data?.drive?.growthRate && (
+						<span className="flex my-auto space-x-2">
+							<TrendingUp size={14} className="text-slate-400 " />
+							<span>
+								{bytes(usageFetcher.data?.drive?.growthRate)}/day growth
+							</span>
+						</span>
+					)}
 				</div>
 				<div className="h-[450px] relative">
 					<Line ref={chartRef} options={options} data={chartData} />

@@ -12,7 +12,7 @@ import {
 	Filler,
 	TimeScale,
 } from 'chart.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -34,13 +34,23 @@ import { H2, H3 } from '../ui/typography';
 import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
-export const CpuChart = ({ url }: { url: string }) => {
-	const usageFetcher = useFetcher();
-	const [unit, setUnit] = useState('last_24_hours');
+const SubChart = ({
+	speed,
+	unit,
+	setUnit,
+	fetcherState,
+	data,
+	startDate,
+	endDate,
+}) => {
 	const chartRef = useRef<ChartJS>(null);
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
+	};
+
+	const emptyDataset = {
+		datasets: [],
 	};
 
 	const getOptions = useCallback(() => {
@@ -95,7 +105,7 @@ export const CpuChart = ({ url }: { url: string }) => {
 				},
 				y2: {
 					type: 'linear' as const,
-					display: true,
+					display: speed,
 					position: 'right' as const,
 					beginAtZero: true,
 					ticks: {
@@ -108,8 +118,8 @@ export const CpuChart = ({ url }: { url: string }) => {
 				x: {
 					stacked: true,
 					type: 'time',
-					min: () => usageFetcher.data?.drive?.startDate,
-					max: () => usageFetcher.data?.drive?.endDate,
+					min: () => startDate,
+					max: () => endDate,
 					time: {
 						unit: () =>
 							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
@@ -121,28 +131,15 @@ export const CpuChart = ({ url }: { url: string }) => {
 				},
 			},
 		};
-	}, [unit, usageFetcher.data]);
-
+	}, [unit, data]);
 	const [options, setOptions] = useState(getOptions());
 
+	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
 	useEffect(() => {
-		usageFetcher.load(
-			url + `?range=${unit}`,
-			//&unit=${dateOptions.filter((x) => x.value === unit)?.[0]
-			//?.unit}`,
-		);
-	}, [unit]);
-
-	useEffect(() => {
-		if (usageFetcher.state === 'loading') {
+		if (fetcherState === 'loading') {
 			setChartData(emptyDataset);
 		}
-	}, [usageFetcher]);
-
-	const emptyDataset = {
-		datasets: [],
-	};
-	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
+	}, [fetcherState]);
 
 	useEffect(() => {
 		const chart = chartRef.current;
@@ -152,18 +149,14 @@ export const CpuChart = ({ url }: { url: string }) => {
 		}
 
 		const chartData = {
-			labels: usageFetcher.data?.monitor?.feeds?.map(
-				(x: MonitorFeeds) => x.createdAt,
-			),
+			labels: data?.map((x: MonitorFeeds) => x.createdAt),
 			datasets: [
 				{
-					fill: true,
+					fill: speed,
 					label: 'Load',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						Number(x.cpuLoad),
-					),
+					data: data?.map((x: MonitorFeeds) => Number(x.cpuLoad)),
 					borderColor: createLinearGradient(
 						chart.ctx,
 						chart.chartArea,
@@ -189,9 +182,7 @@ export const CpuChart = ({ url }: { url: string }) => {
 				{
 					label: 'Speed',
 					fill: false,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						Number(x.cpuSpeed),
-					),
+					data: data?.map((x: MonitorFeeds) => Number(x.cpuSpeed)),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },
@@ -204,7 +195,18 @@ export const CpuChart = ({ url }: { url: string }) => {
 		};
 		setOptions(getOptions());
 		setChartData(chartData);
-	}, [usageFetcher.data]);
+	}, [data]);
+
+	return <Line ref={chartRef} options={options} data={chartData} />;
+};
+
+export const CpuChart = ({ url }: { url: string }) => {
+	const usageFetcher = useFetcher();
+	const [unit, setUnit] = useState('last_24_hours');
+
+	useEffect(() => {
+		usageFetcher.load(`${url}?range=${unit}`);
+	}, [unit]);
 
 	return (
 		<>
@@ -230,13 +232,43 @@ export const CpuChart = ({ url }: { url: string }) => {
 					</div>
 				</div>
 				<div className="h-[450px] relative">
-					<Line ref={chartRef} options={options} data={chartData} />
+					<SubChart
+						speed={true}
+						unit={unit}
+						data={usageFetcher.data?.monitor?.feeds}
+						startDate={usageFetcher.data?.monitor?.startDate}
+						endDate={usageFetcher.data?.monitor?.endDate}
+					/>
+
 					{usageFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />
 						</div>
 					)}
 				</div>
+
+				<div className="grid sm:grid-cols-1 md:grid-cols-3 ls:grid-cols-4">
+					{usageFetcher.data?.monitor?.cpus.map((x) => (
+						<div key={x.id}>
+							<H3 className="text-base">CPU {x.title}</H3>
+							<div className="h-[150px] relative" key={x.id}>
+								<SubChart
+									unit={unit}
+									speed={false}
+									data={x.usage}
+									startDate={usageFetcher.data?.monitor?.startDate}
+									endDate={usageFetcher.data?.monitor?.endDate}
+								/>
+								{usageFetcher.state === 'loading' && (
+									<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
+										<Loader className="m-auto animate-spin" />
+									</div>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+
 				<div className="flex space-x-4 text-muted-foreground">
 					<div className="flex space-x-2 items-center">
 						<Circle

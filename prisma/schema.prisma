@@ -67,6 +67,7 @@ model Monitor {
   updatedAt DateTime @updatedAt
 
   drives Drive[]
+  cpus   Cpu[]
   logs   MonitorLogs[]
   feeds  MonitorFeeds[]
 
@@ -107,6 +108,31 @@ model MonitorLogs {
 
   drive   Drive?  @relation(fields: [driveId], references: [id])
   driveId String?
+}
+
+model Cpu {
+  id        String     @id @default(cuid())
+  title     String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Monitor   Monitor?   @relation(fields: [monitorId], references: [id])
+  monitorId String?
+  usage     CpuUsage[]
+
+  @@unique([monitorId, title])
+}
+
+model CpuUsage {
+  id String @id @default(cuid())
+
+  cpu   Cpu    @relation(fields: [cpuId], references: [id])
+  cpuId String
+
+  createdAt DateTime @default(now())
+
+  // fields sent from monitor
+  load  String?
+  speed String?
 }
 
 model Drive {

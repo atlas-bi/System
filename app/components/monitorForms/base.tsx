@@ -27,6 +27,7 @@ import { Loader2 } from 'lucide-react';
 
 import type { Monitor } from '~/models/monitor.server';
 import SshForm from './ssh';
+import { Switch } from '~/components/ui/switch';
 
 export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 	const [open, setOpen] = useState(false);
@@ -106,6 +107,14 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 									setData({ ...data, description: e.target.value })
 								}
 							/>
+							<Label className="text-right">Enabled</Label>
+							<div className="self-start col-span-3">
+								<Switch
+									name="enabled"
+									checked={data.enabled}
+									onCheckedChange={(enabled) => setData({ ...data, enabled })}
+								/>
+							</div>
 							<Select
 								onValueChange={(type: string) => setData({ ...data, type })}
 								value={data.type}
