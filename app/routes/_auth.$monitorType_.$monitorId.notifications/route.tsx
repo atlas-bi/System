@@ -46,7 +46,7 @@ export async function action({ request, params }: ActionArgs) {
 	});
 	const formData = await request.formData();
 	const { ...values } = Object.fromEntries(formData);
-	console.log(values);
+
 	await updateMonitorNotifications({
 		id: params.monitorId,
 
@@ -195,58 +195,59 @@ export default function Index() {
 							</Collapsible>
 						</div>
 					</div>
-
-					<div className=" rounded-lg border p-4 max-w-[500px]">
-						<div className="space-y-2">
-							<div className="space-y-2 flex justify-between">
-								<div className="flex-grow">
-									<H3 className="text-2xl">Reboot</H3>
-									<div className="text-muted-foreground pb-2">
-										Recieve notification when server reboots.
+					{(monitor.type == 'windows' || monitor.type == 'ubuntu') && (
+						<div className=" rounded-lg border p-4 max-w-[500px]">
+							<div className="space-y-2">
+								<div className="space-y-2 flex justify-between">
+									<div className="flex-grow">
+										<H3 className="text-2xl">Reboot</H3>
+										<div className="text-muted-foreground pb-2">
+											Recieve notification when server reboots.
+										</div>
 									</div>
-								</div>
-								<div className="self-start pt-2">
-									<Switch
-										name="rebootNotify"
-										checked={reboot}
-										onCheckedChange={setReboot}
-									/>
-								</div>
-							</div>
-							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-									reboot ? '' : 'opacity-50 text-slate-600'
-								}`}
-							></div>
-							<Collapsible open={reboot}>
-								<CollapsibleContent className="space-y-2">
-									<div>
-										<MultiSelect
-											label="Notification Methods"
-											placeholder="choose"
-											data={notificationsMap}
-											active={notificationsMap.filter(
-												(x: { value: string }) =>
-													monitor.rebootNotifyTypes.filter(
-														(t) => t.id == x.value,
-													).length > 0,
-											)}
-											name="rebootNotifyTypes"
-											onChange={() => {
-												submit(form.current);
-											}}
+									<div className="self-start pt-2">
+										<Switch
+											name="rebootNotify"
+											checked={reboot}
+											onCheckedChange={setReboot}
 										/>
-										<Link
-											to="/admin/notifications"
-											className="text-sm text-sky-600/80"
-										>
-											Manage notification types.
-										</Link>
 									</div>
-								</CollapsibleContent>
-							</Collapsible>
+								</div>
+								<div
+									className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+										reboot ? '' : 'opacity-50 text-slate-600'
+									}`}
+								></div>
+								<Collapsible open={reboot}>
+									<CollapsibleContent className="space-y-2">
+										<div>
+											<MultiSelect
+												label="Notification Methods"
+												placeholder="choose"
+												data={notificationsMap}
+												active={notificationsMap.filter(
+													(x: { value: string }) =>
+														monitor.rebootNotifyTypes.filter(
+															(t) => t.id == x.value,
+														).length > 0,
+												)}
+												name="rebootNotifyTypes"
+												onChange={() => {
+													submit(form.current);
+												}}
+											/>
+											<Link
+												to="/admin/notifications"
+												className="text-sm text-sky-600/80"
+											>
+												Manage notification types.
+											</Link>
+										</div>
+									</CollapsibleContent>
+								</Collapsible>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</Form>
 		</>

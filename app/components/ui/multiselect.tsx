@@ -20,7 +20,7 @@ export function MultiSelect({
 	name,
 	active = [],
 }: {
-	label?: string;
+	label?: string | null;
 	placeholder?: string;
 	parentClassName?: string;
 	data: DataItem[];
@@ -38,7 +38,6 @@ export function MultiSelect({
 	}, []);
 
 	React.useEffect(() => {
-		console.log(typeof onChange);
 		if (typeof onChange == 'function') onChange(selected);
 	}, [selected]);
 
@@ -124,11 +123,18 @@ export function MultiSelect({
 						/>
 					</div>
 				</div>
-				<div className="relative mt-2 z-10">
+				<div
+					className="relative mt-2 z-10"
+					onMouseDown={(e) => {
+						console.log('mouse down list');
+						e.preventDefault();
+						return false;
+					}}
+				>
 					{open && selectables.length > 0 ? (
 						<div className="absolute w-full top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
 							{/*<CommandEmpty>No results found.</CommandEmpty>*/}
-							<CommandGroup className="h-full overflow-auto">
+							<CommandGroup className="h-full overflow-auto max-h-[400px]">
 								{selectables.map((framework) => {
 									return (
 										<CommandItem

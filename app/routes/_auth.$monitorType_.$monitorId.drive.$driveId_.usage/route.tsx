@@ -31,8 +31,6 @@ function calcGrowth({ usage }) {
 
 	const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
 
-	console.log(diffDays);
-
 	const usedGrowth = Number(end.used) - Number(start.used);
 
 	if (usedGrowth === 0) {

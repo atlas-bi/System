@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
 import { monitorTypes } from '~/models/monitor';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
+import { Minus } from 'lucide-react';
 
 export const columns: ColumnDef<any>[] = [
 	{
@@ -45,7 +46,9 @@ export const columns: ColumnDef<any>[] = [
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{row.getValue('hasError') ? (
+				{!row.getValue('enabled') ? (
+					<Minus className="text-slate-400" size={14} />
+				) : row.getValue('hasError') ? (
 					<AlertTriangle className="text-red-500" size={14} />
 				) : (
 					<Activity className="text-emerald-600" size={14} />

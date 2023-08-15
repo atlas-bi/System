@@ -80,6 +80,14 @@ export function safeRedirect(
 //   return maybeUser;
 // }
 
+export const jsonParser = (str: any) => {
+	try {
+		return JSON.parse(str);
+	} catch (e) {
+		return str;
+	}
+};
+
 export function validateEmail(email: unknown): email is string {
 	return typeof email === 'string' && email.length > 3 && email.includes('@');
 }

@@ -1,5 +1,5 @@
 import { encrypt } from '@/lib/utils';
-import type { Monitor, MonitorLogs, User } from '@prisma/client';
+import type { Monitor, MonitorFeeds, MonitorLogs, User } from '@prisma/client';
 import { prisma } from '~/db.server';
 import monitorMonitor from '~/queues/monitor.server';
 
@@ -60,6 +60,19 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			cpuCores: true,
 			cpuProcessors: true,
 			cpuMaxSpeed: true,
+			httpUrl: true,
+			httpIgnoreSsl: true,
+			httpAcceptedStatusCodes: true,
+			httpMaxRedirects: true,
+			httpRequestMethod: true,
+			httpBodyEncoding: true,
+			httpBody: true,
+			httpHeaders: true,
+			httpAuthentication: true,
+			httpUsername: true,
+			httpPassword: true,
+			httpDomain: true,
+			httpWorkstation: true,
 			feeds: {
 				select: {
 					id: true,
@@ -67,6 +80,8 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 					memoryTotal: true,
 					cpuLoad: true,
 					cpuSpeed: true,
+					ping: true,
+					hasError: true,
 				},
 				orderBy: {
 					createdAt: 'desc',
@@ -136,6 +151,19 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			rebootNotify: true,
 			rebootNotifyTypes: true,
 			rebootNotifySentAt: true,
+			httpUrl: true,
+			httpIgnoreSsl: true,
+			httpAcceptedStatusCodes: true,
+			httpMaxRedirects: true,
+			httpRequestMethod: true,
+			httpBodyEncoding: true,
+			httpBody: true,
+			httpHeaders: true,
+			httpAuthentication: true,
+			httpUsername: true,
+			httpPassword: true,
+			httpDomain: true,
+			httpWorkstation: true,
 			drives: {
 				select: {
 					id: true,
@@ -412,6 +440,38 @@ export function getCpuUsage({
 	});
 }
 
+export function getPing({
+	id,
+	startDate,
+	endDate,
+}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.monitor.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			type: true,
+			feeds: {
+				select: {
+					id: true,
+					ping: true,
+					createdAt: true,
+					hasError: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+			},
+		},
+	});
+}
+
 export function getMemoryUsage({
 	id,
 	startDate,
@@ -583,6 +643,19 @@ export async function createMonitor({
 	type,
 	description,
 	enabled,
+	httpUrl,
+	httpIgnoreSsl,
+	httpAcceptedStatusCodes,
+	httpMaxRedirects,
+	httpRequestMethod,
+	httpBodyEncoding,
+	httpBody,
+	httpHeaders,
+	httpAuthentication,
+	httpUsername,
+	httpPassword,
+	httpDomain,
+	httpWorkstation,
 }: Pick<
 	Monitor,
 	| 'title'
@@ -594,18 +667,44 @@ export async function createMonitor({
 	| 'type'
 	| 'description'
 	| 'enabled'
+	| 'httpUrl'
+	| 'httpIgnoreSsl'
+	| 'httpAcceptedStatusCodes'
+	| 'httpMaxRedirects'
+	| 'httpRequestMethod'
+	| 'httpBodyEncoding'
+	| 'httpBody'
+	| 'httpHeaders'
+	| 'httpAuthentication'
+	| 'httpUsername'
+	| 'httpPassword'
+	| 'httpDomain'
+	| 'httpWorkstation'
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
 			title,
 			host,
 			username,
-			password: password ? encrypt(password) : undefined,
-			privateKey: privateKey ? encrypt(privateKey) : undefined,
+			password: password ? encrypt(password) : null,
+			privateKey: privateKey ? encrypt(privateKey) : null,
 			port,
 			type,
 			description,
 			enabled,
+			httpUrl,
+			httpIgnoreSsl,
+			httpAcceptedStatusCodes,
+			httpMaxRedirects,
+			httpRequestMethod,
+			httpBodyEncoding,
+			httpBody,
+			httpHeaders,
+			httpAuthentication,
+			httpUsername,
+			httpPassword: httpPassword ? encrypt(httpPassword) : null,
+			httpDomain,
+			httpWorkstation,
 		},
 		select: {
 			id: true,
@@ -647,6 +746,19 @@ export async function editMonitor({
 	type,
 	description,
 	enabled,
+	httpUrl,
+	httpIgnoreSsl,
+	httpAcceptedStatusCodes,
+	httpMaxRedirects,
+	httpRequestMethod,
+	httpBodyEncoding,
+	httpBody,
+	httpHeaders,
+	httpAuthentication,
+	httpUsername,
+	httpPassword,
+	httpDomain,
+	httpWorkstation,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -659,6 +771,19 @@ export async function editMonitor({
 	| 'type'
 	| 'description'
 	| 'enabled'
+	| 'httpUrl'
+	| 'httpIgnoreSsl'
+	| 'httpAcceptedStatusCodes'
+	| 'httpMaxRedirects'
+	| 'httpRequestMethod'
+	| 'httpBodyEncoding'
+	| 'httpBody'
+	| 'httpHeaders'
+	| 'httpAuthentication'
+	| 'httpUsername'
+	| 'httpPassword'
+	| 'httpDomain'
+	| 'httpWorkstation'
 >) {
 	const monitor = await prisma.monitor.update({
 		where: { id },
@@ -672,6 +797,19 @@ export async function editMonitor({
 			type,
 			description,
 			enabled,
+			httpUrl,
+			httpIgnoreSsl,
+			httpAcceptedStatusCodes,
+			httpMaxRedirects,
+			httpRequestMethod,
+			httpBodyEncoding,
+			httpBody,
+			httpHeaders,
+			httpAuthentication,
+			httpUsername,
+			httpPassword: httpPassword ? encrypt(httpPassword) : undefined,
+			httpDomain,
+			httpWorkstation,
 		},
 		select: {
 			id: true,
@@ -855,6 +993,7 @@ export function updateMonitor({
 		memoryTotal?: string;
 		cpuLoad?: string;
 		cpuSpeed?: string;
+		ping?: string;
 	};
 	drives?: {
 		data: {
@@ -888,6 +1027,7 @@ export function updateMonitor({
 							memoryTotal: feed.memoryTotal,
 							cpuLoad: feed.cpuLoad,
 							cpuSpeed: feed.cpuSpeed,
+							ping: feed.ping,
 						},
 				  }
 				: undefined,
@@ -978,6 +1118,13 @@ export function updateMonitor({
 					},
 				},
 			},
+			feeds: {
+				select: { id: true },
+				orderBy: {
+					createdAt: 'desc',
+				},
+				take: 1,
+			},
 		},
 	});
 }
@@ -1029,5 +1176,25 @@ export function setMonitorRebootSentAt({
 	return prisma.monitor.update({
 		where: { id },
 		data: { rebootNotifySentAt },
+	});
+}
+
+export function setFeedError({
+	id,
+	hasError,
+}: Pick<MonitorFeeds, 'id' | 'hasError'>) {
+	return prisma.monitorFeeds.update({
+		where: { id },
+		data: { hasError },
+	});
+}
+
+export function getMonitorBootTime({ id }: Pick<Monitor, 'id'>) {
+	return prisma.monitor.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			lastBootTime: true,
+		},
 	});
 }

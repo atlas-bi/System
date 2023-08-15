@@ -24,32 +24,34 @@ export default async function Notifier({
 	const monitor = await getMonitor({ id: job });
 
 	if (message) {
-		collectionNotifier({ monitor, message });
+		return collectionNotifier({ monitor, message });
 	}
 
-	// reboot notifier
-	await rebootNotifier({ monitor });
+	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
+		// reboot notifier
+		await rebootNotifier({ monitor });
 
-	// drive notifications
-	monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
-		// don't report inactive drives.
-		if (drive.enabled == false) return;
+		// drive notifications
+		monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
+			// don't report inactive drives.
+			if (drive.enabled == false) return;
 
-		// drive has no usages, ignore.
-		if (drive.usage.length <= 0) return;
+			// drive has no usages, ignore.
+			if (drive.usage.length <= 0) return;
 
-		if (drive.missingNotify) {
-			// notify if drive was missing
-		}
+			if (drive.missingNotify) {
+				// notify if drive was missing
+			}
 
-		await percentFreeNotifier({ drive, monitor });
+			await percentFreeNotifier({ drive, monitor });
 
-		if (drive.sizeFreeNotify) {
-		}
+			if (drive.sizeFreeNotify) {
+			}
 
-		if (drive.growthRateNotify) {
-		}
-	});
+			if (drive.growthRateNotify) {
+			}
+		});
+	}
 }
 
 export const sendNotification = async ({

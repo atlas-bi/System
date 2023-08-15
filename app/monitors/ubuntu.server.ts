@@ -209,18 +209,22 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 
 		await Notifier({ job: monitor.id });
 
-		console.log(`successfully ran ${monitor.id}`);
+		console.log(`successfully ran ${monitor.type} monitor: ${monitor.id}`);
 	} catch (e) {
 		console.log(e);
 		let message = e.toString();
 		try {
 			message = JSON.stringify(e);
+			// don't return nothing
+			if (message === '{}') {
+				message = e.toString();
+			}
 		} catch (e) {}
 
 		await Notifier({ job: monitor.id, message });
 
 		await monitorError({ id: monitor.id });
-		console.log(`${monitor.id} monitor failed.`);
+		console.log(`${monitor.type} monitor ${monitor.id} failed.`);
 		// try to kill ssh again if there was an error.
 		disposeSsh(ssh);
 	}

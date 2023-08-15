@@ -1,0 +1,15 @@
+-- AlterTable
+ALTER TABLE "Monitor" ADD COLUMN     "httpAcceptedStatusCodes" TEXT,
+ADD COLUMN     "httpAuthentication" TEXT,
+ADD COLUMN     "httpBody" TEXT,
+ADD COLUMN     "httpBodyEncoding" TEXT,
+ADD COLUMN     "httpDomain" TEXT,
+ADD COLUMN     "httpHeaders" TEXT,
+ADD COLUMN     "httpIgnoreSsl" BOOLEAN,
+ADD COLUMN     "httpMaxRedirects" TEXT,
+ADD COLUMN     "httpMethod" TEXT,
+ADD COLUMN     "httpPassword" TEXT,
+ADD COLUMN     "httpUrl" TEXT,
+ADD COLUMN     "httpUsername" TEXT,
+ADD COLUMN     "httpWorkstation" TEXT,
+ADD COLUMN     "httpsAgent" TEXT;

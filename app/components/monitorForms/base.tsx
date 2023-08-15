@@ -28,6 +28,7 @@ import { Loader2 } from 'lucide-react';
 import type { Monitor } from '~/models/monitor.server';
 import SshForm from './ssh';
 import { Switch } from '~/components/ui/switch';
+import HttpForm from './http';
 
 export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 	const [open, setOpen] = useState(false);
@@ -38,7 +39,8 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 
 	const [data, setData] = useState<Monitor>(monitor);
 
-	useEffect(() => setData(monitor), [monitor]);
+	// don't do this, it resets the form when you click test.
+	// useEffect(() => setData(monitor), [monitor]);
 
 	useEffect(() => {
 		if (fetcher.state === 'idle' && fetcher.data?.monitor != null) {
@@ -68,6 +70,10 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 					<small className="text-red-700">
 						{testFetcher.data?.error?.code}
 					</small>
+				) : testFetcher.data?.error?.message ? (
+					<small className="text-red-700">
+						{testFetcher.data?.error?.message}
+					</small>
 				) : testFetcher.data?.error ? (
 					<small className="text-red-700">Failed to connect.</small>
 				) : (
@@ -91,8 +97,8 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 							<Input
 								type="text"
 								id="name"
-								value={data.title}
-								placeholder="Server 1"
+								value={data.title || ''}
+								placeholder="Monitor 1"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, title: e.target.value })}
 							/>
@@ -138,9 +144,12 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 							{(data.type === 'windows' || data.type === 'ubuntu') && (
 								<SshForm data={data} setData={setData} />
 							)}
+							{data.type === 'http' && (
+								<HttpForm data={data} setData={setData} />
+							)}
 						</div>
 					</div>
-					<DialogFooter className="sm:justify-between">
+					<DialogFooter className="sm:justify-between md:justify-end">
 						{data.id && (
 							<Button
 								type="button"

@@ -8,6 +8,7 @@ import {
 	editMonitor,
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
+import { HttpCheck } from '~/monitors/http.server';
 
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	if (str === undefined || str === null || str.toString().trim() === '') {
@@ -16,15 +17,34 @@ const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	return false;
 };
 
-const checkWindows = function ({ values }) {
-	if (values.type !== 'windows') return null;
+const jsonParser = (str: any) => {
+	try {
+		return JSON.parse(str);
+	} catch (e) {
+		console.log(e);
+		return str;
+	}
+};
+
+const checkBase = function ({ values }) {
 	if (isNullOrEmpty(values.title)) {
 		return json({ form: { error: 'Name is required.' } });
 	}
-
 	if (isNullOrEmpty(values.type)) {
 		return json({ form: { error: 'Type is required.' } });
 	}
+};
+
+const checkHttp = function ({ values }) {
+	if (values.type !== 'http') return null;
+
+	if (isNullOrEmpty(values.httpUrl)) {
+		return json({ form: { error: 'URL is required.' } });
+	}
+};
+
+const checkSsh = function ({ values }) {
+	if (values.type !== 'windows' && values.type !== 'ubuntu') return null;
 
 	if (isNullOrEmpty(values.host)) {
 		return json({ form: { error: 'Host is required.' } });
@@ -53,10 +73,20 @@ export async function action({ request }: ActionArgs) {
 			const formData = await request.formData();
 			const { _action, ...values } = Object.fromEntries(formData);
 
-			const windowsErrors = checkWindows({ values });
+			const baseErrors = checkBase({ values });
+			if (baseErrors) {
+				return baseErrors;
+			}
 
-			if (windowsErrors) {
-				return windowsErrors;
+			const sshErrors = checkSsh({ values });
+
+			if (sshErrors) {
+				return sshErrors;
+			}
+
+			const httpErrors = checkHttp({ values });
+			if (httpErrors) {
+				return httpErrors;
 			}
 
 			let monitor = {};
@@ -65,9 +95,9 @@ export async function action({ request }: ActionArgs) {
 				monitor = await editMonitor({
 					id: values.id.toString(),
 					title: values.title.toString(),
-					host: values.host.toString(),
+					host: values.host ? values.host.toString() : null,
+					username: values.username ? values.username.toString() : null,
 					enabled: values.enabled.toString() == 'true',
-					username: values.username.toString(),
 					password: values.password ? values.password.toString() : null,
 					privateKey:
 						values.privateKey && values.privateKey.toString() != 'null'
@@ -79,15 +109,46 @@ export async function action({ request }: ActionArgs) {
 						values.description && values.description.toString() != 'null'
 							? values.description.toString()
 							: null,
+					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
+					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
+					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
+						? jsonParser(values.httpAcceptedStatusCodes)
+						: [],
+					httpMaxRedirects: values.httpMaxRedirects
+						? values.httpMaxRedirects.toString()
+						: null,
+					httpRequestMethod: values.httpRequestMethod
+						? values.httpRequestMethod.toString()
+						: null,
+					httpBodyEncoding: values.httpBodyEncoding
+						? values.httpBodyEncoding.toString()
+						: null,
+					httpBody: values.httpBodyText ? values.httpBodyText.toString() : null,
+					httpHeaders: values.httpHeaderText
+						? values.httpHeaderText.toString()
+						: null,
+					httpAuthentication: values.httpAuthentication
+						? values.httpAuthentication.toString()
+						: null,
+					httpUsername: values.httpUsername
+						? values.httpUsername.toString()
+						: null,
+					httpPassword: values.httpPassword
+						? values.httpPassword.toString()
+						: null,
+					httpDomain: values.httpDomain ? values.httpDomain.toString() : null,
+					httpWorkstation: values.httpWorkstation
+						? values.httpWorkstation.toString()
+						: null,
 				});
 
 				return json({ monitor });
 			} else {
 				monitor = await createMonitor({
 					title: values.title.toString(),
-					host: values.host.toString(),
-					username: values.username.toString(),
-					enabled: values.enabled.toString() == 'true',
+					host: values.host ? values.host.toString() : null,
+					username: values.username ? values.username.toString() : null,
+					enabled: values.enabled?.toString() == 'true',
 					password: values.password ? values.password.toString() : null,
 					privateKey:
 						values.privateKey && values.privateKey.toString() != 'null'
@@ -99,6 +160,37 @@ export async function action({ request }: ActionArgs) {
 						values.description && values.description.toString() != 'null'
 							? values.description.toString()
 							: null,
+					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
+					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
+					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
+						? jsonParser(values.httpAcceptedStatusCodes)
+						: [],
+					httpMaxRedirects: values.httpMaxRedirects
+						? values.httpMaxRedirects.toString()
+						: null,
+					httpRequestMethod: values.httpRequestMethod
+						? values.httpRequestMethod.toString()
+						: null,
+					httpBodyEncoding: values.httpBodyEncoding
+						? values.httpBodyEncoding.toString()
+						: null,
+					httpBody: values.httpBodyText ? values.httpBodyText.toString() : null,
+					httpHeaders: values.httpHeaderText
+						? values.httpHeaderText.toString()
+						: null,
+					httpAuthentication: values.httpAuthentication
+						? values.httpAuthentication.toString()
+						: null,
+					httpUsername: values.httpUsername
+						? values.httpUsername.toString()
+						: null,
+					httpPassword: values.httpPassword
+						? values.httpPassword.toString()
+						: null,
+					httpDomain: values.httpDomain ? values.httpDomain.toString() : null,
+					httpWorkstation: values.httpWorkstation
+						? values.httpWorkstation.toString()
+						: null,
 				});
 			}
 			return json({ monitor });
@@ -114,23 +206,72 @@ export async function action({ request }: ActionArgs) {
 			const formData = await request.formData();
 			const { _action, ...values } = Object.fromEntries(formData);
 
-			const windowsErrors = checkWindows({ values });
-
-			if (windowsErrors) {
-				return windowsErrors;
+			const baseErrors = checkBase({ values });
+			if (baseErrors) {
+				return baseErrors;
 			}
 
-			const ssh = new NodeSSH();
+			const sshErrors = checkSsh({ values });
 
-			try {
-				await ssh.connect({
-					...values,
+			if (sshErrors) {
+				return sshErrors;
+			}
+
+			const httpErrors = checkHttp({ values });
+			if (httpErrors) {
+				return httpErrors;
+			}
+
+			if (
+				values.type?.toString() === 'windows' ||
+				values.type?.toString() === 'ubuntu'
+			) {
+				const ssh = new NodeSSH();
+
+				try {
+					await ssh.connect({
+						...values,
+					});
+				} catch (e) {
+					console.log(e);
+					return json({ error: e });
+				}
+				return json({ success: 'Connection successful.' });
+			}
+
+			if (values.type?.toString() === 'http') {
+				let startTime = new Date();
+
+				const { res, error } = await HttpCheck({
+					httpBody: values.httpBody?.toString(),
+					httpAuthentication: values.httpAuthentication?.toString(),
+					httpUsername: values.httpUsername?.toString(),
+					httpPassword: values.httpPassword?.toString(),
+					httpIgnoreSsl: !!values.httpIgnoreSsl,
+					httpBodyEncoding: values.httpBodyEncoding?.toString(),
+					httpUrl: values.httpUrl?.toString(),
+					httpMethod: values.httpMethod?.toString(),
+					httpHeaders: values.httpHeaders?.toString(),
+					httpMaxRedirects: values.httpMaxRedirects?.toString(),
+					httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
+					httpDomain: values.httpDomain?.toString(),
+					httpWorkstation: values.httpWorkstation?.toString(),
 				});
-			} catch (e) {
-				console.log(e);
-				return json({ error: e });
+
+				if (error) {
+					return json({ error });
+				}
+
+				// console.log(res)
+				const msg = res?.status + res?.statusText;
+				const ping = new Date() - startTime;
+				console.log(msg, ping);
+				return json({
+					success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,
+				});
 			}
-			return json({ success: 'Connection successful.' });
+
+			return null;
 		},
 	});
 }
