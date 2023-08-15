@@ -112,6 +112,8 @@ model MonitorFeeds {
   cpuSpeed String?
 
   ping String?
+
+  message String?
 }
 
 model MonitorLogs {

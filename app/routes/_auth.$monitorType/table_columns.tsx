@@ -3,8 +3,18 @@ import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
 import { monitorTypes } from '~/models/monitor';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
 import { Minus } from 'lucide-react';
+import { MonitorFeeds } from '@prisma/client';
+import { formatInTimeZone } from 'date-fns-tz';
 
-export const columns: ColumnDef<any>[] = [
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '~/components/ui/tooltip';
+import { format } from 'date-fns';
+
+export const columnsSsh: ColumnDef<any>[] = [
 	{
 		accessorKey: 'title',
 		header: ({ column }) => (
@@ -21,7 +31,7 @@ export const columns: ColumnDef<any>[] = [
 				</div>
 			);
 		},
-		enableSorting: false,
+		enableSorting: true,
 		enableHiding: false,
 	},
 	{
@@ -118,5 +128,106 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="OS Version" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('osVersion')}</div>,
+	},
+];
+
+export const columnsPing: ColumnDef<any>[] = [
+	{
+		accessorKey: 'title',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Title" />
+		),
+		cell: ({ row }) => {
+			const icon = monitorTypes.filter(
+				(type) => type.value == row.original.type,
+			)?.[0]?.icon;
+			return (
+				<div className="flex content-center space-x-2">
+					{icon && <>{icon}</>}
+					<span className="my-auto">{row.getValue('title')}</span>
+				</div>
+			);
+		},
+		enableSorting: true,
+		enableHiding: false,
+	},
+	{
+		accessorKey: 'enabled',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Enabled" />
+		),
+		cell: ({ row }) => (
+			<div className="">
+				{row.getValue('enabled') ? (
+					<ToggleRight className="text-emerald-700" />
+				) : (
+					<ToggleLeft className="text-slate-400" />
+				)}
+			</div>
+		),
+	},
+	{
+		accessorKey: 'hasError',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Status" />
+		),
+		cell: ({ row }) => (
+			<div className="">
+				{!row.getValue('enabled') ? (
+					<Minus className="text-slate-400" size={14} />
+				) : row.getValue('hasError') ? (
+					<AlertTriangle className="text-red-500" size={14} />
+				) : (
+					<Activity className="text-emerald-600" size={14} />
+				)}
+			</div>
+		),
+	},
+	{
+		accessorKey: 'feeds',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Ping" />
+		),
+		cell: ({ row }) => (
+			<div className="flex flex-row-reverse space-x-1 space-x-reverse">
+				{row.original.feeds?.map((x: MonitorFeeds) => (
+					<TooltipProvider key={x.id} delayDuration={20} skipDelayDuration={20}>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<div
+									className={`transition-all w-2 h-4 hover:scale-125 rounded ${
+										x.hasError ? 'bg-red-300' : 'bg-emerald-600'
+									}`}
+								></div>
+							</TooltipTrigger>
+							<TooltipContent>
+								<div>
+									<p className="flex space-x-2">
+										<div
+											className={`${
+												x.hasError
+													? 'bg-red-300 border-red-400'
+													: 'bg-emerald-600 border-emerald-700'
+											} border-1 rounded h-3 w-3 my-auto`}
+										></div>
+
+										<strong>{x.ping}ms</strong>
+										<span>
+											{formatInTimeZone(
+												x.createdAt,
+												Intl.DateTimeFormat().resolvedOptions().timeZone,
+												'MMM d, yyyy k:mm',
+											)}
+										</span>
+									</p>
+									{x.message && <>{x.message}</>}
+								</div>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				))}
+			</div>
+		),
+		enableSorting: false,
 	},
 ];

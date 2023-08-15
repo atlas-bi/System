@@ -32,7 +32,7 @@ import {
 import { getMonitors } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
-import { columns } from './table_columns';
+import { columnsSsh, columnsPing } from './table_columns';
 import invariant from 'tiny-invariant';
 
 export const loader = async ({ request, params }: LoaderArgs) => {
@@ -44,7 +44,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 	invariant(params.monitorType, 'Monitor type is required.');
 	const monitors = await getMonitors({ type: params.monitorType });
-	return json({ monitors });
+	return json({ monitors, type: params.monitorType });
 };
 
 interface DataTableProps<TData, TValue> {
@@ -53,7 +53,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 export default function Index() {
-	const { monitors } = useLoaderData<typeof loader>();
+	const { monitors, type } = useLoaderData<typeof loader>();
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
 		React.useState<VisibilityState>({
@@ -73,7 +73,7 @@ export default function Index() {
 
 	const table = useReactTable({
 		data: monitors,
-		columns,
+		columns: type == 'windows' || type == 'ubuntu' ? columnsSsh : columnsPing,
 		state: {
 			sorting,
 			columnVisibility,

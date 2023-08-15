@@ -13,12 +13,102 @@ export function getNotifications() {
 	});
 }
 
+export function getNotificationsDetail() {
+	return prisma.notification.findMany({
+		select: {
+			id: true,
+			name: true,
+			type: true,
+			smtpPort: true,
+			smtpUsername: true,
+			smtpHost: true,
+			smtpPassword: true,
+			smtpSecurity: true,
+			ignoreSSLErrors: true,
+			smtpFromName: true,
+			smtpFromEmail: true,
+			smtpToEmail: true,
+			tgBotToken: true,
+			tgChatId: true,
+			tgThreadId: true,
+			tgSendSilently: true,
+			tgProtectMessage: true,
+		},
+	});
+}
+
+export function deleteNotification({ id }: Pick<Notification, 'id'>) {
+	return prisma.notification.deleteMany({
+		where: { id },
+	});
+}
+
 export function getNotificationConnection({ id }: Pick<Notification, 'id'>) {
 	return prisma.notification.findUnique({
 		where: { id },
 	});
 }
 
+export function editNotification({
+	id,
+	name,
+	type,
+	smtpPort,
+	smtpUsername,
+	smtpHost,
+	smtpPassword,
+	smtpSecurity,
+	ignoreSSLErrors,
+	smtpFromName,
+	smtpFromEmail,
+	smtpToEmail,
+	tgBotToken,
+	tgChatId,
+	tgThreadId,
+	tgSendSilently,
+	tgProtectMessage,
+}: Pick<
+	Notification,
+	| 'id'
+	| 'name'
+	| 'type'
+	| 'smtpPort'
+	| 'smtpUsername'
+	| 'smtpHost'
+	| 'smtpPassword'
+	| 'smtpSecurity'
+	| 'ignoreSSLErrors'
+	| 'smtpFromName'
+	| 'smtpFromEmail'
+	| 'smtpToEmail'
+	| 'tgBotToken'
+	| 'tgChatId'
+	| 'tgThreadId'
+	| 'tgSendSilently'
+	| 'tgProtectMessage'
+>) {
+	return prisma.notification.update({
+		where: { id },
+		data: {
+			name,
+			type,
+			smtpPort,
+			smtpUsername,
+			smtpHost,
+			smtpPassword: smtpPassword ? encrypt(smtpPassword) : null,
+			smtpSecurity,
+			ignoreSSLErrors,
+			smtpFromName,
+			smtpFromEmail,
+			smtpToEmail,
+			tgBotToken: tgBotToken ? encrypt(tgBotToken) : null,
+			tgChatId,
+			tgThreadId,
+			tgSendSilently,
+			tgProtectMessage,
+		},
+	});
+}
 export function createNotification({
 	name,
 	type,
@@ -62,13 +152,13 @@ export function createNotification({
 			smtpPort,
 			smtpUsername,
 			smtpHost,
-			smtpPassword: smtpPassword ? encrypt(smtpPassword) : undefined,
+			smtpPassword: smtpPassword ? encrypt(smtpPassword) : null,
 			smtpSecurity,
 			ignoreSSLErrors,
 			smtpFromName,
 			smtpFromEmail,
 			smtpToEmail,
-			tgBotToken: tgBotToken ? encrypt(tgBotToken) : undefined,
+			tgBotToken: tgBotToken ? encrypt(tgBotToken) : null,
 			tgChatId,
 			tgThreadId,
 			tgSendSilently,

@@ -39,13 +39,15 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 
 	const [data, setData] = useState<Monitor>(monitor);
 
-	// don't do this, it resets the form when you click test.
-	// useEffect(() => setData(monitor), [monitor]);
+	useEffect(() => {
+		if (!monitor.id || monitor.id !== data.id) {
+			setData(monitor);
+		}
+	}, [monitor]);
 
 	useEffect(() => {
 		if (fetcher.state === 'idle' && fetcher.data?.monitor != null) {
 			if (!monitor.id) {
-				setData({});
 				setOpen(false);
 				navigate(`/${fetcher.data.monitor.type}/${fetcher.data.monitor.id}`);
 			} else {
@@ -160,6 +162,7 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 										{ _action: 'delete', id: data.id },
 										{ method: 'post', action: '/monitor/new' },
 									);
+									setOpen(false);
 								}}
 								className="border-red-300"
 							>

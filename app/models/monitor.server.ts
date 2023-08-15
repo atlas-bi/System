@@ -130,6 +130,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 		select: {
 			id: true,
 			type: true,
+			title: true,
 			description: true,
 			enabled: true,
 			hasError: true,
@@ -273,7 +274,6 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 			enabled: true,
 			monitorId: true,
 			location: true,
-			enabled: true,
 			name: true,
 			root: true,
 			systemDescription: true,
@@ -791,8 +791,8 @@ export async function editMonitor({
 			title,
 			host,
 			username,
-			password: password ? encrypt(password) : undefined,
-			privateKey: privateKey ? encrypt(privateKey) : undefined,
+			password: password ? encrypt(password) : null,
+			privateKey: privateKey ? encrypt(privateKey) : null,
 			port,
 			type,
 			description,
@@ -807,7 +807,7 @@ export async function editMonitor({
 			httpHeaders,
 			httpAuthentication,
 			httpUsername,
-			httpPassword: httpPassword ? encrypt(httpPassword) : undefined,
+			httpPassword: httpPassword ? encrypt(httpPassword) : null,
 			httpDomain,
 			httpWorkstation,
 		},
@@ -851,6 +851,19 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 			enabled: true,
 			type: true,
 			hasError: true,
+			feeds: {
+				select: {
+					id: true,
+					ping: true,
+					hasError: true,
+					createdAt: true,
+					message: true,
+				},
+				take: 30,
+				orderBy: {
+					createdAt: 'desc',
+				},
+			},
 		},
 		orderBy: [
 			{
@@ -1181,11 +1194,12 @@ export function setMonitorRebootSentAt({
 
 export function setFeedError({
 	id,
+	message,
 	hasError,
-}: Pick<MonitorFeeds, 'id' | 'hasError'>) {
+}: Pick<MonitorFeeds, 'id' | 'hasError' | 'message'>) {
 	return prisma.monitorFeeds.update({
 		where: { id },
-		data: { hasError },
+		data: { hasError, message },
 	});
 }
 

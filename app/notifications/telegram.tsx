@@ -29,11 +29,7 @@ export default async function Telegram({
 			},
 		);
 	} catch (error) {
-		if (
-			error.response &&
-			error.response.data &&
-			error.response.data.description
-		) {
+		if (error?.response?.data?.description) {
 			throw new Error(error.response.data.description);
 		} else {
 			throw new Error(error.message);

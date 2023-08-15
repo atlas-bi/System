@@ -1,13 +1,17 @@
 import type { ActionArgs } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import { NodeSSH } from 'node-ssh';
-import { namedAction } from 'remix-utils';
+import { namedAction, redirectBack } from 'remix-utils';
 import { createMonitor } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 import SMTP from '~/notifications/smtp';
 import Telegram from '~/notifications/telegram';
-import { createNotification } from '~/models/notification.server';
+import {
+	createNotification,
+	editNotification,
+	deleteNotification,
+} from '~/models/notification.server';
 
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	if (str === undefined || str === null || str.toString().trim() === '') {
@@ -76,54 +80,93 @@ export async function action({ request }: ActionArgs) {
 
 			if (errors) return errors;
 
-			const {
-				name,
-				type,
-				smtpPort,
-				smtpUsername,
-				smtpHost,
-				smtpPassword,
-				smtpSecurity,
-				ignoreSSLErrors,
-				smtpFromName,
-				smtpFromEmail,
-				smtpToEmail,
-				tgBotToken,
-				tgChatId,
-				tgThreadId,
-				tgSendSilently,
-				tgProtectMessage,
-			} = values;
+			let notification = {};
 
-			console.log(values);
-			await createNotification({
-				name: name.toString(),
-				type: type.toString(),
-				smtpPort: smtpPort ? smtpPort.toString() : undefined,
-				smtpUsername: smtpUsername ? smtpUsername.toString() : undefined,
-				smtpHost: smtpHost ? smtpHost.toString() : undefined,
-				smtpPassword: smtpPassword ? smtpPassword.toString() : undefined,
-				smtpSecurity: smtpSecurity ? smtpSecurity.toString() : undefined,
-				ignoreSSLErrors: ignoreSSLErrors
-					? ignoreSSLErrors.toString() == 'true'
-					: undefined,
-				smtpFromName: smtpFromName ? smtpFromName.toString() : undefined,
-				smtpFromEmail: smtpFromEmail ? smtpFromEmail.toString() : undefined,
-				smtpToEmail: smtpToEmail ? smtpToEmail.toString() : undefined,
-				tgBotToken: tgBotToken ? tgBotToken.toString() : undefined,
-				tgChatId: tgChatId ? tgChatId.toString() : undefined,
-				tgThreadId: tgThreadId ? tgThreadId.toString() : undefined,
-				tgSendSilently: tgSendSilently
-					? tgSendSilently.toString() == 'true'
-					: undefined,
-				tgProtectMessage: tgProtectMessage
-					? tgProtectMessage.toString() == 'true'
-					: undefined,
+			if (values.id) {
+				notification = await editNotification({
+					id: values.id.toString(),
+					name: values.name.toString(),
+					type: values.type.toString(),
+					smtpPort: values.smtpPort ? values.smtpPort.toString() : null,
+					smtpUsername: values.smtpUsername
+						? values.smtpUsername.toString()
+						: null,
+					smtpHost: values.smtpHost ? values.smtpHost.toString() : null,
+					smtpPassword: values.smtpPassword
+						? values.smtpPassword.toString()
+						: null,
+					smtpSecurity: values.smtpSecurity
+						? values.smtpSecurity.toString()
+						: null,
+					ignoreSSLErrors: values.ignoreSSLErrors
+						? values.ignoreSSLErrors.toString() == 'true'
+						: null,
+					smtpFromName: values.smtpFromName
+						? values.smtpFromName.toString()
+						: null,
+					smtpFromEmail: values.smtpFromEmail
+						? values.smtpFromEmail.toString()
+						: null,
+					smtpToEmail: values.smtpToEmail
+						? values.smtpToEmail.toString()
+						: null,
+					tgBotToken: values.tgBotToken ? values.tgBotToken.toString() : null,
+					tgChatId: values.tgChatId ? values.tgChatId.toString() : null,
+					tgThreadId: values.tgThreadId ? values.tgThreadId.toString() : null,
+					tgSendSilently: values.tgSendSilently
+						? values.tgSendSilently.toString() == 'true'
+						: null,
+					tgProtectMessage: values.tgProtectMessage
+						? values.tgProtectMessage.toString() == 'true'
+						: null,
+				});
+
+				return json({ notification });
+			}
+			notification = await createNotification({
+				name: values.name.toString(),
+				type: values.type.toString(),
+				smtpPort: values.smtpPort ? values.smtpPort.toString() : null,
+				smtpUsername: values.smtpUsername
+					? values.smtpUsername.toString()
+					: null,
+				smtpHost: values.smtpHost ? values.smtpHost.toString() : null,
+				smtpPassword: values.smtpPassword
+					? values.smtpPassword.toString()
+					: null,
+				smtpSecurity: values.smtpSecurity
+					? values.smtpSecurity.toString()
+					: null,
+				ignoreSSLErrors: values.ignoreSSLErrors
+					? values.ignoreSSLErrors.toString() == 'true'
+					: null,
+				smtpFromName: values.smtpFromName
+					? values.smtpFromName.toString()
+					: null,
+				smtpFromEmail: values.smtpFromEmail
+					? values.smtpFromEmail.toString()
+					: null,
+				smtpToEmail: values.smtpToEmail ? values.smtpToEmail.toString() : null,
+				tgBotToken: values.tgBotToken ? values.tgBotToken.toString() : null,
+				tgChatId: values.tgChatId ? values.tgChatId.toString() : null,
+				tgThreadId: values.tgThreadId ? values.tgThreadId.toString() : null,
+				tgSendSilently: values.tgSendSilently
+					? values.tgSendSilently.toString() == 'true'
+					: null,
+				tgProtectMessage: values.tgProtectMessage
+					? values.tgProtectMessage.toString() == 'true'
+					: null,
 			});
 
-			return json({ success: 'Notification Created' });
+			return json({ notification });
 		},
+		async delete() {
+			const formData = await request.formData();
+			const { _action, ...values } = Object.fromEntries(formData);
 
+			await deleteNotification({ id: values.id });
+			return redirectBack(request, { fallback: '/admin/notifications' });
+		},
 		async test() {
 			const formData = await request.formData();
 			const { _action, ...values } = Object.fromEntries(formData);

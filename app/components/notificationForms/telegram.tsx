@@ -22,6 +22,7 @@ export function TelegramForm({
 					type="password"
 					id="tgBotToken"
 					placeholder="123"
+					value={data.tgBotToken || ''}
 					onChange={(e) => setData({ ...data, tgBotToken: e.target.value })}
 				/>
 				<small className="text-muted-foreground">
@@ -39,6 +40,7 @@ export function TelegramForm({
 				<Input
 					type="text"
 					id="tgChatId"
+					value={data.tgChatId || ''}
 					placeholder="1AD32"
 					onChange={(e) => setData({ ...data, tgChatId: e.target.value })}
 				/>
@@ -56,6 +58,7 @@ export function TelegramForm({
 				<Input
 					type="text"
 					id="tgThreadId"
+					value={data.tgThreadId || ''}
 					placeholder="tgThreadId"
 					onChange={(e) => setData({ ...data, tgThreadId: e.target.value })}
 				/>
@@ -73,6 +76,7 @@ export function TelegramForm({
 						onCheckedChange={(checked) =>
 							setData({ ...data, tgSendSilently: checked === true })
 						}
+						defaultChecked={data.tgSendSilently || false}
 					/>
 					<label
 						htmlFor="tgSendSilently"
@@ -95,6 +99,7 @@ export function TelegramForm({
 						onCheckedChange={(checked) =>
 							setData({ ...data, tgProtectMessage: checked === true })
 						}
+						defaultChecked={data.tgProtectMessage || false}
 					/>
 					<label
 						htmlFor="ssl_errors"

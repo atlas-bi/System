@@ -29,6 +29,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="host"
+				value={data.smtpHost || ''}
 				placeholder="smpt.example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpHost: e.target.value })}
@@ -49,6 +50,7 @@ export function SmtpForm({
 				onValueChange={(smtpSecurity: string) =>
 					setData({ ...data, smtpSecurity })
 				}
+				defaultValue={data.smtpSecurity}
 			>
 				<Label htmlFor="name" className="text-right">
 					Security*
@@ -69,6 +71,7 @@ export function SmtpForm({
 			<div className="flex items-center space-x-2 col-span-3">
 				<Checkbox
 					id="ssl_errors"
+					defaultChecked={data.ignoreSSLErrors || false}
 					onCheckedChange={(checked) =>
 						setData({ ...data, ignoreSSLErrors: checked })
 					}
@@ -87,6 +90,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="search_username"
+				value={data.smtpUsername || ''}
 				placeholder="username"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpUsername: e.target.value })}
@@ -97,6 +101,7 @@ export function SmtpForm({
 			<Input
 				type="password"
 				id="search_password"
+				value={data.smtpPassword || ''}
 				placeholder="123"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpPassword: e.target.value })}
@@ -107,6 +112,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="fromName"
+				value={data.smtpFromName || ''}
 				placeholder="Analytics Dept."
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpFromName: e.target.value })}
@@ -117,6 +123,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="fromEmail"
+				value={data.smtpFromEmail || ''}
 				placeholder="me@example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpFromEmail: e.target.value })}
@@ -127,6 +134,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="toEmail"
+				value={data.smtpToEmail || ''}
 				placeholder="you@example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpToEmail: e.target.value })}

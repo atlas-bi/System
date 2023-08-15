@@ -237,6 +237,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 				await setFeedError({
 					id: data?.feeds?.[0]?.id,
 					hasError: true,
+					message: error.message || error,
 				});
 			}
 			throw new Error(error.message || error);

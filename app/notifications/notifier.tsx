@@ -23,35 +23,33 @@ export default async function Notifier({
 }) {
 	const monitor = await getMonitor({ id: job });
 
-	if (message) {
-		return collectionNotifier({ monitor, message });
-	}
+	return collectionNotifier({ monitor, message });
 
-	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
-		// reboot notifier
-		await rebootNotifier({ monitor });
+	// if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
+	// 	// reboot notifier
+	// 	await rebootNotifier({ monitor });
 
-		// drive notifications
-		monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
-			// don't report inactive drives.
-			if (drive.enabled == false) return;
+	// 	// drive notifications
+	// 	monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
+	// 		// don't report inactive drives.
+	// 		if (drive.enabled == false) return;
 
-			// drive has no usages, ignore.
-			if (drive.usage.length <= 0) return;
+	// 		// drive has no usages, ignore.
+	// 		if (drive.usage.length <= 0) return;
 
-			if (drive.missingNotify) {
-				// notify if drive was missing
-			}
+	// 		if (drive.missingNotify) {
+	// 			// notify if drive was missing
+	// 		}
 
-			await percentFreeNotifier({ drive, monitor });
+	// 		await percentFreeNotifier({ drive, monitor });
 
-			if (drive.sizeFreeNotify) {
-			}
+	// 		if (drive.sizeFreeNotify) {
+	// 		}
 
-			if (drive.growthRateNotify) {
-			}
-		});
-	}
+	// 		if (drive.growthRateNotify) {
+	// 		}
+	// 	});
+	// }
 }
 
 export const sendNotification = async ({
@@ -66,8 +64,8 @@ export const sendNotification = async ({
 	const meta = await getNotificationConnection({ id: notification.id });
 
 	if (meta.type == 'smtp') {
-		await SMTP({ notification: meta, subject, message });
+		return SMTP({ notification: meta, subject, message });
 	} else if (meta.type == 'telegram') {
-		await Telegram({ notification: meta, message: subject });
+		return Telegram({ notification: meta, message: subject });
 	}
 };

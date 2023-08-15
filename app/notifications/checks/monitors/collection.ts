@@ -15,11 +15,16 @@ export default async function collectionNotifier({
 		});
 	}
 
+	const name =
+		monitor.type === 'windows' || monitor.type === 'ubuntu'
+			? `${monitor.title} (${monitor.host})`
+			: `${monitor.title} (${monitor.httpUrl})`;
+
 	if (!message) {
 		if (monitor.connectionNotifySentAt && monitor.connectionNotify) {
 			await reset({ monitor });
-			const subject = `💚 [${monitor.host}] Data collection restored.`;
-			const message = `Data collection restored on ${monitor.host}.`;
+			const subject = `💚 [${name}] Data collection restored.`;
+			const message = `Data collection restored on ${name}.`;
 
 			monitor.connectionNotifyTypes.map(async (notification: Notification) => {
 				try {
@@ -38,12 +43,17 @@ export default async function collectionNotifier({
 				monitor,
 			});
 		}
-		return;
+
+		// reset notification
+		return setMonitorConnectionSentAt({
+			id: monitor.id,
+			connectionNotifySentAt: null,
+		});
 	}
 
 	Logger({ message, type: 'error', monitor });
 
-	let resend = false;
+	let resend = !monitor.connectionNotifySentAt;
 
 	if (
 		monitor.connectionNotifyResendAfterMinutes &&
@@ -56,22 +66,26 @@ export default async function collectionNotifier({
 	}
 
 	if (resend && monitor.connectionNotifyTypes) {
-		const subject = `💔 [${monitor.host}] Data collection failed.`;
-		const errorMessage = `Alert: data collection failed on ${monitor.host}.\n ${message}`;
+		const subject = `💔 [${name}] Data collection failed. ${message?.substring(
+			0,
+			20,
+		)}`;
+		const errorMessage = `Alert: data collection failed on ${name}.\n ${message}`;
 
 		monitor.connectionNotifyTypes.map(async (notification: Notification) => {
+			console.log('sending!', notification);
 			try {
-				return sendNotification({
+				return await sendNotification({
 					notification,
 					subject,
 					message: errorMessage,
 				});
 			} catch (e) {
+				console.log('failed to send!');
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
 					type: 'error',
 					monitor,
-					drive,
 				});
 			}
 		});
