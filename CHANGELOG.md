@@ -1,3 +1,8 @@
+## 1.20.0 (2023-08-15)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([c12844f](https://github.com/atlas-bi/System/commit/c12844f))
+* feat(http): started on a http monitor ([22408a4](https://github.com/atlas-bi/System/commit/22408a4))
+
 ## 1.19.0 (2023-08-04)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([9fb1166](https://github.com/atlas-bi/System/commit/9fb1166))
