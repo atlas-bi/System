@@ -1,3 +1,8 @@
+## 1.21.0 (2023-08-15)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([d57e11a](https://github.com/atlas-bi/System/commit/d57e11a))
+* feat(notification): updated collection notification ([7019863](https://github.com/atlas-bi/System/commit/7019863))
+
 ## 1.20.0 (2023-08-15)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([c12844f](https://github.com/atlas-bi/System/commit/c12844f))
