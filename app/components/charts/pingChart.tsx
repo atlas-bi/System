@@ -138,35 +138,46 @@ export const PingChart = ({ url }: { url: string }) => {
 		}
 
 		const chartData = {
-			labels: pingFetcher.data?.monitor?.feeds?.map(
-				(x: MonitorFeeds) => x.createdAt,
-			),
 			datasets: [
 				{
+					spanGaps: 1000 * 60 * 1.5, // 1.5 min
 					fill: true,
 					label: 'Response Time',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: pingFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						Number(x?.ping),
-					),
+					data: pingFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) => ({
+						x: x.createdAt,
+						y: Number(x?.ping),
+					})),
 					segment: {
-						borderColor: (ctx) =>
-							pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]?.hasError
+						borderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
+								?.hasError
 								? darkErrorGradient[0]
-								: darkGradient[0],
-						backgroundColor: (ctx) =>
-							pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]?.hasError
+								: darkGradient[0];
+						},
+						backgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
+								?.hasError
 								? lightErrorGradient[0]
-								: lightGradient[0],
-						hoverBorderColor: (ctx) =>
-							pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]?.hasError
+								: lightGradient[0];
+						},
+						hoverBorderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
+								?.hasError
 								? darkErrorGradient[1]
-								: darkGradient[1],
-						hoverBackgroundColor: (ctx) =>
-							pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]?.hasError
+								: darkGradient[1];
+						},
+						hoverBackgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
+								?.hasError
 								? lightErrorGradient[1]
-								: lightGradient[1],
+								: lightGradient[1];
+						},
 					},
 					pointStyle: false,
 				},

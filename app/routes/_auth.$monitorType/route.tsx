@@ -123,7 +123,9 @@ export default function Index() {
 								table.getRowModel().rows.map((row) => (
 									<TableRow
 										key={row.id}
-										className="cursor-pointer"
+										className={`cursor-pointer group ${
+											row.original.enabled ? '' : 'bg-slate-100/40'
+										}`}
 										data-state={row.getIsSelected() ? 'selected' : null}
 										onClick={() =>
 											navigate(`/${row.original.type}/${row.original.id}`)

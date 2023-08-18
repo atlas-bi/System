@@ -84,7 +84,10 @@ const SubChart = ({
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + '% Used';
 							}
-							return tooltipItem.raw / 1000 + 'GHz';
+							if (tooltipItem.datasetIndex > 0) {
+								if (speed) return tooltipItem.raw / 1000 + 'GHz';
+								return '';
+							}
 						},
 					},
 				},
@@ -152,31 +155,46 @@ const SubChart = ({
 			labels: data?.map((x: MonitorFeeds) => x.createdAt),
 			datasets: [
 				{
+					spanGaps: 1000 * 60 * 1.5, // 1.5 min
 					fill: speed,
 					label: 'Load',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
 					data: data?.map((x: MonitorFeeds) => Number(x.cpuLoad)),
-					borderColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
-					backgroundColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						lightGradient,
-					),
-					hoverBackgroundColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
-					hoverBorderColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
+					segment: {
+						borderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+						backgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								lightGradient,
+							);
+						},
+						hoverBackgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+						hoverBorderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+					},
 					pointStyle: false,
 				},
 				{
@@ -200,7 +218,13 @@ const SubChart = ({
 	return <Line ref={chartRef} options={options} data={chartData} />;
 };
 
-export const CpuChart = ({ url }: { url: string }) => {
+export const CpuChart = ({
+	url,
+	speed = true,
+}: {
+	url: string;
+	speed?: boolean;
+}) => {
 	const usageFetcher = useFetcher();
 	const [unit, setUnit] = useState('last_24_hours');
 
@@ -233,7 +257,7 @@ export const CpuChart = ({ url }: { url: string }) => {
 				</div>
 				<div className="h-[450px] relative">
 					<SubChart
-						speed={true}
+						speed={speed}
 						unit={unit}
 						data={usageFetcher.data?.monitor?.feeds}
 						startDate={usageFetcher.data?.monitor?.startDate}

@@ -1,11 +1,12 @@
 import { Link, useFetcher, useLocation } from '@remix-run/react';
 import bytes from 'bytes';
-import { format } from 'date-fns';
+import { format, formatDistance } from 'date-fns';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { CpuChart } from '~/components/charts/cpuChart';
 import { DoughnutChart } from '~/components/charts/driveDoughnut';
 import { MemoryChart } from '~/components/charts/memoryChart';
+import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -43,7 +44,11 @@ export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
 						<TableRow>
 							<TableCell className="py-1 font-medium">Last Reboot</TableCell>
 							<TableCell className="py-1 text-slate-700">
-								{format(new Date(monitor.lastBootTime), 'MMM dd, yyyy k:mm')}
+								{formatDistance(new Date(monitor.lastBootTime), new Date())}{' '}
+								ago.{' '}
+								<Badge className="bg-slate-200 text-slate-900">
+									{format(new Date(monitor.lastBootTime), 'MMM dd, yyyy k:mm')}
+								</Badge>
 							</TableCell>
 						</TableRow>
 					)}

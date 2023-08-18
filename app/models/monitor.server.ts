@@ -6,6 +6,39 @@ import monitorMonitor from '~/queues/monitor.server';
 export type { Monitor, Drive, DriveUsage, MonitorLogs } from '@prisma/client';
 
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
+	// delete database file usage
+	await prisma.databaseFileUsage.deleteMany({
+		where: {
+			databaseFile: {
+				database: {
+					monitorId: id,
+				},
+			},
+		},
+	});
+	// delete database files
+	await prisma.databaseFile.deleteMany({
+		where: {
+			database: {
+				monitorId: id,
+			},
+		},
+	});
+	// delete database usage
+	await prisma.databaseUsage.deleteMany({
+		where: {
+			database: {
+				monitorId: id,
+			},
+		},
+	});
+	// delete database
+	await prisma.database.deleteMany({
+		where: {
+			monitorId: id,
+		},
+	});
+
 	// delete drive usage
 	await prisma.driveUsage.deleteMany({
 		where: {
@@ -44,6 +77,10 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 		select: {
 			id: true,
 			type: true,
+			name: true,
+			manufacturer: true,
+			model: true,
+			version: true,
 			enabled: true,
 			host: true,
 			password: true,
@@ -73,6 +110,7 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			httpPassword: true,
 			httpDomain: true,
 			httpWorkstation: true,
+			sqlConnectionString: true,
 			feeds: {
 				select: {
 					id: true,
@@ -140,6 +178,11 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			port: true,
 			privateKey: true,
 			connectionNotify: true,
+			manufacturer: true,
+			model: true,
+			version: true,
+			os: true,
+			osVersion: true,
 			connectionNotifyTypes: {
 				select: {
 					id: true,
@@ -165,6 +208,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			httpPassword: true,
 			httpDomain: true,
 			httpWorkstation: true,
+			sqlConnectionString: true,
 			drives: {
 				select: {
 					id: true,
@@ -260,6 +304,64 @@ export function monitorLog({
 }: Pick<MonitorLogs, 'monitorId' | 'type' | 'message' | 'driveId'>) {
 	return prisma.monitorLogs.create({
 		data: { monitorId, type, message, driveId },
+	});
+}
+
+export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.database.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			enabled: true,
+			monitorId: true,
+			databaseId: true,
+			name: true,
+			state: true,
+			recoveryModel: true,
+			compatLevel: true,
+			backupDataDate: true,
+			backupDataSize: true,
+			backupLogDate: true,
+			backupLogSize: true,
+			monitor: {
+				select: {
+					title: true,
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			files: {
+				select: {
+					id: true,
+					fileName: true,
+					type: true,
+					state: true,
+					growth: true,
+					isPercentGrowth: true,
+					fileId: true,
+					filePath: true,
+					usage: {
+						select: {
+							id: true,
+							size: true,
+							maxSize: true,
+						},
+						take: 1,
+					},
+				},
+			},
+			usage: {
+				select: {
+					id: true,
+					memory: true,
+				},
+				take: 1,
+			},
+		},
 	});
 }
 
@@ -387,6 +489,47 @@ export function getDriveUsage({
 	});
 }
 
+export function getDatabaseUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Database, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.database.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			monitorId: true,
+			enabled: true,
+			name: true,
+			description: true,
+			monitor: {
+				select: {
+					title: true,
+					id: true,
+					type: true,
+				},
+			},
+			usage: {
+				select: {
+					id: true,
+					memory: true,
+					createdAt: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+			},
+		},
+	});
+}
+
 export function getCpuUsage({
 	id,
 	startDate,
@@ -472,6 +615,36 @@ export function getPing({
 	});
 }
 
+export function getDatabaseMemoryUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.database.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			title: true,
+			usage: {
+				select: {
+					id: true,
+					memory: true,
+					createdAt: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+			},
+		},
+	});
+}
+
 export function getMemoryUsage({
 	id,
 	startDate,
@@ -522,9 +695,10 @@ export function getLatestMonitorLog({
 export async function getMonitorLogs({
 	monitorId,
 	driveId,
+	databaseId,
 	page = 0,
 	size = 10,
-}: Pick<MonitorLogs, 'monitorId' | 'driveId'> & {
+}: Pick<MonitorLogs, 'monitorId' | 'driveId' | 'databaseId'> & {
 	page?: number;
 	size?: number;
 }) {
@@ -533,6 +707,7 @@ export async function getMonitorLogs({
 			where: {
 				monitorId,
 				driveId,
+				databaseId,
 				NOT: {
 					message: {
 						contains: 'clientVersion',
@@ -545,6 +720,7 @@ export async function getMonitorLogs({
 			where: {
 				monitorId,
 				driveId,
+				databaseId,
 				NOT: {
 					message: {
 						contains: 'clientVersion',
@@ -563,6 +739,12 @@ export async function getMonitorLogs({
 						name: true,
 						location: true,
 						root: true,
+					},
+				},
+				database: {
+					select: {
+						id: true,
+						name: true,
 					},
 				},
 				monitor: {
@@ -587,6 +769,21 @@ export async function getMonitorLogs({
 	};
 }
 
+export function getMonitorDisabledDatabases({
+	monitorId,
+}: {
+	monitorId: Monitor['id'];
+}) {
+	return prisma.database.findMany({
+		where: { monitorId, enabled: false },
+		select: {
+			id: true,
+			monitorId: true,
+			databaseId: true,
+		},
+	});
+}
+
 export function getMonitorDisabledDrives({
 	monitorId,
 }: {
@@ -601,6 +798,40 @@ export function getMonitorDisabledDrives({
 			name: true,
 			root: true,
 		},
+	});
+}
+
+export function getMonitorDatabases({
+	monitorId,
+}: {
+	monitorId: Monitor['id'];
+}) {
+	return prisma.database.findMany({
+		where: { monitorId },
+		select: {
+			id: true,
+			title: true,
+			monitorId: true,
+			state: true,
+			enabled: true,
+			name: true,
+			databaseId: true,
+			description: true,
+			recoveryModel: true,
+			compatLevel: true,
+			backupDataDate: true,
+			backupDataSize: true,
+			backupLogDate: true,
+			backupLogSize: true,
+			usage: {
+				select: {
+					id: true,
+					memory: true,
+				},
+				take: 1,
+			},
+		},
+		orderBy: [{ enabled: 'desc' }, { name: 'asc' }],
 	});
 }
 
@@ -656,6 +887,7 @@ export async function createMonitor({
 	httpPassword,
 	httpDomain,
 	httpWorkstation,
+	sqlConnectionString,
 }: Pick<
 	Monitor,
 	| 'title'
@@ -680,6 +912,7 @@ export async function createMonitor({
 	| 'httpPassword'
 	| 'httpDomain'
 	| 'httpWorkstation'
+	| 'sqlConnectionString'
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
@@ -705,6 +938,9 @@ export async function createMonitor({
 			httpPassword: httpPassword ? encrypt(httpPassword) : null,
 			httpDomain,
 			httpWorkstation,
+			sqlConnectionString: sqlConnectionString
+				? encrypt(sqlConnectionString)
+				: null,
 		},
 		select: {
 			id: true,
@@ -723,6 +959,25 @@ export function editDrive({
 	enabled,
 }: Pick<Drive, 'id' | 'title' | 'description' | 'enabled'>) {
 	return prisma.drive.update({
+		where: { id },
+		data: {
+			title,
+			description,
+			enabled,
+		},
+		select: {
+			id: true,
+		},
+	});
+}
+
+export function editDatabase({
+	id,
+	title,
+	description,
+	enabled,
+}: Pick<Database, 'id' | 'title' | 'description' | 'enabled'>) {
+	return prisma.database.update({
 		where: { id },
 		data: {
 			title,
@@ -759,6 +1014,7 @@ export async function editMonitor({
 	httpPassword,
 	httpDomain,
 	httpWorkstation,
+	sqlConnectionString,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -784,6 +1040,7 @@ export async function editMonitor({
 	| 'httpPassword'
 	| 'httpDomain'
 	| 'httpWorkstation'
+	| 'sqlConnectionString'
 >) {
 	const monitor = await prisma.monitor.update({
 		where: { id },
@@ -810,6 +1067,9 @@ export async function editMonitor({
 			httpPassword: httpPassword ? encrypt(httpPassword) : null,
 			httpDomain,
 			httpWorkstation,
+			sqlConnectionString: sqlConnectionString
+				? encrypt(sqlConnectionString)
+				: null,
 		},
 		select: {
 			id: true,
@@ -846,6 +1106,7 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 			domain: true,
 			manufacturer: true,
 			model: true,
+			version: true,
 			os: true,
 			osVersion: true,
 			enabled: true,
@@ -983,6 +1244,7 @@ export function updateMonitor({
 	data,
 	feed,
 	drives,
+	databases,
 	cpus,
 }: Pick<Monitor, 'id'> & {
 	data: {
@@ -992,6 +1254,7 @@ export function updateMonitor({
 		domain?: string;
 		manufacturer?: string;
 		model?: string;
+		version?: string;
 		os?: string;
 		osVersion?: string;
 		cpuManufacturer?: string;
@@ -1018,6 +1281,34 @@ export function updateMonitor({
 		};
 		used?: string;
 		free?: string;
+	}[];
+	databases?: {
+		data: {
+			databaseId?: string;
+			name?: string;
+			stateDesc?: string;
+			recoveryModel?: string;
+			backupDataDate?: string;
+			backupDataSize?: string;
+			backupLogDate?: string;
+			backupLogSize?: string;
+			compatLevel?: string;
+			files: {
+				data: {
+					sqlDatabaseId?: string;
+					fileName?: string;
+					type?: string;
+					state?: string;
+					growth?: string;
+					isPercentGrowth?: string;
+					fileId?: string;
+					filePath?: string;
+				};
+				size?: string;
+				maxSize?: string;
+			}[];
+		};
+		memory?: string;
 	}[];
 	cpus?: {
 		name: string;
@@ -1069,6 +1360,87 @@ export function updateMonitor({
 								where: {
 									monitorId_name: {
 										name: drive.data.name,
+										monitorId: id,
+									},
+								},
+							};
+						}),
+				  }
+				: undefined,
+			databases: databases
+				? {
+						upsert: databases.map((database) => {
+							return {
+								update: {
+									...database.data,
+									files: database.files
+										? {
+												upsert: database.files.map((file) => {
+													return {
+														update: {
+															...file.data,
+															monitorId: id,
+															usage: {
+																create: {
+																	size: file.size,
+																	maxSize: file.maxSize,
+																},
+															},
+														},
+														create: {
+															...file.data,
+															monitorId: id,
+															usage: {
+																create: {
+																	size: file.size,
+																	maxSize: file.maxSize,
+																},
+															},
+														},
+														where: {
+															monitorId_sqlDatabaseId_fileId: {
+																sqlDatabaseId: file.data.sqlDatabaseId,
+																fileId: file.data.fileId,
+																monitorId: id,
+															},
+														},
+													};
+												}),
+										  }
+										: undefined,
+									usage: {
+										create: {
+											memory: database.memory,
+										},
+									},
+								},
+								create: {
+									...database.data,
+									files: database.files
+										? {
+												create: database.files.map((file) => {
+													return {
+														...file.data,
+														monitorId: id,
+														usage: {
+															create: {
+																size: file.size,
+																maxSize: file.maxSize,
+															},
+														},
+													};
+												}),
+										  }
+										: undefined,
+									usage: {
+										create: {
+											memory: database.memory,
+										},
+									},
+								},
+								where: {
+									monitorId_databaseId: {
+										databaseId: database.data.databaseId,
 										monitorId: id,
 									},
 								},

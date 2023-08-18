@@ -9,7 +9,7 @@ import {
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { HttpCheck } from '~/monitors/http.server';
-
+import mssql from 'mssql';
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	if (str === undefined || str === null || str.toString().trim() === '') {
 		return true;
@@ -40,6 +40,14 @@ const checkHttp = function ({ values }) {
 
 	if (isNullOrEmpty(values.httpUrl)) {
 		return json({ form: { error: 'URL is required.' } });
+	}
+};
+
+const checkSql = function ({ values }) {
+	if (values.type !== 'sqlServer') return null;
+
+	if (isNullOrEmpty(values.sqlConnectionString)) {
+		return json({ form: { error: 'Connection string is required.' } });
 	}
 };
 
@@ -87,6 +95,11 @@ export async function action({ request }: ActionArgs) {
 			const httpErrors = checkHttp({ values });
 			if (httpErrors) {
 				return httpErrors;
+			}
+
+			const sqlErrors = checkSql({ values });
+			if (sqlErrors) {
+				return sqlErrors;
 			}
 
 			let monitor = {};
@@ -140,6 +153,9 @@ export async function action({ request }: ActionArgs) {
 					httpWorkstation: values.httpWorkstation
 						? values.httpWorkstation.toString()
 						: null,
+					sqlConnectionString: values.sqlConnectionString
+						? values.sqlConnectionString.toString()
+						: null,
 				});
 
 				return json({ monitor });
@@ -191,6 +207,9 @@ export async function action({ request }: ActionArgs) {
 					httpWorkstation: values.httpWorkstation
 						? values.httpWorkstation.toString()
 						: null,
+					sqlConnectionString: values.sqlConnectionString
+						? values.sqlConnectionString.toString()
+						: null,
 				});
 			}
 			return json({ monitor });
@@ -220,6 +239,11 @@ export async function action({ request }: ActionArgs) {
 			const httpErrors = checkHttp({ values });
 			if (httpErrors) {
 				return httpErrors;
+			}
+
+			const sqlErrors = checkSql({ values });
+			if (sqlErrors) {
+				return sqlErrors;
 			}
 
 			if (
@@ -269,6 +293,24 @@ export async function action({ request }: ActionArgs) {
 				return json({
 					success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,
 				});
+			}
+
+			if (values.type?.toString() === 'sqlServer') {
+				let pool;
+				try {
+					pool = new mssql.ConnectionPool(
+						values.sqlConnectionString?.toString(),
+					);
+					await pool.connect();
+					await pool.request().query('select @@version');
+					pool.close();
+					return json({ success: 'Connection successful.' });
+				} catch (e) {
+					if (pool) {
+						pool.close();
+					}
+					return json({ error: { message: e.toString() } });
+				}
 			}
 
 			return null;

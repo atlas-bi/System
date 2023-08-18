@@ -1,4 +1,4 @@
-import type { Usage } from '@prisma/client';
+import type { DatabaseUsage } from '@prisma/client';
 
 import bytes from 'bytes';
 import {
@@ -30,12 +30,11 @@ ChartJS.register([
 ]);
 
 import 'chartjs-adapter-date-fns';
-import { H3 } from '../ui/typography';
-import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
+import { H2, H3 } from '../ui/typography';
+import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
-import { TrendingUp } from 'lucide-react';
 
-export const DriveChart = ({ url }: { url: string }) => {
+export const MemoryChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
 	const [unit, setUnit] = useState('last_24_hours');
 	const chartRef = useRef<ChartJS>(null);
@@ -72,7 +71,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 					position: 'mouse',
 					callbacks: {
 						label: function (tooltipItem) {
-							return tooltipItem.formattedValue + 'GB';
+							if (tooltipItem.datasetIndex === 0) {
+								return tooltipItem.formattedValue + 'GB Used';
+							}
+							return tooltipItem.formattedValue + 'GB Free';
 						},
 					},
 				},
@@ -93,8 +95,8 @@ export const DriveChart = ({ url }: { url: string }) => {
 				x: {
 					stacked: true,
 					type: 'time',
-					min: () => usageFetcher.data?.drive?.startDate,
-					max: () => usageFetcher.data?.drive?.endDate,
+					min: () => usageFetcher.data?.monitor?.startDate,
+					max: () => usageFetcher.data?.monitor?.endDate,
 					time: {
 						unit: () =>
 							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
@@ -131,8 +133,8 @@ export const DriveChart = ({ url }: { url: string }) => {
 		if (!chart) {
 			return;
 		}
+		console.log(usageFetcher.data?.database);
 		const chartData = {
-			labels: usageFetcher.data?.drive?.usage?.map((x: Usage) => x.createdAt),
 			datasets: [
 				{
 					spanGaps: 1000 * 60 * 1.5, // 1.5 min
@@ -140,9 +142,17 @@ export const DriveChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
-						Number(bytes(Number(x.used), { unit: 'GB' }).replace('GB', '')),
-					),
+					data: usageFetcher.data?.database?.usage?.map((x: DatabaseUsage) => {
+						console.log(bytes(Number(x?.memory), { unit: 'MB' }));
+						return {
+							x: x.createdAt,
+							y: Number(
+								bytes(Number(x?.memory) || 0, {
+									unit: 'GB',
+								}).replace('GB', ''),
+							),
+						};
+					}),
 					segment: {
 						borderColor: (ctx) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
@@ -179,22 +189,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 					},
 					pointStyle: false,
 				},
-				{
-					label: 'Free',
-					fill: true,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
-						Number(bytes(Number(x.free), { unit: 'GB' }).replace('GB', '')),
-					),
-					borderColor: '#cbd5e1',
-					backgroundColor: '#e2e8f0',
-					borderRadius: { topLeft: 2, topRight: 2 },
-					cubicInterpolationMode: 'monotone',
-					pointStyle: false,
-					tension: 0.4,
-				},
 			],
 		};
 		setOptions(getOptions());
+		console.log(chartData);
 		setChartData(chartData);
 	}, [usageFetcher.data]);
 
@@ -202,33 +200,24 @@ export const DriveChart = ({ url }: { url: string }) => {
 		<>
 			<div className="w-full space-y-5">
 				<div className="flex space-x-2 justify-between">
-					<H3 className="text-3xl">Storage History</H3>
+					<H3 className="text-3xl">Memory History</H3>
 					<div className="space-x-2 flex">
 						<Button
 							variant="outline"
 							className="h-8"
-							onClick={() => usageFetcher.load(url + `?range=${unit}`)}
+							onClick={() =>
+								usageFetcher.load(
+									url + `?range=${unit}`,
+									//&unit=${dateOptions.filter(
+									//  (x) => x.value === unit,
+									//)?.[0]?.unit}`,
+								)
+							}
 						>
 							<RefreshCw size={14} />
 						</Button>
 						<DateFilter value={unit} onChange={setUnit} />
 					</div>
-				</div>
-				<div className="space-x-4 text-sm h-5 flex content-center">
-					{usageFetcher.data?.drive?.daysTillFull && (
-						<span className="flex my-auto space-x-2">
-							<CalendarDays size={14} className="text-slate-400 " />
-							<span>{usageFetcher.data.drive.daysTillFull} days till full</span>
-						</span>
-					)}
-					{usageFetcher.data?.drive?.growthRate && (
-						<span className="flex my-auto space-x-2">
-							<TrendingUp size={14} className="text-slate-400 " />
-							<span>
-								{bytes(usageFetcher.data?.drive?.growthRate)}/day growth
-							</span>
-						</span>
-					)}
 				</div>
 				<div className="h-[450px] relative">
 					<Line ref={chartRef} options={options} data={chartData} />
@@ -251,7 +240,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 							className={`fill-[#7dd3fc] text-[#0ea5e9] h-3 w-3`}
 							size={10}
 						/>
-						<span>Used</span>
+						<span>Total</span>
 					</div>
 				</div>
 				<small className="text-muted-foreground">*Peak values shown.</small>

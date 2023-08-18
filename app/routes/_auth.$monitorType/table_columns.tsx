@@ -26,7 +26,11 @@ export const columnsSsh: ColumnDef<any>[] = [
 			)?.[0]?.icon;
 			return (
 				<div className="flex content-center space-x-2">
-					{icon && <>{icon}</>}
+					{icon && (
+						<div className="h-4 w-4 flex text-muted-foreground my-auto">
+							{icon}
+						</div>
+					)}
 					<span className="my-auto">{row.getValue('title')}</span>
 				</div>
 			);
@@ -143,7 +147,11 @@ export const columnsPing: ColumnDef<any>[] = [
 			)?.[0]?.icon;
 			return (
 				<div className="flex content-center space-x-2">
-					{icon && <>{icon}</>}
+					{icon && (
+						<div className="h-4 w-4 flex text-muted-foreground my-auto">
+							{icon}
+						</div>
+					)}
 					<span className="my-auto">{row.getValue('title')}</span>
 				</div>
 			);
@@ -189,7 +197,11 @@ export const columnsPing: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Ping" />
 		),
 		cell: ({ row }) => (
-			<div className="flex flex-row-reverse space-x-1 space-x-reverse">
+			<div
+				className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse ${
+					row.original.enabled ? '' : 'opacity-50 group-hover:opacity-100'
+				}`}
+			>
 				{row.original.feeds?.map((x: MonitorFeeds) => (
 					<TooltipProvider key={x.id} delayDuration={20} skipDelayDuration={20}>
 						<Tooltip>
@@ -202,7 +214,7 @@ export const columnsPing: ColumnDef<any>[] = [
 							</TooltipTrigger>
 							<TooltipContent>
 								<div>
-									<p className="flex space-x-2">
+									<div className="flex space-x-2">
 										<div
 											className={`${
 												x.hasError
@@ -219,7 +231,7 @@ export const columnsPing: ColumnDef<any>[] = [
 												'MMM d, yyyy k:mm',
 											)}
 										</span>
-									</p>
+									</div>
 									{x.message && <>{x.message}</>}
 								</div>
 							</TooltipContent>

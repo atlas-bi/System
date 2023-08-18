@@ -19,7 +19,9 @@ export const columns: ColumnDef<any>[] = [
 			return (
 				<div className="flex content-center space-x-2">
 					{icon && (
-						<div className="h-4 w-4 flex text-muted-foreground">{icon}</div>
+						<div className="h-4 w-4 flex text-muted-foreground my-auto">
+							{icon}
+						</div>
 					)}
 					<span className="my-auto">{row.getValue('type')}</span>
 				</div>

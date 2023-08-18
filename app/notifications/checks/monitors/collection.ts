@@ -15,6 +15,9 @@ export default async function collectionNotifier({
 		});
 	}
 
+	// no reporting if disabled.
+	if (monitor.connectionNotify == false) return;
+
 	const name =
 		monitor.type === 'windows' || monitor.type === 'ubuntu'
 			? `${monitor.title} (${monitor.host})`

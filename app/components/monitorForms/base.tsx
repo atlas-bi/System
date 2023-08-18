@@ -29,6 +29,7 @@ import type { Monitor } from '~/models/monitor.server';
 import SshForm from './ssh';
 import { Switch } from '~/components/ui/switch';
 import HttpForm from './http';
+import SqlForm from './sql';
 
 export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 	const [open, setOpen] = useState(false);
@@ -149,6 +150,9 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 							{data.type === 'http' && (
 								<HttpForm data={data} setData={setData} />
 							)}
+							{data.type === 'sqlServer' && (
+								<SqlForm data={data} setData={setData} />
+							)}
 						</div>
 					</div>
 					<DialogFooter className="sm:justify-between md:justify-end">
@@ -175,7 +179,12 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 								onClick={(e) => {
 									e.preventDefault();
 									testFetcher.submit(
-										{ _action: 'test', ...data },
+										{
+											_action: 'test',
+											...JSON.parse(
+												JSON.stringify(data, (k, v) => v ?? undefined),
+											),
+										},
 										{ method: 'post', action: '/monitor/new' },
 									);
 								}}
@@ -193,7 +202,12 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 								type="button"
 								onClick={(e) => {
 									fetcher.submit(
-										{ _action: 'new', ...data },
+										{
+											_action: 'new',
+											...JSON.parse(
+												JSON.stringify(data, (k, v) => v ?? undefined),
+											),
+										},
 										{ method: 'post', action: '/monitor/new' },
 									);
 								}}

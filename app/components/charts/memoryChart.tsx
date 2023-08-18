@@ -135,50 +135,70 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		}
 
 		const chartData = {
-			labels: usageFetcher.data?.monitor?.feeds?.map(
-				(x: MonitorFeeds) => x.createdAt,
-			),
 			datasets: [
 				{
+					spanGaps: 1000 * 60 * 1.5, // 1.5 min
 					fill: true,
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						bytes(
-							(Number(x?.memoryTotal) || 0) - (Number(x?.memoryFree) || 0),
-							{
-								unit: 'GB',
-							},
-						).replace('GB', ''),
-					),
-					borderColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
-					backgroundColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						lightGradient,
-					),
-					hoverBackgroundColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
-					hoverBorderColor: createLinearGradient(
-						chart.ctx,
-						chart.chartArea,
-						darkGradient,
-					),
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) => ({
+						x: x.createdAt,
+						y: Number(
+							bytes(
+								(Number(x?.memoryTotal) || 0) - (Number(x?.memoryFree) || 0),
+								{
+									unit: 'GB',
+								},
+							).replace('GB', ''),
+						),
+					})),
+					segment: {
+						borderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+						backgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								lightGradient,
+							);
+						},
+						hoverBackgroundColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+						hoverBorderColor: (ctx) => {
+							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
+							return createLinearGradient(
+								chart.ctx,
+								chart.chartArea,
+								darkGradient,
+							);
+						},
+					},
 					pointStyle: false,
 				},
 				{
 					label: 'Free',
 					fill: true,
 					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						bytes(Number(x.memoryFree) || 0, { unit: 'GB' }).replace('GB', ''),
+						Number(
+							bytes(Number(x.memoryFree) || 0, { unit: 'GB' }).replace(
+								'GB',
+								'',
+							),
+						),
 					),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',

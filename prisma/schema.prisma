@@ -52,6 +52,7 @@ model Monitor {
   domain       String?
   manufacturer String?
   model        String?
+  version      String?
   os           String?
   osVersion    String?
   lastBootTime String?
@@ -82,10 +83,15 @@ model Monitor {
   httpDomain              String?
   httpWorkstation         String?
 
-  drives Drive[]
-  cpus   Cpu[]
-  logs   MonitorLogs[]
-  feeds  MonitorFeeds[]
+  // sql details
+  sqlConnectionString String?
+
+  drives    Drive[]
+  databases Database[]
+  databasefiles DatabaseFile[]
+  cpus      Cpu[]
+  logs      MonitorLogs[]
+  feeds     MonitorFeeds[]
 
   // notifications
   connectionNotify                   Boolean?
@@ -129,6 +135,9 @@ model MonitorLogs {
 
   drive   Drive?  @relation(fields: [driveId], references: [id])
   driveId String?
+
+  database   Database? @relation(fields: [databaseId], references: [id])
+  databaseId String?
 }
 
 model Cpu {
@@ -154,6 +163,96 @@ model CpuUsage {
   // fields sent from monitor
   load  String?
   speed String?
+}
+
+model Database {
+  id          String  @id @default(cuid())
+  title       String?
+  description String?
+
+  hasError Boolean @default(false)
+
+  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitorId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enabled Boolean @default(true)
+
+  // fields sent from monitor
+  databaseId     String?
+  name           String
+  state          String?
+  recoveryModel  String?
+  compatLevel    String?
+  backupDataDate String?
+  backupDataSize String?
+  backupLogDate  String?
+  backupLogSize  String?
+
+  usage DatabaseUsage[]
+
+  logs MonitorLogs[]
+
+  files DatabaseFile[]
+
+  @@unique([monitorId, databaseId])
+}
+
+model DatabaseFile {
+  id String @id @default(cuid())
+
+  database   Database @relation(fields: [databaseId], references: [id])
+  databaseId String
+
+  monitor   Monitor @relation(fields: [monitorId], references: [id])
+  monitorId String
+
+  createdAt DateTime @default(now())
+
+  sqlDatabaseId String
+  fileName      String?
+
+  type            String?
+  state           String?
+  growth          String?
+  isPercentGrowth String?
+  fileId          String
+  filePath        String?
+
+  usage DatabaseFileUsage[]
+
+  @@unique([monitorId, sqlDatabaseId, fileId])
+}
+
+model DatabaseFileUsage {
+  id String @id @default(cuid())
+
+  databaseFile   DatabaseFile @relation(fields: [databaseFileId], references: [id])
+  databaseFileId String
+
+  createdAt DateTime @default(now())
+
+  hasError Boolean @default(false)
+
+  // fields sent from monitor
+  size    String?
+  maxSize String?
+}
+
+model DatabaseUsage {
+  id String @id @default(cuid())
+
+  database   Database @relation(fields: [databaseId], references: [id])
+  databaseId String
+
+  createdAt DateTime @default(now())
+
+  hasError Boolean @default(false)
+
+  // fields sent from monitor
+  memory String?
 }
 
 model Drive {

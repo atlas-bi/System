@@ -41,8 +41,9 @@ import { ToggleLeft } from 'lucide-react';
 import { CpuChart } from '~/components/charts/cpuChart';
 import { MemoryChart } from '~/components/charts/memoryChart';
 import { SshStats, SshSystem } from './ssh';
+import { SqlStats, SqlSystem } from './sql';
 import { PingChart } from '~/components/charts/pingChart';
-
+import { parseSqlConnectionString } from '@tediousjs/connection-string';
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -66,12 +67,19 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			httpPassword: monitor.httpPassword
 				? decrypt(monitor.httpPassword)
 				: undefined,
+			sqlConnectionString: monitor.sqlConnectionString
+				? decrypt(monitor.sqlConnectionString)
+				: undefined,
 		},
 	});
 };
 
 export default function Index() {
 	const { monitor } = useLoaderData<typeof loader>();
+
+	const sqlConnectionString = monitor.sqlConnectionString
+		? parseSqlConnectionString(monitor.sqlConnectionString, true)
+		: undefined;
 
 	return (
 		<>
@@ -108,6 +116,8 @@ export default function Index() {
 				<span>{monitor.title}</span>
 				{monitor.type === 'http' && monitor.httpUrl ? (
 					<span>({monitor.httpUrl})</span>
+				) : monitor.type === 'sqlServer' ? (
+					<span>({sqlConnectionString?.['data source']})</span>
 				) : (
 					monitor.host && <span>({monitor.host})</span>
 				)}
@@ -119,6 +129,13 @@ export default function Index() {
 					<>
 						<SshSystem monitor={monitor} />
 						<SshStats monitor={monitor} />
+					</>
+				)}
+
+				{monitor.type == 'sqlServer' && (
+					<>
+						<SqlSystem monitor={monitor} />
+						<SqlStats monitor={monitor} />
 					</>
 				)}
 
