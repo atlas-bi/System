@@ -1,3 +1,8 @@
+## 1.22.0 (2023-08-18)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([328e969](https://github.com/atlas-bi/System/commit/328e969))
+* feat(sql): started sql server monitor ([0adcbb4](https://github.com/atlas-bi/System/commit/0adcbb4))
+
 ## 1.21.0 (2023-08-15)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([d57e11a](https://github.com/atlas-bi/System/commit/d57e11a))
