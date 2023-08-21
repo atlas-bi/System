@@ -10,6 +10,7 @@ import {
 import { authenticator } from '~/services/auth.server';
 import { HttpCheck } from '~/monitors/http.server';
 import mssql from 'mssql';
+import { encrypt } from '@/lib/utils';
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	if (str === undefined || str === null || str.toString().trim() === '') {
 		return true;
@@ -270,7 +271,7 @@ export async function action({ request }: ActionArgs) {
 					httpBody: values.httpBody?.toString(),
 					httpAuthentication: values.httpAuthentication?.toString(),
 					httpUsername: values.httpUsername?.toString(),
-					httpPassword: encrypt(values.httpPassword?.toString()),
+					httpPassword: values.httpPassword ? encrypt(values.httpPassword?.toString()) : undefined,
 					httpIgnoreSsl: !!values.httpIgnoreSsl,
 					httpBodyEncoding: values.httpBodyEncoding?.toString(),
 					httpUrl: values.httpUrl?.toString(),
