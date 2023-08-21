@@ -1,3 +1,8 @@
+## <small>1.23.3 (2023-08-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why ([df79624](https://github.com/atlas-bi/System/commit/df79624))
+* fix(ntlm): fixed password encryptiong ([9c1b935](https://github.com/atlas-bi/System/commit/9c1b935))
+
 ## <small>1.23.2 (2023-08-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter ([8b50648](https://github.com/atlas-bi/System/commit/8b50648))
