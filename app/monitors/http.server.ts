@@ -93,7 +93,8 @@ export async function HttpCheck({
 
 	if (httpAuthentication === 'basic') {
 		basicAuthHeader = {
-			Authorization: 'Basic ' + encodeBase64(httpUsername, httpPassword),
+			Authorization:
+				'Basic ' + encodeBase64(httpUsername, decrypt(httpPassword)),
 		};
 	}
 
@@ -151,12 +152,16 @@ export async function HttpCheck({
 	try {
 		if (httpAuthentication === 'ntlm') {
 			options.httpsAgent.keepAlive = true;
-			let client = NtlmClient({
+
+			let credentials: NtlmCredentials = {
 				username: httpUsername || '',
-				password: httpPassword || '',
+				password: httpPassword ? decrypt(httpPassword) : '',
 				domain: httpDomain || '',
 				workstation: httpWorkstation ? httpWorkstation : undefined,
-			});
+			};
+
+			let client = NtlmClient(credentials);
+
 			res = await client(options);
 		} else {
 			res = await axios.request(options);

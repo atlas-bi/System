@@ -270,7 +270,7 @@ export async function action({ request }: ActionArgs) {
 					httpBody: values.httpBody?.toString(),
 					httpAuthentication: values.httpAuthentication?.toString(),
 					httpUsername: values.httpUsername?.toString(),
-					httpPassword: values.httpPassword?.toString(),
+					httpPassword: encrypt(values.httpPassword?.toString()),
 					httpIgnoreSsl: !!values.httpIgnoreSsl,
 					httpBodyEncoding: values.httpBodyEncoding?.toString(),
 					httpUrl: values.httpUrl?.toString(),

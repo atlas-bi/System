@@ -1,4 +1,4 @@
-import { getMonitor } from '~/models/monitor.server';
+import { Monitor, getMonitor } from '~/models/monitor.server';
 import type { Drive, DriveUsage } from '~/models/monitor.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
@@ -29,7 +29,7 @@ export default async function Notifier({
 
 	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier
-		await rebootNotifier({ monitor, oldMonitor });
+		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
 
 		// drive notifications
 		monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {

@@ -37,7 +37,7 @@ export default function HttpForm({
 			<Input
 				type="text"
 				id="httpUrl"
-				value={data.httpUrl}
+				value={data.httpUrl || ''}
 				placeholder="https://google.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, httpUrl: e.target.value })}
