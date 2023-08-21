@@ -1,3 +1,8 @@
+## 1.23.0 (2023-08-21)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([bad3634](https://github.com/atlas-bi/System/commit/bad3634))
+* feat(sql files): added ui for sql files ([d0cf58e](https://github.com/atlas-bi/System/commit/d0cf58e))
+
 ## <small>1.22.1 (2023-08-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([944f172](https://github.com/atlas-bi/System/commit/944f172))
