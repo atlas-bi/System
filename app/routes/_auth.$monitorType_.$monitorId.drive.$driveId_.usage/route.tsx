@@ -26,6 +26,10 @@ function calcGrowth({ usage }) {
 		return { daysTillFull: -1, growthRage: -1 };
 	}
 
+	if (usage.length == 0) {
+		return { daysTillFull: -1, growthRate: 0 };
+	}
+
 	const end = usage[0];
 	const start = usage[usage.length - 1];
 

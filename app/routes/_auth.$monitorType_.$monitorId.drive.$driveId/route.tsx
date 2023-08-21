@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { LogTable } from '~/components/logTable/table';
 import { Button } from '~/components/ui/button';
 import Drive from '~/components/driveForms/base';
+import { Badge } from '~/components/ui/badge';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -75,6 +76,9 @@ export default function Index() {
 						Back to <strong>{drive.monitor.title}</strong>
 					</span>
 				</Link>
+				<Badge variant="outline" className="border-orange-600">
+					Drive
+				</Badge>
 				<div className="flex divide-x">
 					<Drive drive={drive}>
 						<Button variant="link" className="text-slate-700 h-6 ">

@@ -7,6 +7,7 @@ import {
 	monitorError,
 	setDriveDays,
 	setDriveGrowth,
+	setDriveOnline,
 	updateMonitor,
 } from '~/models/monitor.server';
 import Notifier from '~/notifications/notifier';
@@ -214,7 +215,6 @@ export default async function WindowsMonitor({
 				).length == 0;
 			return l;
 		});
-
 		const oldMonitor = await getMonitor({ id: monitor.id });
 		const data = await updateMonitor({
 			id: monitor.id,
@@ -290,9 +290,14 @@ export default async function WindowsMonitor({
 						growthRate: (usedGrowth / diffDays).toString(),
 					});
 				}
+				// online/offline
+				await setDriveOnline({
+					id: drive.id,
+					online:
+						updateableDrives.filter((x) => x.Name == drive.name).length > 0,
+				});
 			},
 		);
-
 		disposeSsh(ssh);
 
 		await Notifier({ job: monitor.id, oldMonitor });

@@ -1,7 +1,7 @@
 import { Link, useFetcher, useLocation } from '@remix-run/react';
 import bytes from 'bytes';
 import { format, formatDistance } from 'date-fns';
-import { ToggleLeft, ToggleRight } from 'lucide-react';
+import { AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { CpuChart } from '~/components/charts/cpuChart';
 import { DoughnutChart } from '~/components/charts/driveDoughnut';
@@ -118,12 +118,24 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 										prefetch="intent"
 										key={drive.id}
 										className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200 ${
-											drive.enabled ? '' : 'opacity-50 hover:opacity-100'
+											!drive.enabled || !drive.online
+												? 'opacity-50 hover:opacity-100'
+												: ''
 										}`}
 									>
 										<div>
 											{drive.enabled ? (
-												<ToggleRight size={20} className="text-slate-400" />
+												!drive.online ? (
+													<div className="flex space-x-2 text-muted-foreground center-content">
+														<AlertTriangle
+															size={16}
+															className="text-red-400 my-auto"
+														/>
+														<span>Offline</span>
+													</div>
+												) : (
+													<ToggleRight size={20} className="text-slate-400" />
+												)
 											) : (
 												<ToggleLeft
 													size={20}
@@ -199,7 +211,7 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 															Days Till Full
 														</TableCell>
 														<TableCell className="py-1">
-															{drive.daysTillFull}
+															{drive.daysTillFull || '-1'}
 														</TableCell>
 													</TableRow>
 													<TableRow>

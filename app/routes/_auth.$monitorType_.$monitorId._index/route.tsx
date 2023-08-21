@@ -44,6 +44,7 @@ import { SshStats, SshSystem } from './ssh';
 import { SqlStats, SqlSystem } from './sql';
 import { PingChart } from '~/components/charts/pingChart';
 import { parseSqlConnectionString } from '@tediousjs/connection-string';
+import { Badge } from '~/components/ui/badge';
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -92,6 +93,9 @@ export default function Index() {
 					<MoveLeft size={16} className="my-auto" />
 					<span className="my-auto">Back to Monitors</span>
 				</Link>
+				<Badge variant="outline" className="border-orange-600">
+					{monitorTypes.filter((x) => x.value === monitor.type)?.[0]?.name}
+				</Badge>
 				<div className="flex divide-x">
 					<Monitor monitor={monitor}>
 						<Button variant="link" className="text-slate-700 h-6 ">

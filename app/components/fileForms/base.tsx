@@ -15,19 +15,19 @@ import { Label } from '~/components/ui/label';
 
 import { Textarea } from '~/components/ui/textarea';
 
-import type { Drive } from '~/models/monitor.server';
+import type { DatabaseFile } from '~/models/monitor.server';
 import { Switch } from '../ui/switch';
 
-export default function Drive({ drive, children }: { drive: Drive }) {
+export default function File({ file, children }: { file: DatabaseFile }) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 
-	const [data, setData] = useState<Drive>(drive);
+	const [data, setData] = useState<DatabaseFile>(file);
 
-	useEffect(() => setData(drive), [drive]);
+	useEffect(() => setData(file), [file]);
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.drive != null) {
+		if (fetcher.state === 'idle' && fetcher.data?.file != null) {
 			setOpen(false);
 		}
 	}, [fetcher]);
@@ -37,13 +37,13 @@ export default function Drive({ drive, children }: { drive: Drive }) {
 			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:min-w-[425px] sm:max-w-fit">
 				<DialogHeader>
-					<DialogTitle>{drive.name}</DialogTitle>
-					<DialogDescription>Editing drive.</DialogDescription>
+					<DialogTitle>{file.fileName}</DialogTitle>
+					<DialogDescription>Editing file.</DialogDescription>
 				</DialogHeader>
 				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
-				<Form method="post" action="/drive/edit">
+				<Form method="post" action="/monitor/new">
 					<div className="grid gap-4 py-4">
 						<div className="grid grid-cols-4 items-center gap-4">
 							<Label className="text-right">Enabled</Label>
@@ -54,57 +54,25 @@ export default function Drive({ drive, children }: { drive: Drive }) {
 									onCheckedChange={(enabled) => setData({ ...data, enabled })}
 								/>
 							</div>
-							<Label htmlFor="name" className="text-right">
-								Name
-							</Label>
-							<Input
-								type="text"
-								id="name"
-								value={data.title}
-								placeholder="Logs drive"
-								className="col-span-3"
-								onChange={(e) => setData({ ...data, title: e.target.value })}
-							/>
-							<Label htmlFor="description" className="text-right">
-								Description
-							</Label>
-							<Textarea
-								id="description"
-								className="col-span-3"
-								value={data.description || ''}
-								onChange={(e) =>
-									setData({ ...data, description: e.target.value })
-								}
-							/>
 						</div>
 					</div>
-					<DialogFooter className="sm:justify-between md:justify-end">
+					<DialogFooter className="sm:justify-between">
 						<div className="flex space-x-2">
 							<Button
 								type="button"
 								onClick={(e) => {
 									fetcher.submit(
-										{ _action: 'edit', ...data },
-										{ method: 'post', action: '/drive/edit' },
+										{
+											_action: 'edit',
+											...JSON.parse(
+												JSON.stringify(data, (k, v) => v ?? undefined),
+											),
+										},
+										{ method: 'post', action: '/file/edit' },
 									);
 								}}
 							>
 								Save
-							</Button>
-						</div>
-						<div className="flex space-x-2">
-							<Button
-								type="button"
-								variant="outline"
-								className="border-red-300"
-								onClick={(e) => {
-									fetcher.submit(
-										{ _action: 'delete', id: data.id },
-										{ method: 'post', action: '/drive/edit' },
-									);
-								}}
-							>
-								Delete
 							</Button>
 						</div>
 					</DialogFooter>

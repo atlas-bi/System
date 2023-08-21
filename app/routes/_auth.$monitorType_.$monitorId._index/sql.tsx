@@ -1,4 +1,9 @@
-import { Link, useFetcher, useLocation } from '@remix-run/react';
+import {
+	Link,
+	useFetcher,
+	useLocation,
+	useSearchParams,
+} from '@remix-run/react';
 import { format, formatDistance } from 'date-fns';
 import { useEffect } from 'react';
 import { CpuChart } from '~/components/charts/cpuChart';
@@ -77,6 +82,8 @@ export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
 		}
 	}, [location]);
 
+	const [searchParams] = useSearchParams();
+
 	useEffect(() => {
 		if (databasesFetcher.state === 'idle' && databasesFetcher.data == null) {
 			databasesFetcher.load(`/${monitor.type}/${monitor.id}/databases`);
@@ -84,17 +91,20 @@ export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
 	}, [databasesFetcher, monitor]);
 
 	return (
-		<Tabs defaultValue="ping" className="w-full">
+		<Tabs
+			defaultValue={`${searchParams.get('tab') || 'ping'}`}
+			className="w-full"
+		>
 			<TabsList className="grid max-w-[400px] grid-cols-4">
 				<TabsTrigger value="ping">Ping</TabsTrigger>
-				<TabsTrigger value="database">Databases</TabsTrigger>
+				<TabsTrigger value="databases">Databases</TabsTrigger>
 				<TabsTrigger value="cpu">CPU</TabsTrigger>
 				<TabsTrigger value="memory">Memory</TabsTrigger>
 			</TabsList>
 			<TabsContent value="ping">
 				<PingChart url={`/${monitor.type}/${monitor.id}/ping`} />
 			</TabsContent>
-			<TabsContent value="database">
+			<TabsContent value="databases">
 				{databasesFetcher.data?.databases ? (
 					<>
 						<SqlDatabaseTable

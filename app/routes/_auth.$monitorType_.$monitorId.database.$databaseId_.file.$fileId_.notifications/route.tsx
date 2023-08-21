@@ -3,6 +3,7 @@ import { json } from '@remix-run/node';
 import {
 	getDatabaseNotifications,
 	getDriveNotifications,
+	getFileNotifications,
 	updateDriveNotifications,
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -27,14 +28,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
-	const database = await getDatabaseNotifications({ id: params.databaseId });
-	if (!database) {
+	const file = await getFileNotifications({ id: params.fileId });
+	if (!file) {
 		throw new Response('Not Found', { status: 404 });
 	}
 
 	const notifications = await getNotifications();
 
-	return json({ database, notifications });
+	return json({ file, notifications });
 };
 
 export async function action({ request, params }: ActionArgs) {
@@ -50,7 +51,7 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 export default function Index() {
-	const { database, notifications } = useLoaderData<typeof loader>();
+	const { file, notifications } = useLoaderData<typeof loader>();
 
 	const submit = useSubmit();
 	const transition = useNavigation();
@@ -59,7 +60,7 @@ export default function Index() {
 			return { label: n.name, value: n.id };
 		},
 	);
-	let { monitorType, monitorId } = useParams();
+	let { monitorType, monitorId, databaseId } = useParams();
 
 	const form = useRef<HTMLFormElement>(null);
 
@@ -71,7 +72,7 @@ export default function Index() {
 		<>
 			<div className="flex space-x-2 pb-4">
 				<Link
-					to={`/${monitorType}/${monitorId}/database/${database.id}`}
+					to={`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}`}
 					className={`transition-colors flex content-center space-x-2  text-slate-600 ${
 						transition.state === 'submitting' ? 'pointer-events-none' : ''
 					}`}
@@ -79,14 +80,14 @@ export default function Index() {
 				>
 					<MoveLeft size={16} className="my-auto" />
 					<span className="my-auto">
-						Back to <strong>{database.name}</strong>
+						Back to <strong>{file.fileName}</strong>
 					</span>
 				</Link>
 				{transition.state === 'submitting' ? (
 					<Loader2 size={14} className="animate-spin my-auto" />
 				) : null}
 			</div>
-			<H1>Notifications for {database.name}</H1>
+			<H1>Notifications for {file.fileName}</H1>
 			coming soon.
 		</>
 	);

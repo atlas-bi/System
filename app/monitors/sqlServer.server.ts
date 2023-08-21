@@ -4,6 +4,8 @@ import {
 	updateMonitor,
 	setFeedError,
 	getMonitorDisabledDatabases,
+	setFileDays,
+	setFileGrowth,
 } from '~/models/monitor.server';
 import mssql from 'mssql';
 import Notifier from '~/notifications/notifier';
@@ -366,6 +368,34 @@ OPTION (
 				memoryTotal: targetMemory.toString(),
 			},
 		});
+
+		// calculate days till full
+		data.databases?.map(
+			(d) =>
+				d.files?.map(
+					async (file: { size: string; usage: string | any[]; id: any }) => {
+						if (!file.usage || file.usage.length <= 1) {
+							await setFileDays({ id: file.id, daysTillFull: null });
+							await setFileGrowth({ id: file.id, growthRate: null });
+						} else {
+							const end = file.usage[0];
+							const start = file.usage[file.usage.length - 1];
+							const diffDays =
+								differenceInDays(end.createdAt, start.createdAt) + 1;
+							const usedGrowth = end.size - start.size;
+							const free = Number(end.maxSize) - end.size;
+							const daysTillFull = (
+								Math.max(Math.round((free * diffDays) / usedGrowth), -1) || -1
+							).toString();
+							await setFileDays({ id: file.id, daysTillFull });
+							await setFileGrowth({
+								id: file.id,
+								growthRate: (usedGrowth / diffDays).toString(),
+							});
+						}
+					},
+				),
+		);
 
 		// if (error) {
 		// 	// update feed to be an error

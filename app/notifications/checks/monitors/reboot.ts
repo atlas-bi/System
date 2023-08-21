@@ -13,11 +13,8 @@ export default async function rebootNotifier({
 	monitor: Monitor;
 	oldMonitor: Monitor;
 }) {
-	console.log('reboot notifier!');
 	// don't notify if disabled.
 	if (!monitor.rebootNotify) return;
-
-	console.log(monitor.lastBootTime, oldMonitor.lastBootTime);
 
 	// send notification if it has changed
 	if (monitor.lastBootTime != oldMonitor.lastBootTime) {

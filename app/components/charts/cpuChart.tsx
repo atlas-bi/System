@@ -1,6 +1,4 @@
 import type { MonitorFeeds } from '@prisma/client';
-
-import bytes from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -12,7 +10,7 @@ import {
 	Filler,
 	TimeScale,
 } from 'chart.js';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';

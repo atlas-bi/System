@@ -43,74 +43,77 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		return evtPos;
 	};
 
-	const getOptions = useCallback(() => {
-		return {
-			responsive: true,
-			maintainAspectRatio: false,
-			interaction: {
-				intersect: false,
-				mode: 'index',
-			},
-			animation: {
-				duration: 300,
-				resize: {
-					duration: 0,
+	const getOptions = useCallback(
+		(sizeUnit) => {
+			return {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: {
+					intersect: false,
+					mode: 'index',
 				},
-				active: {
-					duration: 0,
-				},
-			},
-			plugins: {
-				title: {
-					display: false,
-				},
-				legend: {
-					display: false,
-				},
-				tooltip: {
-					position: 'mouse',
-					callbacks: {
-						label: function (tooltipItem) {
-							if (tooltipItem.datasetIndex === 0) {
-								return tooltipItem.formattedValue + 'GB Used';
-							}
-							return tooltipItem.formattedValue + 'GB Free';
-						},
+				animation: {
+					duration: 300,
+					resize: {
+						duration: 0,
+					},
+					active: {
+						duration: 0,
 					},
 				},
-			},
-			scales: {
-				y: {
-					type: 'linear' as const,
-					display: true,
-					position: 'left' as const,
-					beginAtZero: true,
-					ticks: {
-						callback: function (value: string) {
-							return value + 'GB';
-						},
-					},
-					stacked: true,
-				},
-				x: {
-					stacked: true,
-					type: 'time',
-					min: () => usageFetcher.data?.monitor?.startDate,
-					max: () => usageFetcher.data?.monitor?.endDate,
-					time: {
-						unit: () =>
-							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
-							undefined,
-					},
-					grid: {
+				plugins: {
+					title: {
 						display: false,
 					},
+					legend: {
+						display: false,
+					},
+					tooltip: {
+						position: 'mouse',
+						callbacks: {
+							label: function (tooltipItem) {
+								if (tooltipItem.datasetIndex === 0) {
+									return tooltipItem.formattedValue + sizeUnit + ' Used';
+								}
+								return tooltipItem.formattedValue + sizeUnit + ' Free';
+							},
+						},
+					},
 				},
-			},
-		};
-	}, [unit, usageFetcher.data]);
+				scales: {
+					y: {
+						type: 'linear' as const,
+						display: true,
+						position: 'left' as const,
+						beginAtZero: true,
+						ticks: {
+							callback: function (value: string) {
+								return value + sizeUnit;
+							},
+						},
+						stacked: true,
+					},
+					x: {
+						stacked: true,
+						type: 'time',
+						min: () => usageFetcher.data?.monitor?.startDate,
+						max: () => usageFetcher.data?.monitor?.endDate,
+						time: {
+							unit: () =>
+								dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
+								undefined,
+						},
+						grid: {
+							display: false,
+						},
+					},
+				},
+			};
+		},
+		[unit, usageFetcher.data],
+	);
 
-	const [options, setOptions] = useState(getOptions());
+	const [options, setOptions] = useState(getOptions('GB'));
 
 	useEffect(() => {
 		usageFetcher.load(url + `?range=${unit}`);
@@ -134,22 +137,36 @@ export const MemoryChart = ({ url }: { url: string }) => {
 			return;
 		}
 
+		let sizeUnit = 'GB';
+		const max = usageFetcher.data?.database?.usage?.reduce(
+			(a, e) => Math.max(Number(a), Number(e.memory) || 0),
+			0,
+		);
+		if (max < 10000) {
+			sizeUnit = 'KB';
+		} else if (max < 100000) {
+			sizeUnit = 'MB';
+		}
+
+		const xUnit =
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
+
 		const chartData = {
 			datasets: [
 				{
-					spanGaps: 1000 * 60 * 1.5, // 1.5 min
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
 					data: usageFetcher.data?.database?.usage?.map((x: DatabaseUsage) => {
-						console.log(bytes(Number(x?.memory), { unit: 'MB' }));
 						return {
 							x: x.createdAt,
 							y: Number(
 								bytes(Number(x?.memory) || 0, {
-									unit: 'GB',
-								}).replace('GB', ''),
+									unit: sizeUnit,
+									decimalPlaces: 4,
+								}).replace(sizeUnit, ''),
 							),
 						};
 					}),
@@ -191,7 +208,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				},
 			],
 		};
-		setOptions(getOptions());
+		setOptions(getOptions(sizeUnit));
 		setChartData(chartData);
 	}, [usageFetcher.data]);
 
@@ -204,14 +221,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 						<Button
 							variant="outline"
 							className="h-8"
-							onClick={() =>
-								usageFetcher.load(
-									url + `?range=${unit}`,
-									//&unit=${dateOptions.filter(
-									//  (x) => x.value === unit,
-									//)?.[0]?.unit}`,
-								)
-							}
+							onClick={() => usageFetcher.load(url + `?range=${unit}`)}
 						>
 							<RefreshCw size={14} />
 						</Button>

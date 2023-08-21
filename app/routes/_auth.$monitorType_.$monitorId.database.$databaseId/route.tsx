@@ -8,6 +8,7 @@ import {
 	useFetcher,
 	useLoaderData,
 	useParams,
+	useSearchParams,
 } from '@remix-run/react';
 import { H1, H3 } from '~/components/ui/typography';
 import { MoveLeft, Settings } from 'lucide-react';
@@ -75,12 +76,13 @@ export default function Index() {
 			);
 		}
 	}, [usageFetcher]);
+	const [searchParams] = useSearchParams();
 
 	return (
 		<>
 			<div className="flex justify-between pb-4">
 				<Link
-					to={`/${monitorType}/${monitorId}`}
+					to={`/${monitorType}/${monitorId}?tab=databases`}
 					className="flex content-center space-x-2 text-slate-600"
 					prefetch="intent"
 				>
@@ -89,6 +91,9 @@ export default function Index() {
 						Back to <strong>{database.monitor.title}</strong>
 					</span>
 				</Link>
+				<Badge variant="outline" className="border-orange-600">
+					Database
+				</Badge>
 				<div className="flex divide-x">
 					<Database database={database}>
 						<Button variant="link" className="text-slate-700 h-6 ">
@@ -224,7 +229,10 @@ export default function Index() {
 					</Table>
 				</div>
 
-				<Tabs defaultValue="memory" className="w-full">
+				<Tabs
+					defaultValue={`${searchParams.get('tab') || 'memory'}`}
+					className="w-full"
+				>
 					<TabsList className="grid max-w-[400px] grid-cols-2">
 						<TabsTrigger value="memory">Memory</TabsTrigger>
 						<TabsTrigger value="files">Files</TabsTrigger>
@@ -242,7 +250,6 @@ export default function Index() {
 								database={database}
 							/>
 						)}
-						<Outlet />
 					</TabsContent>
 				</Tabs>
 

@@ -35,7 +35,7 @@ import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { TrendingUp } from 'lucide-react';
 
-export const DriveChart = ({ url }: { url: string }) => {
+export const FileChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
 	const [unit, setUnit] = useState('last_24_hours');
 	const chartRef = useRef<ChartJS>(null);
@@ -94,8 +94,8 @@ export const DriveChart = ({ url }: { url: string }) => {
 					x: {
 						stacked: true,
 						type: 'time',
-						min: () => usageFetcher.data?.drive?.startDate,
-						max: () => usageFetcher.data?.drive?.endDate,
+						min: () => usageFetcher.data?.file?.startDate,
+						max: () => usageFetcher.data?.file?.endDate,
 						time: {
 							unit: () =>
 								dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
@@ -136,10 +136,15 @@ export const DriveChart = ({ url }: { url: string }) => {
 		}
 
 		let sizeUnit = 'GB';
-		const max = usageFetcher.data?.drive?.usage?.reduce(
-			(a, e) => Math.max(Number(a), Number(e.used) || 0),
+		const max = usageFetcher.data?.file?.usage?.reduce(
+			(a, e) =>
+				Math.max(
+					Number(a),
+					Math.max(Number(e.maxSize) || 0, Number(e.size) || 0),
+				),
 			0,
 		);
+
 		if (max < 10000) {
 			sizeUnit = 'KB';
 		} else if (max < 100000) {
@@ -157,10 +162,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) => ({
+					data: usageFetcher.data?.file?.usage?.map((x: Usage) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.used), { unit: sizeUnit }).replace(sizeUnit, ''),
+							bytes(Number(x.size), { unit: sizeUnit }).replace(sizeUnit, ''),
 						),
 					})),
 					segment: {
@@ -202,9 +207,11 @@ export const DriveChart = ({ url }: { url: string }) => {
 				{
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
+					data: usageFetcher.data?.file?.usage?.map((x: Usage) =>
 						Number(
-							bytes(Number(x.free), { unit: sizeUnit }).replace(sizeUnit, ''),
+							bytes(Math.max(Number(x.maxSize) - Number(x.size), 0), {
+								unit: sizeUnit,
+							}).replace(sizeUnit, ''),
 						),
 					),
 					borderColor: '#cbd5e1',
@@ -237,17 +244,17 @@ export const DriveChart = ({ url }: { url: string }) => {
 					</div>
 				</div>
 				<div className="space-x-4 text-sm h-5 flex content-center">
-					{usageFetcher.data?.drive?.daysTillFull !== undefined && (
+					{usageFetcher.data?.file?.daysTillFull !== undefined && (
 						<span className="flex my-auto space-x-2">
 							<CalendarDays size={14} className="text-slate-400 " />
-							<span>{usageFetcher.data.drive.daysTillFull} days till full</span>
+							<span>{usageFetcher.data.file.daysTillFull} days till full</span>
 						</span>
 					)}
-					{usageFetcher.data?.drive?.growthRate !== undefined && (
+					{usageFetcher.data?.file?.growthRate !== undefined && (
 						<span className="flex my-auto space-x-2">
 							<TrendingUp size={14} className="text-slate-400 " />
 							<span>
-								{bytes(usageFetcher.data?.drive?.growthRate)}/day growth
+								{bytes(usageFetcher.data?.file?.growthRate) || '0B'}/day growth
 							</span>
 						</span>
 					)}

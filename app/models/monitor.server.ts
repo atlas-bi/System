@@ -5,6 +5,27 @@ import monitorMonitor from '~/queues/monitor.server';
 
 export type { Monitor, Drive, DriveUsage, MonitorLogs } from '@prisma/client';
 
+export async function deleteDrive({ id }: Pick<Drive, 'id'>) {
+	// delete drive usage
+	await prisma.driveUsage.deleteMany({
+		where: {
+			drive: { id },
+		},
+	});
+
+	// delete drive logs
+	await prisma.monitorLogs.deleteMany({
+		where: {
+			drive: { id },
+		},
+	});
+
+	// delete drives
+	await prisma.drive.deleteMany({
+		where: { id },
+	});
+}
+
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
 	// delete database file usage
 	await prisma.databaseFileUsage.deleteMany({
@@ -308,9 +329,47 @@ export function monitorLog({
 	});
 }
 
+export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
+	return prisma.databaseFile.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			fileName: true,
+			type: true,
+			state: true,
+			growth: true,
+			isPercentGrowth: true,
+			fileId: true,
+			filePath: true,
+			database: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
+			usage: {
+				select: {
+					id: true,
+					size: true,
+					maxSize: true,
+				},
+				take: 1,
+			},
+		},
+	});
+}
+
+export function getFileNotifications({ id }: Pick<DatabaseFile, 'id'>) {
+	return prisma.databaseFile.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			fileName: true,
+		},
+	});
+}
+
 export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
-	let lastMonth = new Date();
-	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.database.findUnique({
 		where: { id },
 		select: {
@@ -438,6 +497,52 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 					free: true,
 				},
 				take: 1,
+			},
+		},
+	});
+}
+
+export function getFileUsage({
+	id,
+	startDate,
+	endDate,
+}: Pick<Drive, 'id'> & { startDate: Date; endDate: Date }) {
+	let lastMonth = new Date();
+	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
+	return prisma.databaseFile.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			databaseId: true,
+			fileName: true,
+			enabled: true,
+			online: true,
+			type: true,
+			state: true,
+			growth: true,
+			isPercentGrowth: true,
+			fileId: true,
+			filePath: true,
+			database: {
+				select: {
+					name: true,
+					id: true,
+				},
+			},
+			usage: {
+				select: {
+					id: true,
+					size: true,
+					maxSize: true,
+					createdAt: true,
+				},
+				where: {
+					createdAt: {
+						gte: startDate,
+						lt: endDate,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
 			},
 		},
 	});
@@ -697,9 +802,10 @@ export async function getMonitorLogs({
 	monitorId,
 	driveId,
 	databaseId,
+	fileId,
 	page = 0,
 	size = 10,
-}: Pick<MonitorLogs, 'monitorId' | 'driveId' | 'databaseId'> & {
+}: Pick<MonitorLogs, 'monitorId' | 'driveId' | 'databaseId' | 'fileId'> & {
 	page?: number;
 	size?: number;
 }) {
@@ -709,6 +815,7 @@ export async function getMonitorLogs({
 				monitorId,
 				driveId,
 				databaseId,
+				fileId,
 				NOT: {
 					message: {
 						contains: 'clientVersion',
@@ -722,6 +829,7 @@ export async function getMonitorLogs({
 				monitorId,
 				driveId,
 				databaseId,
+				fileId,
 				NOT: {
 					message: {
 						contains: 'clientVersion',
@@ -852,6 +960,7 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 			size: true,
 			daysTillFull: true,
 			growthRate: true,
+			online: true,
 			usage: {
 				select: {
 					id: true,
@@ -861,10 +970,22 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 				take: 1,
 			},
 		},
-		orderBy: [{ enabled: 'desc' }, { size: 'desc' }, { name: 'asc' }],
+		orderBy: [
+			{ online: 'desc' },
+			{ enabled: 'desc' },
+			{ size: 'desc' },
+			{ name: 'asc' },
+		],
 	});
 }
-
+export function getDriveMonitor({ id }: { id: Drive['id'] }) {
+	return prisma.drive.findUnique({
+		where: { id },
+		select: {
+			monitor: { select: { id: true, type: true } },
+		},
+	});
+}
 export async function createMonitor({
 	title,
 	host,
@@ -983,6 +1104,22 @@ export function editDatabase({
 		data: {
 			title,
 			description,
+			enabled,
+		},
+		select: {
+			id: true,
+		},
+	});
+}
+
+export function editFile({
+	id,
+
+	enabled,
+}: Pick<DatabaseFile, 'id' | 'enabled'>) {
+	return prisma.databaseFile.update({
+		where: { id },
+		data: {
 			enabled,
 		},
 		select: {
@@ -1487,6 +1624,7 @@ export function updateMonitor({
 				select: {
 					id: true,
 					size: true,
+					name: true,
 					usage: {
 						where: {
 							createdAt: {
@@ -1511,7 +1649,43 @@ export function updateMonitor({
 				},
 				take: 1,
 			},
+			databases: {
+				select: {
+					id: true,
+					files: {
+						select: {
+							id: true,
+							usage: {
+								where: {
+									createdAt: {
+										gte: lastWeek,
+									},
+								},
+								select: {
+									id: true,
+									maxSize: true,
+									size: true,
+									createdAt: true,
+								},
+								orderBy: {
+									createdAt: 'desc',
+								},
+							},
+						},
+					},
+				},
+			},
 		},
+	});
+}
+
+export function setFileDays({
+	id,
+	daysTillFull,
+}: Pick<DatabaseFile, 'id' | 'daysTillFull'>) {
+	return prisma.databaseFile.update({
+		where: { id },
+		data: { daysTillFull },
 	});
 }
 
@@ -1522,6 +1696,23 @@ export function setDriveDays({
 	return prisma.drive.update({
 		where: { id },
 		data: { daysTillFull },
+	});
+}
+
+export function setDriveOnline({ id, online }: Pick<Drive, 'id' | 'online'>) {
+	return prisma.drive.update({
+		where: { id },
+		data: { online },
+	});
+}
+
+export function setFileGrowth({
+	id,
+	growthRate,
+}: Pick<DatabaseFile, 'id' | 'growthRate'>) {
+	return prisma.databaseFile.update({
+		where: { id },
+		data: { growthRate },
 	});
 }
 

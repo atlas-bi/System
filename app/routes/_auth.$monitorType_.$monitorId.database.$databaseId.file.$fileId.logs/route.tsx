@@ -12,6 +12,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	});
 	invariant(params.monitorId, 'Monitor ID is required.');
 	invariant(params.databaseId, 'Database ID is required');
+	invariant(params.databaseId, 'File ID is required');
 	const url = new URL(request.url);
 
 	const page = Number(url.searchParams.get('page') || 0);
@@ -20,6 +21,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		data: await getMonitorLogs({
 			monitorId: params.monitorId,
 			databaseId: params.databaseId,
+			fileId: params.fileId,
 			page,
 			size,
 		}),

@@ -138,6 +138,9 @@ model MonitorLogs {
 
   database   Database? @relation(fields: [databaseId], references: [id])
   databaseId String?
+
+  file   DatabaseFile? @relation(fields: [fileId], references: [id])
+  fileId String?
 }
 
 model Cpu {
@@ -179,6 +182,7 @@ model Database {
   updatedAt DateTime @updatedAt
 
   enabled Boolean @default(true)
+  online Boolean @default(true)
 
   // fields sent from monitor
   databaseId     String?
@@ -209,6 +213,9 @@ model DatabaseFile {
   monitor   Monitor @relation(fields: [monitorId], references: [id])
   monitorId String
 
+  enabled Boolean @default(true)
+  online Boolean @default(true)
+
   createdAt DateTime @default(now())
 
   sqlDatabaseId String
@@ -221,7 +228,12 @@ model DatabaseFile {
   fileId          String
   filePath        String?
 
+  daysTillFull String?
+  growthRate   String?
+
   usage DatabaseFileUsage[]
+
+  logs MonitorLogs[]
 
   @@unique([monitorId, sqlDatabaseId, fileId])
 }
@@ -261,6 +273,7 @@ model Drive {
   description String?
 
   hasError Boolean @default(false)
+  online Boolean @default(true)
 
   monitor   Monitor @relation(fields: [monitorId], references: [id])
   monitorId String

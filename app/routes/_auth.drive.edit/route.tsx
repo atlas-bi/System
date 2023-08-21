@@ -1,7 +1,11 @@
-import { ActionArgs } from '@remix-run/node';
+import { ActionArgs, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { namedAction } from 'remix-utils';
-import { editDrive } from '~/models/monitor.server';
+import {
+	deleteDrive,
+	editDrive,
+	getDriveMonitor,
+} from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
@@ -61,6 +65,18 @@ export async function action({ request }: ActionArgs) {
 						: null,
 			});
 			return json({ drive });
+		},
+		async delete() {
+			const formData = await request.formData();
+			const { _action, ...values } = Object.fromEntries(formData);
+
+			const drive = await getDriveMonitor({
+				id: values.id.toString(),
+			});
+			await deleteDrive({
+				id: values.id.toString(),
+			});
+			return redirect(`/${drive.monitor.type}/${drive.monitor.id}`);
 		},
 	});
 }
