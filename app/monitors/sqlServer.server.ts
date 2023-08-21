@@ -39,7 +39,8 @@ export default async function SqlServerMonitor({
 			targetMemory,
 			usedMemory,
 			databaseInfo,
-			fileInfo;
+			fileInfo,
+			osInfo;
 
 		let pool;
 		try {
@@ -73,6 +74,7 @@ AS (
 SELECT SERVERPROPERTY('SERVERNAME') AS servername
     , SERVERPROPERTY('productversion') AS productversion
     , SERVERPROPERTY('edition') AS edition
+    , SERVERPROPERTY('productversion')as year
     , (
         SELECT 'SQL Server ' + CASE CAST(SERVERPROPERTY('productversion') AS CHAR(2))
                 WHEN '8.'
@@ -95,18 +97,6 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
                     THEN '2022'
                 END
         ) AS manufacturer
-    , (
-        SELECT host_platform AS osType
-        FROM sys.dm_os_host_info
-        ) osType
-    , (
-        SELECT host_distribution AS os
-        FROM sys.dm_os_host_info
-        ) os
-    , (
-        SELECT host_release AS osVersion
-        FROM sys.dm_os_host_info
-        ) osVersion
     , (
         SELECT create_date AS lastBootTime
         FROM sys.databases
@@ -167,12 +157,48 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
 			version = systemInfo.productversion;
 			model = systemInfo.edition;
 			manufacturer = systemInfo.manufacturer;
-			os = systemInfo.os;
-			osVersion = systemInfo.osVersion;
+
 			lastBootTime = systemInfo.lastBootTime;
 			targetMemory = systemInfo.targetMemory;
 			usedMemory = systemInfo.usedMemory;
 			cpuLoad = systemInfo.cpu;
+
+			// os info
+			if (systemInfo.year > 13) {
+				// after 2016
+				osInfo = (
+					await pool.request().query(`
+						select  (
+        SELECT host_platform AS osType
+        FROM sys.dm_os_host_info
+        ) osType
+    , (
+        SELECT host_distribution AS os
+        FROM sys.dm_os_host_info
+        ) os
+    , (
+        SELECT host_release AS osVersion
+        FROM sys.dm_os_host_info
+        ) osVersion`)
+				)?.recordset?.[0];
+			} else {
+				osInfo = (
+					await pool.request().query(`
+select 'Windows' as os,
+case when windows_release ='10.0' then'Windows Server 2016 10.0'
+when windows_release ='6.3' then 'Windows 8.1, Windows Server 2012 R2 6.3'
+when windows_release ='6.2' then 'Windows 8, Windows Server 2012 6.2'
+when windows_release ='6.1' then 'Windows 7, Windows Server 2008 R2 6.1'
+when windows_release ='6.0' then 'Windows Server 2008, Windows Vista 6.0'
+when windows_release ='5.2' then 'Windows Server 2003 R2, Windows Server 2003, Windows XP 64-Bit Edition 5.2'
+when windows_release ='5.1' then 'Windows XP 5.1'
+when windows_release ='5.0' then 'Windows 2000 5.0' end as osVersion
+from sys.dm_os_windows_info`)
+				)?.recordset?.[0];
+			}
+
+			os = osInfo.os;
+			osVersion = osInfo.osVersion;
 
 			// database info
 			databaseInfo = (
