@@ -1,3 +1,8 @@
+## <small>1.22.1 (2023-08-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([944f172](https://github.com/atlas-bi/System/commit/944f172))
+* fix(reboot): fixed reboot notifier ([8570074](https://github.com/atlas-bi/System/commit/8570074)), closes [#6](https://github.com/atlas-bi/System/issues/6)
+
 ## 1.22.0 (2023-08-18)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([328e969](https://github.com/atlas-bi/System/commit/328e969))
