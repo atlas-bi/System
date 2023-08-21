@@ -1,3 +1,8 @@
+## <small>1.23.1 (2023-08-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([a762952](https://github.com/atlas-bi/System/commit/a762952))
+* fix(ntlm): fixed spelling on lookup table ([265208c](https://github.com/atlas-bi/System/commit/265208c))
+
 ## 1.23.0 (2023-08-21)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([bad3634](https://github.com/atlas-bi/System/commit/bad3634))
