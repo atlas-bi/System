@@ -1,3 +1,8 @@
+## <small>1.23.2 (2023-08-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter ([8b50648](https://github.com/atlas-bi/System/commit/8b50648))
+* fix(sql server 2016): updated query to work on older sql servers ([b4ea74d](https://github.com/atlas-bi/System/commit/b4ea74d))
+
 ## <small>1.23.1 (2023-08-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([a762952](https://github.com/atlas-bi/System/commit/a762952))
