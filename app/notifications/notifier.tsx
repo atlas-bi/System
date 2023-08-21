@@ -17,17 +17,19 @@ import collectionNotifier from './checks/monitors/collection';
 export default async function Notifier({
 	job,
 	message,
+	oldMonitor,
 }: {
 	job: string;
 	message?: string;
+	oldMonitor?: Monitor;
 }) {
 	const monitor = await getMonitor({ id: job });
 
-	return collectionNotifier({ monitor, message });
+	await collectionNotifier({ monitor, message });
 
 	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier
-		await rebootNotifier({ monitor });
+		await rebootNotifier({ monitor, oldMonitor });
 
 		// drive notifications
 		monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {

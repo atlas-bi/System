@@ -8,26 +8,21 @@ import { sendNotification } from '~/notifications/notifier';
 
 export default async function rebootNotifier({
 	monitor,
+	oldMonitor,
 }: {
 	monitor: Monitor;
+	oldMonitor: Monitor;
 }) {
+	console.log('reboot notifier!');
 	// don't notify if disabled.
 	if (!monitor.rebootNotify) return;
 
-	// get last reboot time
-	const lastBootTime = await getMonitorBootTime({ id: monitor.id });
+	console.log(monitor.lastBootTime, oldMonitor.lastBootTime);
 
-	// if new , update time and skip notification
-	if (!monitor.rebootNotifySentAt) {
-		return setMonitorRebootSentAt({
-			id: monitor.id,
-			rebootNotifySentAt: new Date(),
-		});
-	}
-
-	if (monitor.lastBootTime != lastBootTime) {
-		const subject = `[${monitor.host}] Rebooted.`;
-		const message = `[${monitor.host}] Rebooted.`;
+	// send notification if it has changed
+	if (monitor.lastBootTime != oldMonitor.lastBootTime) {
+		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
+		const message = `[${monitor.host}] Reboot time changed.`;
 
 		monitor.rebootNotifyTypes.map(async (notification: Notification) => {
 			try {

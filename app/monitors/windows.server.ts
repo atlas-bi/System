@@ -2,6 +2,7 @@ import { decrypt } from '@/lib/utils';
 import { NodeSSH } from 'node-ssh';
 import {
 	Monitor,
+	getMonitor,
 	getMonitorDisabledDrives,
 	monitorError,
 	setDriveDays,
@@ -214,6 +215,7 @@ export default async function WindowsMonitor({
 			return l;
 		});
 
+		const oldMonitor = await getMonitor({ id: monitor.id });
 		const data = await updateMonitor({
 			id: monitor.id,
 			data: {
@@ -224,7 +226,7 @@ export default async function WindowsMonitor({
 				model: cs.Model,
 				os: os.Caption,
 				osVersion: os.Version,
-				lastBootTime: lastBoot,
+				lastBootTime: lastBoot.toISOString(),
 				cpuManufacturer: pc.Manufacturer,
 				cpuModel: pc.Caption,
 				cpuCores: pc.NumberOfCores.toString(),
@@ -236,7 +238,7 @@ export default async function WindowsMonitor({
 				memoryFree: (os.FreePhysicalMemory * 1000).toString(),
 				memoryTotal: (os.TotalVisibleMemorySize * 1000).toString(),
 
-				cpuLoad: pc.LoadPercentage.toString(),
+				cpuLoad: pc.LoadPercentage ? pc.LoadPercentage.toString() : null,
 				cpuSpeed: pc.CurrentClockSpeed.toString(),
 			},
 			drives: updateableDrives.map(
@@ -293,7 +295,7 @@ export default async function WindowsMonitor({
 
 		disposeSsh(ssh);
 
-		await Notifier({ job: monitor.id });
+		await Notifier({ job: monitor.id, oldMonitor });
 
 		console.log(`successfully ran ${monitor.type} monitor: ${monitor.id}`);
 	} catch (e) {

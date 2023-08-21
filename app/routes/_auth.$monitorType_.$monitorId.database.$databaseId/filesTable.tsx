@@ -35,7 +35,6 @@ export const FilesTable = ({
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
 		React.useState<VisibilityState>({
-			title: false,
 			recoveryModel: false,
 			compatLevel: false,
 			backupLogDate: false,
@@ -45,7 +44,7 @@ export const FilesTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'name', desc: true },
+		{ id: 'fileName', desc: true },
 	]);
 
 	const table = useReactTable({

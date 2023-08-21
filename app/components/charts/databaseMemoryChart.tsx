@@ -133,7 +133,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		if (!chart) {
 			return;
 		}
-		console.log(usageFetcher.data?.database);
+
 		const chartData = {
 			datasets: [
 				{
@@ -192,7 +192,6 @@ export const MemoryChart = ({ url }: { url: string }) => {
 			],
 		};
 		setOptions(getOptions());
-		console.log(chartData);
 		setChartData(chartData);
 	}, [usageFetcher.data]);
 

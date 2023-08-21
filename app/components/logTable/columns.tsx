@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Activity, AlertTriangle } from 'lucide-react';
+import { Activity, AlertCircle, AlertTriangle } from 'lucide-react';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
 import { format } from 'date-fns';
 import { Link } from '@remix-run/react';
@@ -20,6 +20,8 @@ export const columns: ColumnDef<any>[] = [
 			<div className="">
 				{row.getValue('type') == 'error' ? (
 					<AlertTriangle className="text-red-500" size={14} />
+				) : row.getValue('type') == 'warning' ? (
+					<AlertCircle className="text-orange-600" size={14} />
 				) : (
 					<Activity className="text-emerald-600" size={14} />
 				)}

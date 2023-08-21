@@ -1,5 +1,6 @@
 import {
 	Monitor,
+	getMonitor,
 	getMonitorDisabledDrives,
 	monitorError,
 	setDriveDays,
@@ -86,7 +87,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		let lastBootTime = null;
 
 		try {
-			lastBootTime = new Date(lastBoot).toString();
+			lastBootTime = new Date(lastBoot).toISOString();
 		} catch (e) {}
 
 		/*
@@ -124,7 +125,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 				).length == 0;
 			return l;
 		});
-
+		const oldMonitor = await getMonitor({ id: monitor.id });
 		const data = await updateMonitor({
 			id: monitor.id,
 			data: {
@@ -207,7 +208,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 
 		disposeSsh(ssh);
 
-		await Notifier({ job: monitor.id });
+		await Notifier({ job: monitor.id, oldMonitor });
 
 		console.log(`successfully ran ${monitor.type} monitor: ${monitor.id}`);
 	} catch (e) {

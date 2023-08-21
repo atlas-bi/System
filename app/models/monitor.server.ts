@@ -209,6 +209,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			httpDomain: true,
 			httpWorkstation: true,
 			sqlConnectionString: true,
+			lastBootTime: true,
 			drives: {
 				select: {
 					id: true,
