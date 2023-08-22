@@ -1,3 +1,8 @@
+## <small>1.24.1 (2023-08-22)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([21d395c](https://github.com/atlas-bi/System/commit/21d395c))
+* fix(sql server): fixed sql typo ([bd4eb53](https://github.com/atlas-bi/System/commit/bd4eb53))
+
 ## 1.24.0 (2023-08-22)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit ([0bd473b](https://github.com/atlas-bi/System/commit/0bd473b))
