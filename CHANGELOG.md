@@ -1,3 +1,8 @@
+## <small>1.23.4 (2023-08-21)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why ([d73bc3d](https://github.com/atlas-bi/System/commit/d73bc3d))
+* fix(http): fixed missing import ([3b0896b](https://github.com/atlas-bi/System/commit/3b0896b))
+
 ## <small>1.23.3 (2023-08-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why ([df79624](https://github.com/atlas-bi/System/commit/df79624))
