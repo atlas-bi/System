@@ -1,3 +1,8 @@
+## <small>1.24.2 (2023-08-22)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([268d498](https://github.com/atlas-bi/System/commit/268d498))
+* fix(sql): replaced cte with tmp table ([585c4a3](https://github.com/atlas-bi/System/commit/585c4a3))
+
 ## <small>1.24.1 (2023-08-22)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([21d395c](https://github.com/atlas-bi/System/commit/21d395c))
