@@ -1,6 +1,8 @@
-import { json } from '@remix-run/node';
-import { useLoaderData, useNavigate } from '@remix-run/react';
+import { LoaderArgs, json } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
 import {
+	ColumnFiltersState,
+	SortingState,
 	VisibilityState,
 	flexRender,
 	getCoreRowModel,
@@ -11,6 +13,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
+import Notification from '~/components/notificationForms/base';
 import React from 'react';
 import { DataTableToolbar } from '~/components/table/data-table-toolbar';
 import { getNotificationsDetail } from '~/models/notification.server';
@@ -25,12 +28,9 @@ import {
 	TableRow,
 } from '~/components/ui/table';
 import { DataTablePagination } from '~/components/table/data-table-pagination';
-import { Button } from '~/components/ui/button';
-import { Settings } from 'lucide-react';
-import Notification from '~/components/notificationForms/base';
 import { decrypt } from '@/lib/utils';
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -42,7 +42,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 		notifications: notifications.map((x) => ({
 			...x,
 			title: x.name,
-			password: x.password ? decrypt(x.password) : undefined,
+			smtpPassword: x.smtpPassword ? decrypt(x.smtpPassword) : undefined,
 			tgBotToken: x.tgBotToken ? decrypt(x.tgBotToken) : undefined,
 		})),
 	});
@@ -59,7 +59,7 @@ export default function Index() {
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'title', asc: true },
+		{ id: 'title', desc: false },
 	]);
 
 	const table = useReactTable({
@@ -83,7 +83,6 @@ export default function Index() {
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
 	});
-	const navigate = useNavigate();
 	return (
 		<>
 			<div className="space-y-4">
@@ -117,9 +116,6 @@ export default function Index() {
 											key={row.id}
 											className="cursor-pointer"
 											data-state={row.getIsSelected() ? 'selected' : null}
-											// onClick={() =>
-											// 	//navigate(`/${row.original.type}/${row.original.id}`)
-											// }
 										>
 											{row.getVisibleCells().map((cell) => (
 												<TableCell key={cell.id}>

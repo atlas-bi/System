@@ -1,50 +1,22 @@
-import bytes from 'bytes';
-import { useEffect } from 'react';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { DoughnutChart } from '~/components/charts/driveDoughnut';
-import { H1, H3 } from '~/components/ui/typography';
+import { H1 } from '~/components/ui/typography';
 import { LoaderArgs, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
-
-import { Link, useFetcher, useLoaderData, useLocation } from '@remix-run/react';
-import {
-	BellRing,
-	MoveLeft,
-	MoveRight,
-	Settings,
-	ToggleRight,
-} from 'lucide-react';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Link, useLoaderData } from '@remix-run/react';
+import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
 import invariant from 'tiny-invariant';
-
-import type { Drive, DriveUsage, MonitorLogs } from '~/models/monitor.server';
 import { LogTable } from '~/components/logTable/table';
 import { monitorTypes } from '~/models/monitor';
-import { format } from 'date-fns';
-
 import Monitor from '~/components/monitorForms/base';
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Button } from '~/components/ui/button';
 import { decrypt } from '@/lib/utils';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '/components/ui/dropdown-menu';
-import { ToggleLeft } from 'lucide-react';
-import { CpuChart } from '~/components/charts/cpuChart';
-import { MemoryChart } from '~/components/charts/memoryChart';
 import { SshStats, SshSystem } from './ssh';
 import { SqlStats, SqlSystem } from './sql';
 import { PingChart } from '~/components/charts/pingChart';
 import { parseSqlConnectionString } from '@tediousjs/connection-string';
 import { Badge } from '~/components/ui/badge';
+import { PingStat } from './responseTime';
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -113,19 +85,24 @@ export default function Index() {
 					</Link>
 				</div>
 			</div>
-			<H1 className="space-x-2">
-				{monitor.enabled === false && (
-					<span className="!text-slate-400">(Disabled)</span>
+			<div className="flex flex-wrap justify-between">
+				<H1 className="space-x-2">
+					{monitor.enabled === false && (
+						<span className="!text-slate-400">(Disabled)</span>
+					)}
+					<span>{monitor.title}</span>
+					{monitor.type === 'http' && monitor.httpUrl ? (
+						<span>({monitor.httpUrl})</span>
+					) : monitor.type === 'sqlServer' ? (
+						<span>({sqlConnectionString?.['data source']})</span>
+					) : (
+						monitor.host && <span>({monitor.host})</span>
+					)}
+				</H1>
+				{monitor.type == 'http' && (
+					<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
 				)}
-				<span>{monitor.title}</span>
-				{monitor.type === 'http' && monitor.httpUrl ? (
-					<span>({monitor.httpUrl})</span>
-				) : monitor.type === 'sqlServer' ? (
-					<span>({sqlConnectionString?.['data source']})</span>
-				) : (
-					monitor.host && <span>({monitor.host})</span>
-				)}
-			</H1>
+			</div>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{monitor.description}</div>
 

@@ -1,5 +1,6 @@
-import { setDrivePercFreeSentAt } from '~/models/monitor.server';
+import { DriveUsage, setDrivePercFreeSentAt } from '~/models/monitor.server';
 import type { Drive, Monitor } from '~/models/monitor.server';
+import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 
@@ -8,7 +9,7 @@ async function allClear({
 	drive,
 }: {
 	monitor: Monitor;
-	drive: Drive;
+	drive: Drive & { percFreeNotifyTypes: Notification[] };
 }) {
 	if (drive.percFreeNotifySentAt) {
 		// send an all clear alert
@@ -48,7 +49,7 @@ export default async function percentFreeNotifier({
 	drive,
 	monitor,
 }: {
-	drive: Drive;
+	drive: Drive & { usage: DriveUsage[]; percFreeNotifyTypes: Notification[] };
 	monitor: Monitor;
 }) {
 	// don't notify if disabled.
@@ -58,7 +59,7 @@ export default async function percentFreeNotifier({
 	const percFree = (Number(drive.usage[0].free) / Number(drive.size)) * 100;
 
 	// don't send if there is no error.
-	if (percFree > drive.percFreeValue) {
+	if (percFree > (drive.percFreeValue || 0)) {
 		await allClear({ monitor, drive });
 		return reset({ drive });
 	}
@@ -80,7 +81,8 @@ export default async function percentFreeNotifier({
 		drive.percFreeNotifyResendAfterMinutes &&
 		drive.percFreeNotifyResendAfterMinutes > 0
 	) {
-		const diff = +new Date() - +new Date(drive.percFreeNotifySentAt);
+		const diff =
+			Date.now() - +new Date(drive.percFreeNotifySentAt || new Date());
 
 		resend =
 			Math.round(diff / 1000 / 60) > drive.percFreeNotifyResendAfterMinutes;

@@ -12,7 +12,6 @@ import {
 } from '~/models/monitor.server';
 import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
-import { cp } from 'fs';
 import { differenceInDays } from 'date-fns';
 
 function cpuBuilder(data) {
@@ -24,20 +23,23 @@ function cpuBuilder(data) {
 
 	const dataClone = structuredClone(data);
 	const totalPercentage = dataClone.reduce(
-		(sum, key) => sum + (key.LoadPercentage || 0) * (key.NumberOfCores || 0),
+		(sum: number, key: { LoadPercentage: any; NumberOfCores: any }) =>
+			sum + (key.LoadPercentage || 0) * (key.NumberOfCores || 0),
 		0,
 	);
 	const totalSpeed = dataClone.reduce(
-		(sum, key) => sum + (key.CurrentClockSpeed || 0),
+		(sum: any, key: { CurrentClockSpeed: any }) =>
+			sum + (key.CurrentClockSpeed || 0),
 		0,
 	);
 
 	calcData.NumberOfCores = dataClone.reduce(
-		(sum, key) => sum + (key.NumberOfCores || 0),
+		(sum: any, key: { NumberOfCores: any }) => sum + (key.NumberOfCores || 0),
 		0,
 	);
 	calcData.NumberOfLogicalProcessors = dataClone.reduce(
-		(sum, key) => sum + (key.NumberOfLogicalProcessors || 0),
+		(sum: any, key: { NumberOfLogicalProcessors: any }) =>
+			sum + (key.NumberOfLogicalProcessors || 0),
 		0,
 	);
 	calcData.LoadPercentage = totalPercentage / calcData.NumberOfCores;

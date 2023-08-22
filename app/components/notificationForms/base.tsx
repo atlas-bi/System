@@ -1,5 +1,5 @@
 import { Form, useFetcher, useNavigate, useSubmit } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -32,12 +32,12 @@ export default function Notification({
 	children,
 }: {
 	notification: Notification;
+	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 	const deleteSubmit = useSubmit();
 	const testFetcher = useFetcher();
-	const navigate = useNavigate();
 
 	const [data, setData] = useState<Notification>(notification);
 
@@ -160,7 +160,7 @@ export default function Notification({
 									{
 										_action: 'test',
 										...JSON.parse(
-											JSON.stringify(data, (k, v) => v ?? undefined),
+											JSON.stringify(data, (_k, v) => v ?? undefined),
 										),
 									},
 									{ method: 'post', action: '/admin/notifications/new' },
@@ -183,7 +183,7 @@ export default function Notification({
 									{
 										_action: 'new',
 										...JSON.parse(
-											JSON.stringify(data, (k, v) => v ?? undefined),
+											JSON.stringify(data, (_k, v) => v ?? undefined),
 										),
 									},
 									{ method: 'post', action: '/admin/notifications/new' },

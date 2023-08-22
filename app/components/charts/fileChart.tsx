@@ -1,6 +1,4 @@
-import type { Usage } from '@prisma/client';
-
-import bytes from 'bytes';
+import bytes, { Unit } from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -34,6 +32,7 @@ import { H3 } from '../ui/typography';
 import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { TrendingUp } from 'lucide-react';
+import { DatabaseFileUsage } from '~/models/monitor.server';
 
 export const FileChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
@@ -45,7 +44,7 @@ export const FileChart = ({ url }: { url: string }) => {
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit) => {
+		(sizeUnit: string) => {
 			return {
 				responsive: true,
 				maintainAspectRatio: false,
@@ -72,7 +71,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					tooltip: {
 						position: 'mouse',
 						callbacks: {
-							label: function (tooltipItem) {
+							label: function (tooltipItem: { formattedValue: string }) {
 								return tooltipItem.formattedValue + sizeUnit;
 							},
 						},
@@ -137,7 +136,7 @@ export const FileChart = ({ url }: { url: string }) => {
 
 		let sizeUnit = 'GB';
 		const max = usageFetcher.data?.file?.usage?.reduce(
-			(a, e) =>
+			(a: number, e: { maxSize?: number | null; size?: number | null }) =>
 				Math.max(
 					Number(a),
 					Math.max(Number(e.maxSize) || 0, Number(e.size) || 0),
@@ -162,14 +161,17 @@ export const FileChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.file?.usage?.map((x: Usage) => ({
+					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.size), { unit: sizeUnit }).replace(sizeUnit, ''),
+							bytes(Number(x.size), { unit: sizeUnit as Unit }).replace(
+								sizeUnit,
+								'',
+							),
 						),
 					})),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -177,7 +179,10 @@ export const FileChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -185,7 +190,10 @@ export const FileChart = ({ url }: { url: string }) => {
 								lightGradient,
 							);
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -193,7 +201,10 @@ export const FileChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -207,10 +218,10 @@ export const FileChart = ({ url }: { url: string }) => {
 				{
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: Usage) =>
+					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) =>
 						Number(
 							bytes(Math.max(Number(x.maxSize) - Number(x.size), 0), {
-								unit: sizeUnit,
+								unit: sizeUnit as Unit,
 							}).replace(sizeUnit, ''),
 						),
 					),

@@ -42,3 +42,11 @@ export const decrypt = (hash: string) => {
 
 	return decrpyted.toString();
 };
+
+export const jsonParser = (str: string) => {
+	try {
+		return JSON.parse(str);
+	} catch (e) {
+		return str;
+	}
+};

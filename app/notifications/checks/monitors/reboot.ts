@@ -1,8 +1,5 @@
-import {
-	Monitor,
-	setMonitorRebootSentAt,
-	getMonitorBootTime,
-} from '~/models/monitor.server';
+import { Monitor, setMonitorRebootSentAt } from '~/models/monitor.server';
+import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 
@@ -10,7 +7,7 @@ export default async function rebootNotifier({
 	monitor,
 	oldMonitor,
 }: {
-	monitor: Monitor;
+	monitor: Monitor & { rebootNotifyTypes: Notification[] };
 	oldMonitor: Monitor;
 }) {
 	// don't notify if disabled.

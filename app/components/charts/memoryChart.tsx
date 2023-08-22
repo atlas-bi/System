@@ -1,4 +1,4 @@
-import type { MonitorFeeds } from '@prisma/client';
+import type { MonitorFeeds } from '~/models/monitor.server';
 
 import bytes from 'bytes';
 import {
@@ -70,7 +70,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				tooltip: {
 					position: 'mouse',
 					callbacks: {
-						label: function (tooltipItem) {
+						label: function (tooltipItem: {
+							datasetIndex: number;
+							formattedValue: string;
+						}) {
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + 'GB Used';
 							}
@@ -134,10 +137,13 @@ export const MemoryChart = ({ url }: { url: string }) => {
 			return;
 		}
 
+		const xUnit =
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
+
 		const chartData = {
 			datasets: [
 				{
-					spanGaps: 1000 * 60 * 1.5, // 1.5 min
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
@@ -154,7 +160,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 						),
 					})),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -162,7 +168,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -170,7 +179,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								lightGradient,
 							);
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -178,7 +190,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -190,16 +205,18 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					pointStyle: false,
 				},
 				{
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) =>
-						Number(
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) => ({
+						x: x.createdAt,
+						y: Number(
 							bytes(Number(x.memoryFree) || 0, { unit: 'GB' }).replace(
 								'GB',
 								'',
 							),
 						),
-					),
+					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },

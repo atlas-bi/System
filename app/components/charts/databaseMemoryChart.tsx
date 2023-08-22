@@ -1,6 +1,6 @@
 import type { DatabaseUsage } from '@prisma/client';
 
-import bytes from 'bytes';
+import bytes, { Unit } from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -44,7 +44,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit) => {
+		(sizeUnit: string) => {
 			return {
 				responsive: true,
 				maintainAspectRatio: false,
@@ -71,7 +71,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					tooltip: {
 						position: 'mouse',
 						callbacks: {
-							label: function (tooltipItem) {
+							label: function (tooltipItem: {
+								datasetIndex: number;
+								formattedValue: string;
+							}) {
 								if (tooltipItem.datasetIndex === 0) {
 									return tooltipItem.formattedValue + sizeUnit + ' Used';
 								}
@@ -139,7 +142,8 @@ export const MemoryChart = ({ url }: { url: string }) => {
 
 		let sizeUnit = 'GB';
 		const max = usageFetcher.data?.database?.usage?.reduce(
-			(a, e) => Math.max(Number(a), Number(e.memory) || 0),
+			(a: number, e: { memory?: number | null }) =>
+				Math.max(Number(a), Number(e.memory) || 0),
 			0,
 		);
 		if (max < 10000) {
@@ -164,14 +168,14 @@ export const MemoryChart = ({ url }: { url: string }) => {
 							x: x.createdAt,
 							y: Number(
 								bytes(Number(x?.memory) || 0, {
-									unit: sizeUnit,
+									unit: sizeUnit as Unit,
 									decimalPlaces: 4,
 								}).replace(sizeUnit, ''),
 							),
 						};
 					}),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -179,7 +183,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -187,7 +194,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								lightGradient,
 							);
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -195,7 +205,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,

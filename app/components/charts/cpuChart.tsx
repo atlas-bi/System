@@ -1,4 +1,4 @@
-import type { MonitorFeeds } from '@prisma/client';
+import type { MonitorFeeds, Cpu, CpuUsage } from '~/models/monitor.server';
 import {
 	LineElement,
 	CategoryScale,
@@ -10,7 +10,7 @@ import {
 	Filler,
 	TimeScale,
 } from 'chart.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, useCallback, useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -35,11 +35,17 @@ import { Button } from '../ui/button';
 const SubChart = ({
 	speed,
 	unit,
-	setUnit,
 	fetcherState,
 	data,
 	startDate,
 	endDate,
+}: {
+	speed?: boolean;
+	unit: string;
+	fetcherState: string;
+	data: MonitorFeeds[];
+	startDate: Date;
+	endDate: Date;
 }) => {
 	const chartRef = useRef<ChartJS>(null);
 
@@ -78,7 +84,11 @@ const SubChart = ({
 				tooltip: {
 					position: 'mouse',
 					callbacks: {
-						label: function (tooltipItem) {
+						label: function (tooltipItem: {
+							datasetIndex: number;
+							formattedValue: string;
+							raw: number;
+						}) {
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + '% Used';
 							}
@@ -149,18 +159,23 @@ const SubChart = ({
 			return;
 		}
 
+		const xUnit =
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
+
 		const chartData = {
-			labels: data?.map((x: MonitorFeeds) => x.createdAt),
 			datasets: [
 				{
-					spanGaps: 1000 * 60 * 1.5, // 1.5 min
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: speed,
 					label: 'Load',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: data?.map((x: MonitorFeeds) => Number(x.cpuLoad)),
+					data: data?.map((x: MonitorFeeds) => ({
+						x: x.createdAt,
+						y: Number(x.cpuLoad),
+					})),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -168,7 +183,10 @@ const SubChart = ({
 								darkGradient,
 							);
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -176,7 +194,10 @@ const SubChart = ({
 								lightGradient,
 							);
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -184,7 +205,10 @@ const SubChart = ({
 								darkGradient,
 							);
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -196,9 +220,13 @@ const SubChart = ({
 					pointStyle: false,
 				},
 				{
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Speed',
 					fill: false,
-					data: data?.map((x: MonitorFeeds) => Number(x.cpuSpeed)),
+					data: data?.map((x: MonitorFeeds) => ({
+						x: x.createdAt,
+						y: Number(x.cpuSpeed),
+					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },
@@ -257,6 +285,7 @@ export const CpuChart = ({
 					<SubChart
 						speed={speed}
 						unit={unit}
+						fetcherState={usageFetcher.state}
 						data={usageFetcher.data?.monitor?.feeds}
 						startDate={usageFetcher.data?.monitor?.startDate}
 						endDate={usageFetcher.data?.monitor?.endDate}
@@ -270,25 +299,28 @@ export const CpuChart = ({
 				</div>
 
 				<div className="grid sm:grid-cols-1 md:grid-cols-3 ls:grid-cols-4">
-					{usageFetcher.data?.monitor?.cpus.map((x) => (
-						<div key={x.id}>
-							<H3 className="text-base">CPU {x.title}</H3>
-							<div className="h-[150px] relative" key={x.id}>
-								<SubChart
-									unit={unit}
-									speed={false}
-									data={x.usage}
-									startDate={usageFetcher.data?.monitor?.startDate}
-									endDate={usageFetcher.data?.monitor?.endDate}
-								/>
-								{usageFetcher.state === 'loading' && (
-									<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
-										<Loader className="m-auto animate-spin" />
-									</div>
-								)}
+					{usageFetcher.data?.monitor?.cpus.map(
+						(x: Cpu & { usage: CpuUsage }) => (
+							<div key={x.id}>
+								<H3 className="text-base">CPU {x.title}</H3>
+								<div className="h-[150px] relative" key={x.id}>
+									<SubChart
+										unit={unit}
+										speed={false}
+										fetcherState={usageFetcher.state}
+										data={x.usage}
+										startDate={usageFetcher.data?.monitor?.startDate}
+										endDate={usageFetcher.data?.monitor?.endDate}
+									/>
+									{usageFetcher.state === 'loading' && (
+										<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
+											<Loader className="m-auto animate-spin" />
+										</div>
+									)}
+								</div>
 							</div>
-						</div>
-					))}
+						),
+					)}
 				</div>
 
 				<div className="flex space-x-4 text-muted-foreground">

@@ -3,14 +3,14 @@ import { Dispatch } from 'react';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 
-import type { Notification } from '~/models/notification.server';
+import type { Monitor } from '~/models/monitor.server';
 
 export default function SqlForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Monitor;
+	setData: Dispatch<Monitor>;
 }) {
 	return (
 		<>

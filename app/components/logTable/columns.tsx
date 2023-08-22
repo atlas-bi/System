@@ -3,14 +3,7 @@ import { Activity, AlertCircle, AlertTriangle } from 'lucide-react';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
 import { format } from 'date-fns';
 import { Link } from '@remix-run/react';
-
-const jsonParser = (str: string) => {
-	try {
-		return JSON.parse(str);
-	} catch (e) {
-		return str;
-	}
-};
+import { jsonParser } from '@/lib/utils';
 
 export const columns: ColumnDef<any>[] = [
 	{

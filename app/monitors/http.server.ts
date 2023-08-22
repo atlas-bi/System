@@ -1,21 +1,14 @@
 import {
 	Monitor,
-	getMonitorDisabledDrives,
 	monitorError,
-	setDriveDays,
-	setDriveGrowth,
 	updateMonitor,
-	updateFeedError,
 	setFeedError,
 } from '~/models/monitor.server';
 import https from 'https';
 
 import Notifier from '~/notifications/notifier';
-import { disposeSsh } from './helpers.server';
-import { NodeSSH } from 'node-ssh';
 import { decrypt } from '@/lib/utils';
-import { differenceInDays } from 'date-fns';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { NtlmClient, NtlmCredentials } from 'axios-ntlm';
 import { jsonParser } from '~/utils';
 
@@ -24,7 +17,7 @@ const checkStatusCode = (
 	codes: number | string | string[] | undefined,
 ) => {
 	// any code is ok
-	if (!codes || codes.length === 0) {
+	if (!codes || (typeof codes == 'object' && codes.length === 0)) {
 		return true;
 	}
 
@@ -46,14 +39,14 @@ const checkStatusCode = (
 	};
 
 	if (typeof codes === 'string' || typeof codes === 'number') {
-		return check(status, codes);
+		return check(status, codes.toString());
 	}
 
 	const matched = codes.map((c) => check(status, c)).filter((x) => x);
 	return matched.length > 0;
 };
 
-const encodeBase64 = (user, pass) => {
+const encodeBase64 = (user: string | undefined, pass: string) => {
 	return Buffer.from(user + ':' + pass).toString('base64');
 };
 
@@ -87,6 +80,8 @@ export async function HttpCheck({
 	httpAcceptedStatusCodes?: string[];
 	httpDomain?: string;
 	httpWorkstation?: string;
+	httpBodyText?: string;
+	httpHeaderText?: string;
 }) {
 	// HTTP basic auth
 	let basicAuthHeader = {};
@@ -94,7 +89,8 @@ export async function HttpCheck({
 	if (httpAuthentication === 'basic') {
 		basicAuthHeader = {
 			Authorization:
-				'Basic ' + encodeBase64(httpUsername, decrypt(httpPassword)),
+				'Basic ' +
+				encodeBase64(httpUsername, httpPassword ? decrypt(httpPassword) : ''),
 		};
 	}
 
@@ -207,8 +203,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		httpWorkstation,
 	} = monitor;
 
-	let startTime = new Date();
-	let feed = undefined;
+	let startTime = Date.now();
 
 	try {
 		const { res, error } = await HttpCheck({
@@ -227,7 +222,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 			httpWorkstation,
 		});
 
-		const ping = new Date() - startTime;
+		const ping = Date.now() - startTime;
 
 		const data = await updateMonitor({
 			id: monitor.id,
@@ -247,8 +242,6 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 			}
 			throw new Error(error.message || error);
 		}
-
-		const msg = (res?.status || '') + (res?.statusText || '');
 
 		await Notifier({ job: monitor.id });
 

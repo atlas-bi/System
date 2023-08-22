@@ -1,6 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Link, Outlet, useLoaderData, useNavigate } from '@remix-run/react';
+import { Outlet, useLoaderData, useNavigate } from '@remix-run/react';
 import type {
 	ColumnDef,
 	ColumnFiltersState,
@@ -46,11 +46,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 	const monitors = await getMonitors({ type: params.monitorType });
 	return json({ monitors, type: params.monitorType });
 };
-
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-}
 
 export default function Index() {
 	const { monitors, type } = useLoaderData<typeof loader>();
@@ -144,7 +139,12 @@ export default function Index() {
 							) : (
 								<TableRow>
 									<TableCell
-										colSpan={columns.length}
+										colSpan={
+											(type == 'windows' || type == 'ubuntu'
+												? columnsSsh
+												: columnsPing
+											).length
+										}
 										className="h-24 text-center"
 									>
 										No results.

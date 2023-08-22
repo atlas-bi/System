@@ -1,5 +1,5 @@
 import { Form, useFetcher } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -10,15 +10,18 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
+
 import { Label } from '~/components/ui/label';
-
-import { Textarea } from '~/components/ui/textarea';
-
 import type { DatabaseFile } from '~/models/monitor.server';
 import { Switch } from '../ui/switch';
 
-export default function File({ file, children }: { file: DatabaseFile }) {
+export default function File({
+	file,
+	children,
+}: {
+	file: DatabaseFile;
+	children: ReactNode;
+}) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 

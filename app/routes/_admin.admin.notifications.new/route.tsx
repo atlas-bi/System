@@ -1,8 +1,7 @@
 import type { ActionArgs } from '@remix-run/node';
-import { json, redirect } from '@remix-run/node';
-import { NodeSSH } from 'node-ssh';
+import { json } from '@remix-run/node';
 import { namedAction, redirectBack } from 'remix-utils';
-import { createMonitor } from '~/models/monitor.server';
+
 import { authenticator } from '~/services/auth.server';
 
 import SMTP from '~/notifications/smtp';

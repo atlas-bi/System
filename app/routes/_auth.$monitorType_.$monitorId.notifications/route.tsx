@@ -56,7 +56,7 @@ export async function action({ request, params }: ActionArgs) {
 			values.connectionNotifyResend == 'on'
 				? Number(values.connectionNotifyResendAfterMinutes || '0')
 				: 0,
-
+		connectionNotifyRetries: Number(values.connectionNotifyRetries || '0'),
 		rebootNotify: values.rebootNotify == 'on',
 		rebootNotifyTypes: formData.getAll('rebootNotifyTypes'),
 	});
@@ -85,6 +85,10 @@ export default function Index() {
 
 	const [connectionResendValue, setConnectionResendValue] = useState(
 		monitor.connectionNotifyResendAfterMinutes,
+	);
+
+	const [connectionRetries, setConnectionRetries] = useState(
+		monitor.connectionNotifyRetries || 0,
 	);
 
 	const [connectionNotifyResend, setConnectionNotifyResend] = useState(
@@ -164,6 +168,16 @@ export default function Index() {
 										>
 											Manage notification types.
 										</Link>
+									</div>
+									<div className="space-y-2">
+										<Label className="text-slate-700">Retry Attempts</Label>
+										<Input
+											type="number"
+											name="connectionNotifyRetries"
+											value={connectionRetries || 0}
+											onChange={(e) => setConnectionRetries(e.target.value)}
+											placeholder="3"
+										/>
 									</div>
 									<div
 										className={`space-y-2 ${

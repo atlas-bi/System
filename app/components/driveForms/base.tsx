@@ -1,5 +1,5 @@
 import { Form, useFetcher } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -18,7 +18,13 @@ import { Textarea } from '~/components/ui/textarea';
 import type { Drive } from '~/models/monitor.server';
 import { Switch } from '../ui/switch';
 
-export default function Drive({ drive, children }: { drive: Drive }) {
+export default function Drive({
+	drive,
+	children,
+}: {
+	drive: Drive;
+	children: ReactNode;
+}) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 
@@ -60,7 +66,7 @@ export default function Drive({ drive, children }: { drive: Drive }) {
 							<Input
 								type="text"
 								id="name"
-								value={data.title}
+								value={data.title || ''}
 								placeholder="Logs drive"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, title: e.target.value })}

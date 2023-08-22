@@ -12,7 +12,6 @@ import {
 	getFacetedRowModel,
 	getFacetedUniqueValues,
 	getFilteredRowModel,
-	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
@@ -26,19 +25,11 @@ import {
 	TableRow,
 } from '~/components/ui/table';
 
-// import { DataTablePagination } from "../components/data-table-pagination"
-// import { DataTableToolbar } from "../components/data-table-toolbar"
-import { MonitorLogs } from '~/models/monitor.server';
 import { columns } from './columns';
 import { H3 } from '../ui/typography';
 import { LogTablePagination } from './pagination';
 import { useEffect } from 'react';
 import { useFetcher } from '@remix-run/react';
-
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-}
 
 export function LogTable({ url }: { url: string }) {
 	const logsFetcher = useFetcher();

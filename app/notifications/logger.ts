@@ -23,7 +23,7 @@ export async function Logger({
 
 	if (message !== lastLog?.message) {
 		await monitorLog({
-			driveId: drive?.id,
+			driveId: drive?.id || null,
 			monitorId: monitor.id,
 			type,
 			message,

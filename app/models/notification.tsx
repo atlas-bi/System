@@ -1,4 +1,4 @@
-import { Mail, Send } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { SiTelegram } from '@icons-pack/react-simple-icons';
 export const notificationTypes = [
 	{

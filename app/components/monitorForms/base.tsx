@@ -1,5 +1,5 @@
 import { Form, useFetcher, useNavigate, useSubmit } from '@remix-run/react';
-import { Children, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -31,7 +31,13 @@ import { Switch } from '~/components/ui/switch';
 import HttpForm from './http';
 import SqlForm from './sql';
 
-export default function Monitor({ monitor, children }: { monitor: Monitor }) {
+export default function Monitor({
+	monitor,
+	children,
+}: {
+	monitor: Monitor;
+	children: ReactNode;
+}) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();
 	const deleteSubmit = useSubmit();
@@ -182,7 +188,7 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 										{
 											_action: 'test',
 											...JSON.parse(
-												JSON.stringify(data, (k, v) => v ?? undefined),
+												JSON.stringify(data, (_k, v) => v ?? undefined),
 											),
 										},
 										{ method: 'post', action: '/monitor/new' },
@@ -205,7 +211,7 @@ export default function Monitor({ monitor, children }: { monitor: Monitor }) {
 										{
 											_action: 'new',
 											...JSON.parse(
-												JSON.stringify(data, (k, v) => v ?? undefined),
+												JSON.stringify(data, (_k, v) => v ?? undefined),
 											),
 										},
 										{ method: 'post', action: '/monitor/new' },

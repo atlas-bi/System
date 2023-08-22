@@ -36,7 +36,6 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 
 		const name = await getStdout(ssh, 'cat /etc/hostname');
 		const domain = await getStdout(ssh, 'hostname -d');
-		// const fullSpecs = await getStdout(ssh, 'sudo dmidecode')
 		const manufacturer = await getStdout(
 			ssh,
 			'cat /sys/devices/virtual/dmi/id/sys_vendor',

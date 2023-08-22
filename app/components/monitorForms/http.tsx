@@ -5,7 +5,7 @@ import { Label } from '~/components/ui/label';
 
 import { Textarea } from '~/components/ui/textarea';
 
-import type { Notification } from '~/models/notification.server';
+import type { Monitor } from '~/models/monitor.server';
 import { Switch } from '../ui/switch';
 import { statusCodes } from '~/models/statusCodes';
 import { MultiSelect } from '../ui/multiselect';
@@ -26,8 +26,8 @@ export default function HttpForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Monitor;
+	setData: Dispatch<Monitor>;
 }) {
 	return (
 		<>
@@ -144,7 +144,7 @@ export default function HttpForm({
 			</Label>
 			<Textarea
 				id="httpBodyText"
-				value={data.httpBodyText}
+				value={data.httpBodyText || ''}
 				placeholder=""
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, httpBodyText: e.target.value })}
@@ -154,7 +154,7 @@ export default function HttpForm({
 			</Label>
 			<Textarea
 				id="httpHeaderText"
-				value={data.httpHeaderText}
+				value={data.httpHeaderText || ''}
 				placeholder=""
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, httpHeaderText: e.target.value })}
@@ -192,7 +192,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpUsername"
-						value={data.httpUsername}
+						value={data.httpUsername || ''}
 						placeholder="john-smith"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpUsername: e.target.value })}
@@ -203,7 +203,7 @@ export default function HttpForm({
 					<Input
 						type="password"
 						id="httpPassword"
-						value={data.httpPassword}
+						value={data.httpPassword || ''}
 						placeholder="123"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpPassword: e.target.value })}
@@ -219,7 +219,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpDomain"
-						value={data.httpDomain}
+						value={data.httpDomain || ''}
 						placeholder="WORKGROUP"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpDomain: e.target.value })}
@@ -230,7 +230,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpWorkstation"
-						value={data.httpWorkstation}
+						value={data.httpWorkstation || ''}
 						placeholder="ws103"
 						className="col-span-3"
 						onChange={(e) =>

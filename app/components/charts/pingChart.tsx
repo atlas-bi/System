@@ -1,6 +1,5 @@
-import type { MonitorFeeds } from '@prisma/client';
+import type { MonitorFeeds } from '~/models/monitor.server';
 
-import bytes from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -15,7 +14,6 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
-	createLinearGradient,
 	darkErrorGradient,
 	darkGradient,
 	lightErrorGradient,
@@ -37,7 +35,7 @@ ChartJS.register([
 
 import 'chartjs-adapter-date-fns';
 import { H2, H3 } from '../ui/typography';
-import { Circle, Loader, RefreshCw } from 'lucide-react';
+import { Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
 export const PingChart = ({ url }: { url: string }) => {
@@ -76,7 +74,7 @@ export const PingChart = ({ url }: { url: string }) => {
 				tooltip: {
 					position: 'mouse',
 					callbacks: {
-						label: function (tooltipItem) {
+						label: function (tooltipItem: { formattedValue: string }) {
 							return tooltipItem.formattedValue + 'ms';
 						},
 					},
@@ -150,28 +148,44 @@ export const PingChart = ({ url }: { url: string }) => {
 						y: Number(x?.ping),
 					})),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+							p0DataIndex: string | number;
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError
 								? darkErrorGradient[0]
 								: darkGradient[0];
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+							p0DataIndex: string | number;
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError
 								? lightErrorGradient[0]
 								: lightGradient[0];
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+							p0DataIndex: string | number;
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError
 								? darkErrorGradient[1]
 								: darkGradient[1];
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+							p0DataIndex: string | number;
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError

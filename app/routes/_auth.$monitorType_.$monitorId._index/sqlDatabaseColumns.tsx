@@ -1,18 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
-import { monitorTypes } from '~/models/monitor';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
 import { Minus } from 'lucide-react';
-import { MonitorFeeds } from '@prisma/client';
 import { formatInTimeZone, formatInTimeZone } from 'date-fns-tz';
-
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '~/components/ui/tooltip';
-import { format, formatDistance } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { Badge } from '~/components/ui/badge';
 
 export const columns: ColumnDef<any>[] = [

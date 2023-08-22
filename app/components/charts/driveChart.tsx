@@ -1,6 +1,4 @@
-import type { Usage } from '@prisma/client';
-
-import bytes from 'bytes';
+import bytes, { Unit } from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -34,6 +32,7 @@ import { H3 } from '../ui/typography';
 import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { TrendingUp } from 'lucide-react';
+import { DriveUsage } from '~/models/monitor.server';
 
 export const DriveChart = ({ url }: { url: string }) => {
 	const usageFetcher = useFetcher();
@@ -45,7 +44,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit) => {
+		(sizeUnit: string) => {
 			return {
 				responsive: true,
 				maintainAspectRatio: false,
@@ -72,7 +71,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 					tooltip: {
 						position: 'mouse',
 						callbacks: {
-							label: function (tooltipItem) {
+							label: function (tooltipItem: { formattedValue: string }) {
 								return tooltipItem.formattedValue + sizeUnit;
 							},
 						},
@@ -137,7 +136,8 @@ export const DriveChart = ({ url }: { url: string }) => {
 
 		let sizeUnit = 'GB';
 		const max = usageFetcher.data?.drive?.usage?.reduce(
-			(a, e) => Math.max(Number(a), Number(e.used) || 0),
+			(a: number, e: { used?: number | null }) =>
+				Math.max(Number(a), Number(e.used) || 0),
 			0,
 		);
 		if (max < 10000) {
@@ -157,14 +157,17 @@ export const DriveChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) => ({
+					data: usageFetcher.data?.drive?.usage?.map((x: DriveUsage) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.used), { unit: sizeUnit }).replace(sizeUnit, ''),
+							bytes(Number(x.used), { unit: sizeUnit as Unit }).replace(
+								sizeUnit,
+								'',
+							),
 						),
 					})),
 					segment: {
-						borderColor: (ctx) => {
+						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -172,7 +175,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						backgroundColor: (ctx) => {
+						backgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -180,7 +186,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 								lightGradient,
 							);
 						},
-						hoverBackgroundColor: (ctx) => {
+						hoverBackgroundColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -188,7 +197,10 @@ export const DriveChart = ({ url }: { url: string }) => {
 								darkGradient,
 							);
 						},
-						hoverBorderColor: (ctx) => {
+						hoverBorderColor: (ctx: {
+							p0: { stop: any };
+							p1: { stop: any };
+						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -200,13 +212,18 @@ export const DriveChart = ({ url }: { url: string }) => {
 					pointStyle: false,
 				},
 				{
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.drive?.usage?.map((x: Usage) =>
-						Number(
-							bytes(Number(x.free), { unit: sizeUnit }).replace(sizeUnit, ''),
+					data: usageFetcher.data?.drive?.usage?.map((x: DriveUsage) => ({
+						x: x.createdAt,
+						y: Number(
+							bytes(Number(x.free), { unit: sizeUnit as Unit }).replace(
+								sizeUnit,
+								'',
+							),
 						),
-					),
+					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },

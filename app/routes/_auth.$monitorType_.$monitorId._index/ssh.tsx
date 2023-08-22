@@ -13,7 +13,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { H3 } from '~/components/ui/typography';
 import { Drive, DriveUsage, Monitor } from '~/models/monitor.server';
 
-export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
+export const SshSystem = ({
+	monitor,
+}: {
+	monitor: Monitor & { feeds: MonitorFeeds[] };
+}) => {
 	return (
 		<div className="space-y-2 flex-grow">
 			<Table>

@@ -5,8 +5,6 @@ import { buttonVariants } from '~/components/ui/button';
 
 import { monitorTypes as typeDict } from '~/models/monitor';
 
-// export function SidebarNav({ className,  ...props }) {
-
 export const SidebarNav = forwardRef<
 	HTMLDivElement,
 	React.HTMLAttributes<HTMLDivElement>

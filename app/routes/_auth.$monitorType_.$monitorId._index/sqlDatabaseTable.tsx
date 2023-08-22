@@ -23,6 +23,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '~/components/ui/table';
+import { Database, Monitor } from '~/models/monitor.server';
 
 export const SqlDatabaseTable = ({
 	monitor,

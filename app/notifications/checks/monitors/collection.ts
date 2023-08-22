@@ -1,17 +1,26 @@
-import { Monitor, setMonitorConnectionSentAt } from '~/models/monitor.server';
+import {
+	Monitor,
+	setMonitorConnectionRetried,
+	setMonitorConnectionSentAt,
+} from '~/models/monitor.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 export default async function collectionNotifier({
 	monitor,
 	message,
 }: {
-	monitor: Monitor;
+	monitor: Monitor & { connectionNotifyTypes: Notification[] };
 	message?: string;
 }) {
 	async function reset({ monitor }: { monitor: Monitor }) {
-		return setMonitorConnectionSentAt({
+		await setMonitorConnectionSentAt({
 			id: monitor.id,
 			connectionNotifySentAt: null,
+		});
+
+		return setMonitorConnectionRetried({
+			id: monitor.id,
+			connectionNotifyRetried: null,
 		});
 	}
 
@@ -48,9 +57,8 @@ export default async function collectionNotifier({
 		}
 
 		// reset notification
-		return setMonitorConnectionSentAt({
-			id: monitor.id,
-			connectionNotifySentAt: null,
+		return reset({
+			monitor,
 		});
 	}
 
@@ -62,13 +70,20 @@ export default async function collectionNotifier({
 		monitor.connectionNotifyResendAfterMinutes &&
 		monitor.connectionNotifyResendAfterMinutes > 0
 	) {
-		const diff = +new Date() - +new Date(monitor.connectionNotifySentAt);
+		const diff =
+			+new Date() - +new Date(monitor.connectionNotifySentAt || new Date());
 
 		resend =
 			Math.round(diff / 1000 / 60) > monitor.connectionNotifyResendAfterMinutes;
 	}
 
-	if (resend && monitor.connectionNotifyTypes) {
+	// only send if we have reached the retry count.
+	if (
+		resend &&
+		monitor.connectionNotifyTypes &&
+		(!monitor.connectionNotifyRetries ||
+			monitor.connectionNotifyRetries <= (monitor.connectionNotifyRetried || 0))
+	) {
 		const subject = `💔 [${name}] Data collection failed. ${message?.substring(
 			0,
 			20,
@@ -98,4 +113,13 @@ export default async function collectionNotifier({
 			connectionNotifySentAt: new Date(),
 		});
 	}
+
+	// increment try value only if we are still checking it.
+	if (monitor.connectionNotifyRetried <= monitor.connectionNotifyRetries) {
+		return setMonitorConnectionRetried({
+			id: monitor.id,
+			connectionNotifyRetried: (monitor.connectionNotifyRetried || 0) + 1,
+		});
+	}
+	return;
 }

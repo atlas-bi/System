@@ -271,7 +271,9 @@ export async function action({ request }: ActionArgs) {
 					httpBody: values.httpBody?.toString(),
 					httpAuthentication: values.httpAuthentication?.toString(),
 					httpUsername: values.httpUsername?.toString(),
-					httpPassword: values.httpPassword ? encrypt(values.httpPassword?.toString()) : undefined,
+					httpPassword: values.httpPassword
+						? encrypt(values.httpPassword?.toString())
+						: undefined,
 					httpIgnoreSsl: !!values.httpIgnoreSsl,
 					httpBodyEncoding: values.httpBodyEncoding?.toString(),
 					httpUrl: values.httpUrl?.toString(),

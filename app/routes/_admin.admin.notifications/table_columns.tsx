@@ -1,9 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
-import { monitorTypes } from '~/models/monitor';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
-import { Minus } from 'lucide-react';
-import { SiTelegram } from '@icons-pack/react-simple-icons';
 import { notificationTypes } from '~/models/notification';
 
 export const columns: ColumnDef<any>[] = [

@@ -86,14 +86,16 @@ model Monitor {
   // sql details
   sqlConnectionString String?
 
-  drives    Drive[]
-  databases Database[]
+  drives        Drive[]
+  databases     Database[]
   databasefiles DatabaseFile[]
-  cpus      Cpu[]
-  logs      MonitorLogs[]
-  feeds     MonitorFeeds[]
+  cpus          Cpu[]
+  logs          MonitorLogs[]
+  feeds         MonitorFeeds[]
 
   // notifications
+  connectionNotifyRetries            Int?
+  connectionNotifyRetried            Int?
   connectionNotify                   Boolean?
   connectionNotifyTypes              Notification[] @relation("connectionNotifyTypesTable")
   connectionNotifyResendAfterMinutes Int?
@@ -182,7 +184,7 @@ model Database {
   updatedAt DateTime @updatedAt
 
   enabled Boolean @default(true)
-  online Boolean @default(true)
+  online  Boolean @default(true)
 
   // fields sent from monitor
   databaseId     String?
@@ -214,7 +216,7 @@ model DatabaseFile {
   monitorId String
 
   enabled Boolean @default(true)
-  online Boolean @default(true)
+  online  Boolean @default(true)
 
   createdAt DateTime @default(now())
 
@@ -273,7 +275,7 @@ model Drive {
   description String?
 
   hasError Boolean @default(false)
-  online Boolean @default(true)
+  online   Boolean @default(true)
 
   monitor   Monitor @relation(fields: [monitorId], references: [id])
   monitorId String

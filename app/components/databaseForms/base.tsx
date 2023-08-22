@@ -1,5 +1,5 @@
 import { Form, useFetcher } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -23,6 +23,7 @@ export default function Database({
 	children,
 }: {
 	database: Database;
+	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher();

@@ -4,15 +4,14 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 
 import { Textarea } from '~/components/ui/textarea';
-
-import type { Notification } from '~/models/notification.server';
+import type { Monitor } from '~/models/monitor.server';
 
 export default function SshForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Monitor;
+	setData: Dispatch<Monitor>;
 }) {
 	return (
 		<>
@@ -22,7 +21,7 @@ export default function SshForm({
 			<Input
 				type="text"
 				id="host"
-				value={data.host}
+				value={data.host || ''}
 				placeholder="server1"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, host: e.target.value })}
@@ -45,7 +44,7 @@ export default function SshForm({
 				type="text"
 				id="username"
 				placeholder="username"
-				value={data.username}
+				value={data.username || ''}
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, username: e.target.value })}
 			/>
@@ -55,7 +54,7 @@ export default function SshForm({
 			<Input
 				type="password"
 				id="password"
-				value={data.password}
+				value={data.password || ''}
 				placeholder="123"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, password: e.target.value })}

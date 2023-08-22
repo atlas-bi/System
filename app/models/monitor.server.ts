@@ -3,7 +3,18 @@ import type { Monitor, MonitorFeeds, MonitorLogs, User } from '@prisma/client';
 import { prisma } from '~/db.server';
 import monitorMonitor from '~/queues/monitor.server';
 
-export type { Monitor, Drive, DriveUsage, MonitorLogs } from '@prisma/client';
+export type {
+	DatabaseFile,
+	Database,
+	Cpu,
+	CpuUsage,
+	Monitor,
+	Drive,
+	DriveUsage,
+	MonitorLogs,
+	MonitorFeeds,
+	DatabaseFileUsage,
+} from '@prisma/client';
 
 export async function deleteDrive({ id }: Pick<Drive, 'id'>) {
 	// delete drive usage
@@ -172,6 +183,8 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 			},
 			connectionNotifyResendAfterMinutes: true,
 			connectionNotifySentAt: true,
+			connectionNotifyRetries: true,
+			connectionNotifyRetried: true,
 			rebootNotify: true,
 			rebootNotifyTypes: {
 				select: {
@@ -213,6 +226,8 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			},
 			connectionNotifyResendAfterMinutes: true,
 			connectionNotifySentAt: true,
+			connectionNotifyRetried: true,
+			connectionNotifyRetries: true,
 			rebootNotify: true,
 			rebootNotifyTypes: true,
 			rebootNotifySentAt: true,
@@ -805,7 +820,11 @@ export async function getMonitorLogs({
 	fileId,
 	page = 0,
 	size = 10,
-}: Pick<MonitorLogs, 'monitorId' | 'driveId' | 'databaseId' | 'fileId'> & {
+}: Pick<MonitorLogs, 'monitorId'> & {
+	driveId?: string;
+	databaseId?: string;
+	fileId?: string;
+} & {
 	page?: number;
 	size?: number;
 }) {
@@ -1230,6 +1249,23 @@ export function getEnabledMonitors() {
 	});
 }
 
+export function getMonitorLatestFeeds({ id }: Pick<Monitor, 'id'>) {
+	return prisma.monitorFeeds.findMany({
+		where: { monitorId: id },
+		select: {
+			id: true,
+			ping: true,
+			hasError: true,
+			createdAt: true,
+			message: true,
+		},
+		take: 30,
+		orderBy: {
+			createdAt: 'desc',
+		},
+	});
+}
+
 export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 	return prisma.monitor.findMany({
 		where: { type },
@@ -1351,6 +1387,7 @@ export function updateMonitorNotifications({
 	connectionNotifyResendAfterMinutes,
 	rebootNotify,
 	rebootNotifyTypes,
+	connectionNotifyRetries,
 }: Pick<
 	Drive,
 	| 'id'
@@ -1359,6 +1396,7 @@ export function updateMonitorNotifications({
 	| 'connectionNotifyResendAfterMinutes'
 	| 'rebootNotify'
 	| 'rebootNotifyTypes'
+	| 'connectionNotifyRetries'
 >) {
 	return prisma.monitor.update({
 		where: { id },
@@ -1368,7 +1406,7 @@ export function updateMonitorNotifications({
 				? { set: connectionNotifyTypes.map((x) => ({ id: x })) }
 				: undefined,
 			connectionNotifyResendAfterMinutes,
-
+			connectionNotifyRetries,
 			rebootNotify,
 			rebootNotifyTypes: rebootNotifyTypes
 				? { set: rebootNotifyTypes.map((x: string) => ({ id: x })) }
@@ -1385,7 +1423,7 @@ export function updateMonitor({
 	databases,
 	cpus,
 }: Pick<Monitor, 'id'> & {
-	data: {
+	data?: {
 		caption?: string;
 		name?: string;
 		dnsHostName?: string;
@@ -1733,6 +1771,16 @@ export function setDrivePercFreeSentAt({
 	return prisma.drive.update({
 		where: { id },
 		data: { percFreeNotifySentAt },
+	});
+}
+
+export function setMonitorConnectionRetried({
+	id,
+	connectionNotifyRetried,
+}: Pick<Monitor, 'id' | 'connectionNotifyRetried'>) {
+	return prisma.monitor.update({
+		where: { id },
+		data: { connectionNotifyRetried },
 	});
 }
 

@@ -1,8 +1,7 @@
-import { Fragment } from 'react';
+import { Dispatch, Fragment } from 'react';
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectItemNoIndicator,
 	SelectTrigger,
 	SelectValue,
@@ -10,7 +9,13 @@ import {
 import { Separator } from '~/components/ui/separator';
 import { dateOptions } from '~/models/dates';
 
-export const DateFilter = ({ value, onChange }) => {
+export const DateFilter = ({
+	value,
+	onChange,
+}: {
+	value?: string;
+	onChange: Dispatch<string>;
+}) => {
 	return (
 		<Select value={value || 'last_24_hours'} onValueChange={onChange}>
 			<SelectTrigger className="h-8 w-[150px] focus:ring-0 focus:ring-offset-0">

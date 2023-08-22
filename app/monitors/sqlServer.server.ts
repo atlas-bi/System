@@ -2,18 +2,14 @@ import {
 	Monitor,
 	monitorError,
 	updateMonitor,
-	setFeedError,
 	getMonitorDisabledDatabases,
 	setFileDays,
 	setFileGrowth,
 } from '~/models/monitor.server';
 import mssql from 'mssql';
 import Notifier from '~/notifications/notifier';
-import { disposeSsh } from './helpers.server';
-import { NodeSSH } from 'node-ssh';
 import { decrypt } from '@/lib/utils';
 import { differenceInDays } from 'date-fns';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export default async function SqlServerMonitor({
 	monitor,
@@ -22,8 +18,7 @@ export default async function SqlServerMonitor({
 }) {
 	const { sqlConnectionString } = monitor;
 
-	let startTime = new Date();
-	let feed = undefined;
+	let startTime = Date.now();
 
 	try {
 		if (!sqlConnectionString) throw new Error('Connection string not defined.');
@@ -102,35 +97,6 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
         FROM sys.databases
         WHERE name = 'tempdb'
         ) lastBootTime
-    -- , (
-    --     SELECT value_in_use
-    --     FROM sys.configurations
-    --     WHERE name LIKE '%max server memory%'
-    --     ) AS 'maxServerMemory'
-    -- , (
-    --     SELECT physical_memory_in_use_kb
-    --     FROM sys.dm_os_process_memory
-    --     ) AS 'memoryUsage'
-    -- , (
-    --     SELECT total_physical_memory_kb * 1024
-    --     FROM sys.dm_os_sys_memory
-    --     ) AS 'physicalMemory'
-    -- , (
-    --     SELECT available_physical_memory_kb * 1024
-    --     FROM sys.dm_os_sys_memory
-    --     ) AS 'availableMemory'
-    -- , -- available to os
-    -- (
-    --     SELECT system_memory_state_desc
-    --     FROM sys.dm_os_sys_memory
-    --     ) AS 'systemMemoryState'
-    -- , (
-    --     SELECT [cntr_value]
-    --     FROM sys.dm_os_performance_counters
-    --     WHERE [object_name] LIKE '%Manager%'
-    --         AND [counter_name] = 'Page life expectancy'
-    --     ) AS 'pageLifeExpectancy'
-    , -- in seconds
     (
         SELECT AVG(CPU_Usage)
         FROM SQLProcessCPU
@@ -330,7 +296,7 @@ OPTION (
 			throw new Error(e);
 		}
 
-		const ping = new Date() - startTime;
+		const ping = Date.now() - startTime;
 
 		const disabledDatabases = await getMonitorDisabledDatabases({
 			monitorId: monitor.id,

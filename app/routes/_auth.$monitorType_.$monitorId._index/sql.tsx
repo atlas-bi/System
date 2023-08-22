@@ -1,9 +1,4 @@
-import {
-	Link,
-	useFetcher,
-	useLocation,
-	useSearchParams,
-} from '@remix-run/react';
+import { useFetcher, useLocation, useSearchParams } from '@remix-run/react';
 import { format, formatDistance } from 'date-fns';
 import { useEffect } from 'react';
 import { CpuChart } from '~/components/charts/cpuChart';

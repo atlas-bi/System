@@ -26,7 +26,6 @@ const Authed = () => {
 	return (
 		<>
 			<Nav />
-
 			<div className="container pt-4">
 				<div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
 					<div className="flex-1">
