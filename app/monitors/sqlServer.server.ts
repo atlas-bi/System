@@ -346,7 +346,7 @@ OPTION (
 						size: f.size ? f.size.toString() : null,
 						maxSize: f.maxSize ? f.maxSize.toString() : null,
 					})),
-				memory: d.pagesInMemory.toString(),
+				memory: d.pagesInMemory ? d.pagesInMemory.toString() : null,
 			})),
 			feed: {
 				ping: ping.toString(),
