@@ -165,18 +165,19 @@ from sys.dm_os_windows_info`)
 			os = osInfo.os;
 			osVersion = osInfo.osVersion;
 
+			// create mem temp table
+			await pool.request().query(``);
 			// database info
 			databaseInfo = (
-				await pool.request().query(
+				await pool.request().batch(
 					`
-;
-WITH mem
-AS (
-    SELECT database_id
+    drop table if exists #mem;
+	SELECT database_id
         , COUNT_BIG(*) AS db_buffer_pages
+		into #mem
     FROM sys.dm_os_buffer_descriptors
     GROUP BY database_id
-    )
+
 SELECT d.database_id databaseId
     , d.name
     , d.state_desc stateDesc
@@ -228,14 +229,9 @@ LEFT JOIN (
     GROUP BY f.database_name
     ) bu
     ON d.name = bu.database_name
-LEFT OUTER JOIN mem
-    ON mem.database_id = d.database_id
+LEFT OUTER JOIN #mem
+    ON #mem.database_id = d.database_id
 ORDER BY d.database_id DESC
-OPTION (
-    RECOMPILE
-    , MAXDOP 1
-    );
-
 `,
 				)
 			)?.recordset;
