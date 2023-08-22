@@ -1,3 +1,8 @@
+## 1.24.0 (2023-08-22)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit ([0bd473b](https://github.com/atlas-bi/System/commit/0bd473b))
+* feat(retry): allow connection errors to be retried before reporting ([3282df5](https://github.com/atlas-bi/System/commit/3282df5))
+
 ## <small>1.23.4 (2023-08-21)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why ([d73bc3d](https://github.com/atlas-bi/System/commit/d73bc3d))
