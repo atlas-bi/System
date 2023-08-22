@@ -97,7 +97,7 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
         FROM sys.databases
         WHERE name = 'tempdb'
         ) lastBootTime
-    (
+    , (
         SELECT AVG(CPU_Usage)
         FROM SQLProcessCPU
         WHERE row_number = 1
@@ -114,7 +114,6 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
         FROM sys.dm_os_performance_counters
         WHERE counter_name LIKE '%Total Server%'
         ) usedMemory
-
 `,
 				)
 			)?.recordset?.[0];
