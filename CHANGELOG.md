@@ -1,3 +1,8 @@
+## 1.26.0 (2023-08-23)
+
+* Merge branch 'master' of github.com:atlas-bi/System # ([8ddf650](https://github.com/atlas-bi/System/commit/8ddf650))
+* feat(charts): changed chart size on homepage ([c968cac](https://github.com/atlas-bi/System/commit/c968cac))
+
 ## 1.25.0 (2023-08-23)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([7d1cb73](https://github.com/atlas-bi/System/commit/7d1cb73))
