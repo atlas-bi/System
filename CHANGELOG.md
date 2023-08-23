@@ -1,3 +1,8 @@
+## 1.25.0 (2023-08-23)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([7d1cb73](https://github.com/atlas-bi/System/commit/7d1cb73))
+* feat(monitor list): moved ping data to api call to speed up home page ([7674d0a](https://github.com/atlas-bi/System/commit/7674d0a))
+
 ## <small>1.24.3 (2023-08-22)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([ff2c480](https://github.com/atlas-bi/System/commit/ff2c480))
