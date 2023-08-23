@@ -1286,19 +1286,19 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 			enabled: true,
 			type: true,
 			hasError: true,
-			feeds: {
-				select: {
-					id: true,
-					ping: true,
-					hasError: true,
-					createdAt: true,
-					message: true,
-				},
-				take: 30,
-				orderBy: {
-					createdAt: 'desc',
-				},
-			},
+			// feeds: {
+			// 	select: {
+			// 		id: true,
+			// 		ping: true,
+			// 		hasError: true,
+			// 		createdAt: true,
+			// 		message: true,
+			// 	},
+			// 	take: 1,
+			// 	orderBy: {
+			// 		createdAt: 'desc',
+			// 	},
+			// },
 		},
 		orderBy: [
 			{

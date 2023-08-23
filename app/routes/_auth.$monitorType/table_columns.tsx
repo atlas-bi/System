@@ -13,6 +13,8 @@ import {
 	TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { format } from 'date-fns';
+import { useFetcher } from '@remix-run/react';
+import { useEffect } from 'react';
 
 export const columnsSsh: ColumnDef<any>[] = [
 	{
@@ -196,50 +198,74 @@ export const columnsPing: ColumnDef<any>[] = [
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Ping" />
 		),
-		cell: ({ row }) => (
-			<div
-				className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse ${
-					row.original.enabled ? '' : 'opacity-50 group-hover:opacity-100'
-				}`}
-			>
-				{row.original.feeds?.map((x: MonitorFeeds) => (
-					<TooltipProvider key={x.id} delayDuration={20} skipDelayDuration={20}>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div
-									className={`transition-all w-2 h-4 hover:scale-125 rounded ${
-										x.hasError ? 'bg-red-300' : 'bg-emerald-600'
-									}`}
-								></div>
-							</TooltipTrigger>
-							<TooltipContent>
-								<div>
-									<div className="flex space-x-2">
-										<div
-											className={`${
-												x.hasError
-													? 'bg-red-300 border-red-400'
-													: 'bg-emerald-600 border-emerald-700'
-											} border-1 rounded h-3 w-3 my-auto`}
-										></div>
+		cell: ({ row }) => {
+			const pingFetcher = useFetcher();
+			const url = `/${row.original.type}/${row.original.id}/ping-latest`;
 
-										<strong>{x.ping}ms</strong>
-										<span>
-											{formatInTimeZone(
-												x.createdAt,
-												Intl.DateTimeFormat().resolvedOptions().timeZone,
-												'MMM d, yyyy k:mm',
-											)}
-										</span>
+			useEffect(() => {
+				const interval = setInterval(() => {
+					if (document.visibilityState === 'visible') {
+						pingFetcher.load(url);
+					}
+				}, 30 * 1000);
+				return () => clearInterval(interval);
+			}, []);
+
+			useEffect(() => {
+				if (pingFetcher.state === 'idle' && pingFetcher.data == null) {
+					pingFetcher.load(url);
+				}
+			}, [pingFetcher]);
+
+			return (
+				<div
+					className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse ${
+						row.original.enabled ? '' : 'opacity-50 group-hover:opacity-100'
+					}`}
+				>
+					{pingFetcher.data?.feeds?.map((x: MonitorFeeds) => (
+						<TooltipProvider
+							key={x.id}
+							delayDuration={20}
+							skipDelayDuration={20}
+						>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div
+										className={`transition-all w-2 h-4 hover:scale-125 rounded ${
+											x.hasError ? 'bg-red-300' : 'bg-emerald-600'
+										}`}
+									></div>
+								</TooltipTrigger>
+								<TooltipContent>
+									<div>
+										<div className="flex space-x-2">
+											<div
+												className={`${
+													x.hasError
+														? 'bg-red-300 border-red-400'
+														: 'bg-emerald-600 border-emerald-700'
+												} border-1 rounded h-3 w-3 my-auto`}
+											></div>
+
+											<strong>{x.ping}ms</strong>
+											<span>
+												{formatInTimeZone(
+													x.createdAt,
+													Intl.DateTimeFormat().resolvedOptions().timeZone,
+													'MMM d, yyyy k:mm',
+												)}
+											</span>
+										</div>
+										{x.message && <>{x.message}</>}
 									</div>
-									{x.message && <>{x.message}</>}
-								</div>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				))}
-			</div>
-		),
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					))}
+				</div>
+			);
+		},
 		enableSorting: false,
 	},
 ];
