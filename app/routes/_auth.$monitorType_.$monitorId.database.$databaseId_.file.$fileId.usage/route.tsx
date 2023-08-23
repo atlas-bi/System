@@ -94,7 +94,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				}
 				a[startOfHour(e.createdAt).toISOString()].push({
 					maxSize: e.maxSize,
-					size: e.size,
+					currentSize: e.currentSize,
+					usedSize: e.usedSize,
 				});
 				return a;
 			}, {});
@@ -107,7 +108,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				}
 				a[startOfDay(e.createdAt).toISOString()].push({
 					maxSize: e.maxSize,
-					size: e.size,
+					currentSize: e.currentSize,
+					usedSize: e.usedSize,
 				});
 				return a;
 			}, {});
@@ -120,7 +122,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			return {
 				createdAt: k,
 				maxSize: v.reduce((a, e) => Math.max(Number(a), Number(e.maxSize)), 0), //a + Number(e.free), 0) / v.length,
-				size: v.reduce((a, e) => Math.max(Number(a), Number(e.size)), 0), //a + Number(e.used), 0) / v.length,
+				currentSize: v.reduce(
+					(a, e) => Math.max(Number(a), Number(e.currentSize)),
+					0,
+				), //a + Number(e.used), 0) / v.length,
+				usedSize: v.reduce(
+					(a, e) => Math.max(Number(a), Number(e.usedSize)),
+					0,
+				), //a + Number(e.used), 0) / v.length,
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

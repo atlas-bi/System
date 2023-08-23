@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
+import bytes from 'bytes';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
 
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
@@ -54,5 +55,25 @@ export const columns: ColumnDef<any>[] = [
 				{row.getValue('state')}
 			</div>
 		),
+	},
+	{
+		accessorKey: 'currentSize',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Size" />
+		),
+		cell: ({ row }) => {
+			console.log(row.original);
+			return (
+				<div
+					className={`${
+						row.original.state !== 'ONLINE' ? 'text-orange-700' : ''
+					}`}
+				>
+					{row.original.usage?.[0].currentSize
+						? bytes(Number(row.original.usage?.[0].currentSize))
+						: 'n/a'}
+				</div>
+			);
+		},
 	},
 ];

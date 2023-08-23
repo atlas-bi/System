@@ -136,10 +136,21 @@ export const FileChart = ({ url }: { url: string }) => {
 
 		let sizeUnit = 'GB';
 		const max = usageFetcher.data?.file?.usage?.reduce(
-			(a: number, e: { maxSize?: number | null; size?: number | null }) =>
+			(
+				a: number,
+				e: {
+					maxSize?: number | null;
+					currentSize?: number | null;
+					usedSize?: number | null;
+				},
+			) =>
 				Math.max(
 					Number(a),
-					Math.max(Number(e.maxSize) || 0, Number(e.size) || 0),
+					Math.max(
+						Number(e.maxSize) || 0,
+						Number(e.currentSize) || 0,
+						Number(e.usedSize) || 0,
+					),
 				),
 			0,
 		);
@@ -164,7 +175,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.size), { unit: sizeUnit as Unit }).replace(
+							bytes(Number(x.usedSize), { unit: sizeUnit as Unit }).replace(
 								sizeUnit,
 								'',
 							),
@@ -218,15 +229,44 @@ export const FileChart = ({ url }: { url: string }) => {
 				{
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) =>
-						Number(
-							bytes(Math.max(Number(x.maxSize) - Number(x.size), 0), {
-								unit: sizeUnit as Unit,
-							}).replace(sizeUnit, ''),
-						),
-					),
+					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
+						x: x.createdAt,
+						y: x.currentSize
+							? Number(
+									bytes(
+										Math.max(Number(x.currentSize) - Number(x.usedSize), 0),
+										{
+											unit: sizeUnit as Unit,
+										},
+									).replace(sizeUnit, ''),
+							  )
+							: null,
+					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
+					borderRadius: { topLeft: 2, topRight: 2 },
+					cubicInterpolationMode: 'monotone',
+					pointStyle: false,
+					tension: 0.4,
+				},
+				{
+					label: 'Limit',
+					fill: true,
+					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
+						x: x.createdAt,
+						y: x.maxSize
+							? Number(
+									bytes(
+										Math.max(Number(x.maxSize) - Number(x.currentSize), 0),
+										{
+											unit: sizeUnit as Unit,
+										},
+									).replace(sizeUnit, ''),
+							  )
+							: undefined,
+					})),
+					borderColor: '#a7f3d0',
+					backgroundColor: '#d1fae5',
 					borderRadius: { topLeft: 2, topRight: 2 },
 					cubicInterpolationMode: 'monotone',
 					pointStyle: false,
@@ -292,6 +332,13 @@ export const FileChart = ({ url }: { url: string }) => {
 							size={10}
 						/>
 						<span>Used</span>
+					</div>
+					<div className="flex space-x-2 items-center">
+						<Circle
+							className={`fill-[#d1fae5] text-[#a7f3d0] h-3 w-3`}
+							size={10}
+						/>
+						<span>Max</span>
 					</div>
 				</div>
 				<small className="text-muted-foreground">*Peak values shown.</small>

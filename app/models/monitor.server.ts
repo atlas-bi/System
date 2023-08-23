@@ -318,6 +318,9 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							used: true,
 						},
 						take: 1,
+						orderBy: {
+							createdAt: 'desc',
+						},
 					},
 				},
 			},
@@ -373,10 +376,14 @@ export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
 			usage: {
 				select: {
 					id: true,
-					size: true,
+					currentSize: true,
+					usedSize: true,
 					maxSize: true,
 				},
 				take: 1,
+				orderBy: {
+					createdAt: 'desc',
+				},
 			},
 		},
 	});
@@ -430,10 +437,14 @@ export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
 					usage: {
 						select: {
 							id: true,
-							size: true,
+							currentSize: true,
+							usedSize: true,
 							maxSize: true,
 						},
 						take: 1,
+						orderBy: {
+							createdAt: 'desc',
+						},
 					},
 				},
 			},
@@ -443,6 +454,9 @@ export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
 					memory: true,
 				},
 				take: 1,
+				orderBy: {
+					createdAt: 'desc',
+				},
 			},
 		},
 	});
@@ -520,6 +534,9 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 					free: true,
 				},
 				take: 1,
+				orderBy: {
+					createdAt: 'desc',
+				},
 			},
 		},
 	});
@@ -555,7 +572,8 @@ export function getFileUsage({
 			usage: {
 				select: {
 					id: true,
-					size: true,
+					currentSize: true,
+					usedSize: true,
 					maxSize: true,
 					createdAt: true,
 				},
@@ -965,6 +983,9 @@ export function getMonitorDatabases({
 					memory: true,
 				},
 				take: 1,
+				orderBy: {
+					createdAt: 'desc',
+				},
 			},
 		},
 		orderBy: [{ enabled: 'desc' }, { name: 'asc' }],
@@ -995,6 +1016,9 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 					used: true,
 				},
 				take: 1,
+				orderBy: {
+					createdAt: 'desc',
+				},
 			},
 		},
 		orderBy: [
@@ -1489,7 +1513,8 @@ export function updateMonitor({
 				fileId: string;
 				filePath?: string;
 			};
-			size?: string;
+			usedSize?: string;
+			currentSize?: string;
 			maxSize?: string;
 		}[];
 	}[];
@@ -1565,7 +1590,8 @@ export function updateMonitor({
 															monitorId: id,
 															usage: {
 																create: {
-																	size: file.size,
+																	usedSize: file.usedSize,
+																	currentSize: file.currentSize,
 																	maxSize: file.maxSize,
 																},
 															},
@@ -1575,7 +1601,8 @@ export function updateMonitor({
 															monitorId: id,
 															usage: {
 																create: {
-																	size: file.size,
+																	usedSize: file.usedSize,
+																	currentSize: file.currentSize,
 																	maxSize: file.maxSize,
 																},
 															},
@@ -1607,7 +1634,8 @@ export function updateMonitor({
 														monitorId: id,
 														usage: {
 															create: {
-																size: file.size,
+																usedSize: file.usedSize,
+																currentSize: file.currentSize,
 																maxSize: file.maxSize,
 															},
 														},
@@ -1709,7 +1737,8 @@ export function updateMonitor({
 								select: {
 									id: true,
 									maxSize: true,
-									size: true,
+									currentSize: true,
+									usedSize: true,
 									createdAt: true,
 								},
 								orderBy: {

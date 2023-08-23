@@ -237,44 +237,60 @@ ORDER BY d.database_id DESC
 			)?.recordset;
 
 			fileInfo = (
-				await pool.request().query(`
+				await pool.request().batch(`
+DECLARE @command VARCHAR(5000)
+DECLARE @DBInfo TABLE
+( database_id int,
+database_name varchar(500),
+file_id int,
+name VARCHAR(500),
+physical_name VARCHAR(500),
+is_percent_growth NVARCHAR(520),
+state_desc NVARCHAR(520),
+type_desc NVARCHAR(520),
+total_size bigint,
+used_size bigint,
+growth NVARCHAR(500),
+max_size bigint
+)
+
+SELECT @command = 'Use ?
+SELECT d.database_id, ''?''
+        , mf.file_id
+        , mf.name
+        , mf.physical_name
+        , mf.is_percent_growth
+        , mf.state_desc
+        , mf.type_desc
+        , total_size = cast(mf.size AS BIGINT) * 8 * 1024
+        , used_size = CAST(FILEPROPERTY(mf.[name], ''SpaceUsed'') as bigint) * 8 * 1024
+        , mf.growth
+        , CASE
+            WHEN mf.max_size < 0
+                THEN NULL
+            ELSE cast(mf.max_size AS BIGINT) * 8 * 1024
+            END AS max_size
+    FROM sys.master_files mf
+    inner join sys.databases d on mf.database_id=d.database_id
+    where d.name=''?''
+   '
+
+print @command
+INSERT INTO @DBInfo
+EXEC sp_MSForEachDB @command
+
 SELECT t.database_id databaseId
     , t.[type_desc] typeDesc
     , t.state_desc stateDesc
-    , t.total_size AS size
+    , t.total_size AS currentSize
+    , t.used_size as usedSize
     , t.growth
     , t.is_percent_growth isPercentGrowth
     , t.file_id fileId
     , t.name fileName
     , t.physical_name physicalName
     , t.max_size maxSize
-FROM (
-    SELECT database_id
-        , file_id
-        , name
-        , physical_name
-        , is_percent_growth
-        , state_desc
-        , type_desc
-        , total_size = SUM(cast(size AS BIGINT) * 8 * 1024)
-        , growth
-        , CASE
-            WHEN max_size < 0
-                THEN NULL
-            ELSE cast(max_size AS BIGINT) * 8 * 1024
-            END AS max_size
-    FROM sys.master_files
-    GROUP BY type_desc
-        , database_id
-        , growth
-        , max_size
-        , name
-        , file_id
-        , physical_name
-        , is_percent_growth
-        , state_desc
-    ) t
-ORDER BY t.database_id DESC
+FROM @DBInfo t
 OPTION (
     RECOMPILE
     , MAXDOP 1
@@ -343,7 +359,8 @@ OPTION (
 							filePath: f.physicalName,
 							state: f.stateDesc,
 						},
-						size: f.size ? f.size.toString() : null,
+						usedSize: f.usedSize ? f.usedSize.toString() : null,
+						currentSize: f.currentSize ? f.currentSize.toString() : null,
 						maxSize: f.maxSize ? f.maxSize.toString() : null,
 					})),
 				memory: d.pagesInMemory ? d.pagesInMemory.toString() : null,

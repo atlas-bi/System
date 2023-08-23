@@ -251,8 +251,9 @@ model DatabaseFileUsage {
   hasError Boolean @default(false)
 
   // fields sent from monitor
-  size    String?
-  maxSize String?
+  usedSize    String?
+  currentSize String?
+  maxSize     String?
 }
 
 model DatabaseUsage {
