@@ -1,3 +1,8 @@
+## 1.27.0 (2023-08-23)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([5507c70](https://github.com/atlas-bi/System/commit/5507c70))
+* feat(sql files): show how much of the file is currently being used ([cbfdf9e](https://github.com/atlas-bi/System/commit/cbfdf9e))
+
 ## 1.26.0 (2023-08-23)
 
 * Merge branch 'master' of github.com:atlas-bi/System # ([8ddf650](https://github.com/atlas-bi/System/commit/8ddf650))
