@@ -1,3 +1,8 @@
+## <small>1.24.3 (2023-08-22)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([ff2c480](https://github.com/atlas-bi/System/commit/ff2c480))
+* fix(sql offline db): fixed memory for offline databases ([1552de3](https://github.com/atlas-bi/System/commit/1552de3))
+
 ## <small>1.24.2 (2023-08-22)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([268d498](https://github.com/atlas-bi/System/commit/268d498))
