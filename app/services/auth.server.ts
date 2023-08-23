@@ -14,7 +14,7 @@ export const authenticator = new Authenticator<SlimUserFields>(sessionStorage);
 
 const host = process.env.HOSTNAME;
 
-let metadata = {};
+let metadata;
 
 try {
 	invariant(process.env.SAML_IDP_METADATA);
