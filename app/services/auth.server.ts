@@ -1,17 +1,16 @@
 import * as validator from '@authenio/samlify-node-xmllint';
-import type { User } from '@prisma/client';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 import { SamlStrategy } from 'remix-auth-saml';
 import invariant from 'tiny-invariant';
-import { updateUserProps } from '~/models/user.server';
+import { SlimUserFields, updateUserProps } from '~/models/user.server';
 import { sessionStorage } from '~/services/session.server';
 
 import { verifyLogin } from './ldap.server';
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<User>(sessionStorage);
+export const authenticator = new Authenticator<SlimUserFields>(sessionStorage);
 
 const host = process.env.HOSTNAME;
 
@@ -19,6 +18,7 @@ let metadata = {};
 
 try {
 	invariant(process.env.SAML_IDP_METADATA);
+	invariant(host, 'HOSTNAME is required for saml.');
 
 	const samlStrategy = new SamlStrategy(
 		{
@@ -65,7 +65,7 @@ try {
 				}
 			}
 
-			return await updateUserProps(
+			return updateUserProps(
 				email,
 				extract.attributes?.firstName,
 				extract.attributes?.lastName,

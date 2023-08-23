@@ -4,13 +4,6 @@ import { namedAction } from 'remix-utils';
 import { editDatabase } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
-const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
-	if (str === undefined || str === null || str.toString().trim() === '') {
-		return true;
-	}
-	return false;
-};
-
 export async function action({ request }: ActionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(

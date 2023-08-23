@@ -1,27 +1,13 @@
 import {
 	type ActionArgs,
 	type LoaderArgs,
-	type MetaFunction,
+	type V2_MetaFunction,
 	json,
-	redirect,
 } from '@remix-run/node';
-import {
-	Form,
-	Link,
-	useActionData,
-	useLoaderData,
-	useSearchParams,
-} from '@remix-run/react';
-import * as React from 'react';
+import { useSearchParams } from '@remix-run/react';
 import { safeRedirect } from 'remix-utils';
 import { authenticator } from '~/services/auth.server';
-import {
-	commitSession,
-	createUserSession,
-	getSession,
-	getUserId,
-	sessionStorage,
-} from '~/services/session.server';
+import { commitSession, getSession } from '~/services/session.server';
 import { validateEmail } from '~/utils';
 
 import { UserAuthForm } from './LoginForm';
@@ -31,7 +17,7 @@ export async function loader({ request }: LoaderArgs) {
 	await authenticator.isAuthenticated(request, {
 		successRedirect: '/',
 	});
-	const session = await getSession(request.headers.get('cookie'));
+	const session = await getSession(request);
 	const error = session.get(authenticator.sessionErrorKey);
 
 	session.unset(authenticator.sessionErrorKey);
@@ -47,7 +33,7 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
 	// remove session error messages
-	const session = await getSession(request.headers.get('cookie'));
+	const session = await getSession(request);
 	session.unset(authenticator.sessionErrorKey);
 
 	// validate the form before trying to login
@@ -80,14 +66,14 @@ export async function action({ request }: ActionArgs) {
 	const url = new URL(request.url);
 	const returnTo = safeRedirect(url.searchParams.get('returnTo') || '/');
 
-	return await authenticator.authenticate('ldap', request, {
+	return authenticator.authenticate('ldap', request, {
 		successRedirect: returnTo,
 		failureRedirect: '/login',
 		context: { formData },
 	});
 }
 
-export const meta: MetaFunction = () => {
+export const meta: V2_MetaFunction = () => {
 	return [
 		{
 			title: 'Login',

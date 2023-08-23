@@ -8,38 +8,6 @@ import {
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
-const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
-	if (str === undefined || str === null || str.toString().trim() === '') {
-		return true;
-	}
-	return false;
-};
-
-const checkWindows = function ({ values }) {
-	if (values.type !== 'windows') return null;
-	if (isNullOrEmpty(values.title)) {
-		return json({ form: { error: 'Name is required.' } });
-	}
-
-	if (isNullOrEmpty(values.type)) {
-		return json({ form: { error: 'Type is required.' } });
-	}
-
-	if (isNullOrEmpty(values.host)) {
-		return json({ form: { error: 'Host is required.' } });
-	}
-
-	if (isNullOrEmpty(values.username)) {
-		return json({ form: { error: 'Username is required.' } });
-	}
-
-	if (isNullOrEmpty(values.password) && isNullOrEmpty(values.privateKey)) {
-		return json({
-			form: { error: 'Password or Private Key is required.' },
-		});
-	}
-};
-
 export async function action({ request }: ActionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -76,6 +44,9 @@ export async function action({ request }: ActionArgs) {
 			await deleteDrive({
 				id: values.id.toString(),
 			});
+			if (!drive) {
+				return redirect('/');
+			}
 			return redirect(`/${drive.monitor.type}/${drive.monitor.id}`);
 		},
 	});

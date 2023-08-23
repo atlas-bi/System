@@ -3,12 +3,7 @@ import { authenticate } from 'ldap-authentication';
 import invariant from 'tiny-invariant';
 import { updateUserProps } from '~/models/user.server';
 
-export type { User } from '@prisma/client';
-
-export async function verifyLogin(
-	email: User['email'],
-	password: string,
-): Promise<User> {
+export async function verifyLogin(email: User['email'], password: string) {
 	invariant(
 		process.env.LDAP_USERNAME,
 		'process.env.LDAP_USERNAME is required.',
@@ -101,16 +96,12 @@ export async function verifyLogin(
 		};
 
 		// update user info
-		return await updateUserProps(
+		return updateUserProps(
 			email,
-			process.env.LDAP_FIRSTNAME
-				? ldapUser[process.env.LDAP_FIRSTNAME]
-				: undefined,
-			process.env.LDAP_LASTNAME
-				? ldapUser[process.env.LDAP_LASTNAME]
-				: undefined,
+			process.env.LDAP_FIRSTNAME ? ldapUser[process.env.LDAP_FIRSTNAME] : null,
+			process.env.LDAP_LASTNAME ? ldapUser[process.env.LDAP_LASTNAME] : null,
 			ldapUser.groups?.map((group: Group) => group.cn),
-			profilePhoto,
+			profilePhoto || null,
 		);
 	} catch (err) {
 		if (err === 'Access denied.') {

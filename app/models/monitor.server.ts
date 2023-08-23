@@ -1,5 +1,13 @@
 import { encrypt } from '@/lib/utils';
-import type { Monitor, MonitorFeeds, MonitorLogs, User } from '@prisma/client';
+import type {
+	Database,
+	DatabaseFile,
+	Drive,
+	Monitor,
+	MonitorFeeds,
+	MonitorLogs,
+	User,
+} from '@prisma/client';
 import { prisma } from '~/db.server';
 import monitorMonitor from '~/queues/monitor.server';
 
@@ -1335,18 +1343,19 @@ export function updateDriveNotifications({
 	| 'sizeFreeValue'
 	| 'growthRateValue'
 	| 'missingNotify'
-	| 'missingNotifyTypes'
 	| 'missingNotifyResendAfterMinutes'
 	| 'percFreeNotify'
-	| 'percFreeNotifyTypes'
 	| 'percFreeNotifyResendAfterMinutes'
 	| 'sizeFreeNotify'
-	| 'sizeFreeNotifyTypes'
 	| 'sizeFreeNotifyResendAfterMinutes'
 	| 'growthRateNotify'
-	| 'growthRateNotifyTypes'
 	| 'growthRateNotifyResendAfterMinutes'
->) {
+> & {
+	percFreeNotifyTypes: string[];
+	growthRateNotifyTypes: string[];
+	missingNotifyTypes: string[];
+	sizeFreeNotifyTypes: string[];
+}) {
 	return prisma.drive.update({
 		where: { id },
 		data: {
@@ -1389,15 +1398,13 @@ export function updateMonitorNotifications({
 	rebootNotifyTypes,
 	connectionNotifyRetries,
 }: Pick<
-	Drive,
+	Monitor,
 	| 'id'
 	| 'connectionNotify'
-	| 'connectionNotifyTypes'
 	| 'connectionNotifyResendAfterMinutes'
 	| 'rebootNotify'
-	| 'rebootNotifyTypes'
 	| 'connectionNotifyRetries'
->) {
+> & { connectionNotifyTypes: string[]; rebootNotifyTypes: string[] }) {
 	return prisma.monitor.update({
 		where: { id },
 		data: {
@@ -1450,7 +1457,7 @@ export function updateMonitor({
 	drives?: {
 		data: {
 			location?: string;
-			name?: string;
+			name: string;
 			root?: string;
 			systemDescription?: string;
 			size: string;
@@ -1460,8 +1467,8 @@ export function updateMonitor({
 	}[];
 	databases?: {
 		data: {
-			databaseId?: string;
-			name?: string;
+			databaseId: string;
+			name: string;
 			stateDesc?: string;
 			recoveryModel?: string;
 			backupDataDate?: string;
@@ -1469,22 +1476,22 @@ export function updateMonitor({
 			backupLogDate?: string;
 			backupLogSize?: string;
 			compatLevel?: string;
-			files: {
-				data: {
-					sqlDatabaseId?: string;
-					fileName?: string;
-					type?: string;
-					state?: string;
-					growth?: string;
-					isPercentGrowth?: string;
-					fileId?: string;
-					filePath?: string;
-				};
-				size?: string;
-				maxSize?: string;
-			}[];
 		};
 		memory?: string;
+		files?: {
+			data: {
+				sqlDatabaseId: string;
+				fileName?: string;
+				type?: string;
+				state?: string;
+				growth?: string;
+				isPercentGrowth?: string;
+				fileId: string;
+				filePath?: string;
+			};
+			size?: string;
+			maxSize?: string;
+		}[];
 	}[];
 	cpus?: {
 		name: string;

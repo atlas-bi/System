@@ -1,20 +1,7 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	addDays,
-	endOfDay,
-	endOfToday,
-	endOfWeek,
-	startOfDay,
-	startOfHour,
-	startOfMonth,
-	startOfToday,
-	startOfWeek,
-	startOfYear,
-	subDays,
-	subHours,
-	subYears,
-} from 'date-fns';
+import { startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import { getMemoryUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -27,12 +14,13 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
+	invariant(params.monitorId);
 	const url = new URL(request.url);
 	let {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range'),
+		url.searchParams.get('range') || 'last_24_hours',
 	);
 
 	const monitor = await getMemoryUsage({
@@ -60,29 +48,61 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			// minute is db default
 			return json({ monitor: { ...monitor, startDate, endDate } });
 		case 'hour':
-			grouped = monitor.feeds.reduce((a, e) => {
-				if (!a[startOfHour(e.createdAt).toISOString()]) {
-					a[startOfHour(e.createdAt).toISOString()] = [];
-				}
-				a[startOfHour(e.createdAt).toISOString()].push({
-					memoryTotal: e.memoryTotal,
-					memoryFree: e.memoryFree,
-				});
-				return a;
-			}, {});
+			grouped = monitor.feeds.reduce(
+				(
+					a: {
+						[key: string]: {
+							memoryTotal: string | null;
+							memoryFree: string | null;
+						}[];
+					},
+
+					e: {
+						memoryTotal: string | null;
+						memoryFree: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfHour(e.createdAt).toISOString()]) {
+						a[startOfHour(e.createdAt).toISOString()] = [];
+					}
+					a[startOfHour(e.createdAt).toISOString()].push({
+						memoryTotal: e.memoryTotal,
+						memoryFree: e.memoryFree,
+					});
+					return a;
+				},
+				{},
+			);
 			break;
 		case 'day':
 		default:
-			grouped = monitor.feeds.reduce((a, e) => {
-				if (!a[startOfDay(e.createdAt).toISOString()]) {
-					a[startOfDay(e.createdAt).toISOString()] = [];
-				}
-				a[startOfDay(e.createdAt).toISOString()].push({
-					memoryTotal: e.memoryTotal,
-					memoryFree: e.memoryFree,
-				});
-				return a;
-			}, {});
+			grouped = monitor.feeds.reduce(
+				(
+					a: {
+						[key: string]: {
+							memoryTotal: string | null;
+							memoryFree: string | null;
+						}[];
+					},
+
+					e: {
+						memoryTotal: string | null;
+						memoryFree: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfDay(e.createdAt).toISOString()]) {
+						a[startOfDay(e.createdAt).toISOString()] = [];
+					}
+					a[startOfDay(e.createdAt).toISOString()].push({
+						memoryTotal: e.memoryTotal,
+						memoryFree: e.memoryFree,
+					});
+					return a;
+				},
+				{},
+			);
 			break;
 	}
 
@@ -91,14 +111,28 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		.map(([k, v]) => {
 			return {
 				createdAt: k,
-				memoryTotal: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.memoryTotal)),
+				memoryTotal: (
+					v as {
+						memoryTotal: string | null;
+						memoryFree: string | null;
+						createdAt: string;
+					}[]
+				).reduce(
+					(a: number, e: { memoryTotal: string | null }) =>
+						Math.max(Number(a), Number(e.memoryTotal || 0)),
 					0,
-				), //a + Number(e.memoryTotal), 0) / v.length,
-				memoryFree: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.memoryFree)),
+				),
+				memoryFree: (
+					v as {
+						memoryTotal: string | null;
+						memoryFree: string | null;
+						createdAt: string;
+					}[]
+				).reduce(
+					(a: number, e: { memoryFree: string | null }) =>
+						Math.max(Number(a), Number(e.memoryFree)),
 					0,
-				), // a + Number(e.memoryFree), 0) / v.length,
+				),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

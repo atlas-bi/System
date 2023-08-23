@@ -86,6 +86,11 @@ export default function Index() {
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
+		initialState: {
+			pagination: {
+				pageSize: 25,
+			},
+		},
 	});
 
 	const navigate = useNavigate();
@@ -154,7 +159,7 @@ export default function Index() {
 						</TableBody>
 					</Table>
 				</div>
-				<DataTablePagination table={table} />
+				<DataTablePagination table={table} pageSizes={[25, 50, 100]} />
 			</div>
 			<Outlet />
 		</>

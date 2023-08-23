@@ -46,7 +46,7 @@ export default function HttpForm({
 			<div className="self-start col-span-3">
 				<Switch
 					name="httpIgnoreSsl"
-					checked={data.httpIgnoreSsl}
+					checked={data.httpIgnoreSsl || false}
 					onCheckedChange={(httpIgnoreSsl) =>
 						setData({ ...data, httpIgnoreSsl })
 					}

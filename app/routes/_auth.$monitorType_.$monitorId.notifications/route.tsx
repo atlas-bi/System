@@ -1,9 +1,7 @@
 import type { ActionArgs, LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import {
-	getDriveNotifications,
 	getMonitorNotifications,
-	updateDriveNotifications,
 	updateMonitorNotifications,
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -15,11 +13,12 @@ import { useSubmit, useNavigation } from '@remix-run/react';
 import { Collapsible, CollapsibleContent } from '~/components/ui/collapsible';
 
 import { Label } from '~/components/ui/label';
-import { Separator } from '~/components/ui/separator';
+
 import { useRef, useState } from 'react';
 import { Input } from '~/components/ui/input';
 import { MultiSelect } from '~/components/ui/multiselect';
 import { getNotifications } from '~/models/notification.server';
+import invariant from 'tiny-invariant';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -27,7 +26,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			new URL(request.url).pathname,
 		)}`,
 	});
-
+	invariant(params.monitorId);
 	const monitor = await getMonitorNotifications({ id: params.monitorId });
 	if (!monitor) {
 		throw new Response('Not Found', { status: 404 });
@@ -175,7 +174,9 @@ export default function Index() {
 											type="number"
 											name="connectionNotifyRetries"
 											value={connectionRetries || 0}
-											onChange={(e) => setConnectionRetries(e.target.value)}
+											onChange={(e) =>
+												setConnectionRetries(Number(e.target.value))
+											}
 											placeholder="3"
 										/>
 									</div>
@@ -201,7 +202,9 @@ export default function Index() {
 											type="number"
 											name="connectionNotifyResendAfterMinutes"
 											value={connectionResendValue || undefined}
-											onChange={(e) => setConnectionResendValue(e.target.value)}
+											onChange={(e) =>
+												setConnectionResendValue(Number(e.target.value))
+											}
 											placeholder="60"
 										/>
 									</div>

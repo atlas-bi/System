@@ -15,6 +15,7 @@ import {
 	subHours,
 	subYears,
 } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import { getDatabaseMemoryUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -26,13 +27,13 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			new URL(request.url).pathname,
 		)}`,
 	});
-
+	invariant(params.databaseId);
 	const url = new URL(request.url);
 	let {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range'),
+		url.searchParams.get('range') || 'last_24_hours',
 	);
 
 	const database = await getDatabaseMemoryUsage({
@@ -60,27 +61,55 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			// minute is db default
 			return json({ database: { ...database, startDate, endDate } });
 		case 'hour':
-			grouped = database.usage.reduce((a, e) => {
-				if (!a[startOfHour(e.createdAt).toISOString()]) {
-					a[startOfHour(e.createdAt).toISOString()] = [];
-				}
-				a[startOfHour(e.createdAt).toISOString()].push({
-					memory: e.memory,
-				});
-				return a;
-			}, {});
+			grouped = database.usage.reduce(
+				(
+					a: {
+						[key: string]: {
+							memory: string | null;
+						}[];
+					},
+
+					e: {
+						memory: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfHour(e.createdAt).toISOString()]) {
+						a[startOfHour(e.createdAt).toISOString()] = [];
+					}
+					a[startOfHour(e.createdAt).toISOString()].push({
+						memory: e.memory,
+					});
+					return a;
+				},
+				{},
+			);
 			break;
 		case 'day':
 		default:
-			grouped = database.usage.reduce((a, e) => {
-				if (!a[startOfDay(e.createdAt).toISOString()]) {
-					a[startOfDay(e.createdAt).toISOString()] = [];
-				}
-				a[startOfDay(e.createdAt).toISOString()].push({
-					memory: e.memory,
-				});
-				return a;
-			}, {});
+			grouped = database.usage.reduce(
+				(
+					a: {
+						[key: string]: {
+							memory: string | null;
+						}[];
+					},
+
+					e: {
+						memory: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfDay(e.createdAt).toISOString()]) {
+						a[startOfDay(e.createdAt).toISOString()] = [];
+					}
+					a[startOfDay(e.createdAt).toISOString()].push({
+						memory: e.memory,
+					});
+					return a;
+				},
+				{},
+			);
 			break;
 	}
 
@@ -89,8 +118,9 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		.map(([k, v]) => {
 			return {
 				createdAt: k,
-				memory: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.memory) || 0),
+				memory: (v as { memory: string | null }[]).reduce(
+					(a: number, e: { memory: string | null }) =>
+						Math.max(Number(), Number(e.memory || 0), 0),
 					0,
 				),
 			};

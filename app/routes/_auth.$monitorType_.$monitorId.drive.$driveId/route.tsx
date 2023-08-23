@@ -4,7 +4,7 @@ import { getDriveNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
 import { DriveChart } from '~/components/charts/driveChart';
-import { H1, H3 } from '~/components/ui/typography';
+import { H1 } from '~/components/ui/typography';
 import { MoveLeft, Settings } from 'lucide-react';
 import { BellRing } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
@@ -56,12 +56,16 @@ export default function Index() {
 	}, [dataFetcher.data]);
 
 	useEffect(() => {
-		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (drive && usageFetcher.state === 'idle' && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
 			);
 		}
 	}, [usageFetcher]);
+
+	if (!drive) {
+		return <></>;
+	}
 
 	return (
 		<>

@@ -15,7 +15,7 @@ export async function loader({ request }: LoaderArgs) {
 		)}`,
 	});
 
-	const session = await getSession(request.headers.get('cookie'));
+	const session = await getSession(request);
 	const monitorTypes = await getMonitorTypes();
 	return json({
 		headers: {

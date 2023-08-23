@@ -1,6 +1,7 @@
 import { encrypt } from '@/lib/utils';
 import { prisma } from '~/db.server';
 
+import type { Notification } from '@prisma/client';
 export type { Notification } from '@prisma/client';
 
 export function getNotifications() {

@@ -12,7 +12,7 @@ export async function loader({ request }: LoaderArgs) {
 		)}`,
 	});
 
-	const session = await getSession(request.headers.get('cookie'));
+	const session = await getSession(request);
 
 	return json({
 		headers: {

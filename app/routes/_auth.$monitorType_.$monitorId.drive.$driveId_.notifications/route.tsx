@@ -236,7 +236,9 @@ export default function Index() {
 											type="number"
 											name="missingNotifyResendAfterMinutes"
 											value={missingResendValue || undefined}
-											onChange={(e) => setMissingResendValue(e.target.value)}
+											onChange={(e) =>
+												setMissingResendValue(Number(e.target.value))
+											}
 											placeholder="60"
 										/>
 									</div>
@@ -280,7 +282,7 @@ export default function Index() {
 											type="number"
 											placeholder="10"
 											value={percValue}
-											onChange={(e) => setPercValue(e.target.value)}
+											onChange={(e) => setPercValue(Number(e.target.value))}
 										/>
 									</div>
 									<div>
@@ -328,7 +330,9 @@ export default function Index() {
 											type="number"
 											name="percFreeNotifyResendAfterMinutes"
 											value={percResendValue || undefined}
-											onChange={(e) => setPercResendValue(e.target.value)}
+											onChange={(e) =>
+												setPercResendValue(Number(e.target.value))
+											}
 											placeholder="60"
 										/>
 									</div>
@@ -363,8 +367,12 @@ export default function Index() {
 											name="sizeFreeValue"
 											type="number"
 											placeholder="10"
-											value={sizeValue}
-											onChange={(e) => setSizeValue(e.target.value)}
+											value={
+												sizeValue === undefined || sizeValue === null
+													? 0
+													: sizeValue
+											}
+											onChange={(e) => setSizeValue(Number(e.target.value))}
 										/>
 									</div>
 									<div>
@@ -412,7 +420,9 @@ export default function Index() {
 											type="number"
 											name="sizeFreeNotifyResendAfterMinutes"
 											value={sizeResendValue || undefined}
-											onChange={(e) => setSizeResendValue(e.target.value)}
+											onChange={(e) =>
+												setSizeResendValue(Number(e.target.value))
+											}
 											placeholder="60"
 										/>
 									</div>
@@ -455,8 +465,12 @@ export default function Index() {
 											name="growthRateValue"
 											type="number"
 											placeholder="10"
-											value={growthValue}
-											onChange={(e) => setGrowthValue(e.target.value)}
+											value={
+												growthValue === undefined || growthValue === null
+													? 0
+													: growthValue
+											}
+											onChange={(e) => setGrowthValue(Number(e.target.value))}
 										/>
 									</div>
 									<div>
@@ -504,7 +518,9 @@ export default function Index() {
 											type="number"
 											name="growthRateNotifyResendAfterMinutes"
 											value={sizeResendValue || undefined}
-											onChange={(e) => setGrowthResendValue(e.target.value)}
+											onChange={(e) =>
+												setGrowthResendValue(Number(e.target.value))
+											}
 											placeholder="60"
 										/>
 									</div>

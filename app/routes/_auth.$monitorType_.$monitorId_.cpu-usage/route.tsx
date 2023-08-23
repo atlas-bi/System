@@ -1,20 +1,7 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	addDays,
-	endOfDay,
-	endOfToday,
-	endOfWeek,
-	startOfDay,
-	startOfHour,
-	startOfMonth,
-	startOfToday,
-	startOfWeek,
-	startOfYear,
-	subDays,
-	subHours,
-	subYears,
-} from 'date-fns';
+import { startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import { getCpuUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -24,40 +11,81 @@ function reducer(
 	unit: string,
 	data: {
 		createdAt: Date;
-		cpuLoad?: string;
-		cpuSpeed?: string;
-		load?: string;
-		speed?: string;
+		cpuLoad?: string | null;
+		cpuSpeed?: string | null;
+		load?: string | null;
+		speed?: string | null;
 	}[],
 ) {
 	switch (unit) {
 		case 'hour':
-			return data.reduce((a, e) => {
-				if (!a[startOfHour(e.createdAt).toISOString()]) {
-					a[startOfHour(e.createdAt).toISOString()] = [];
-				}
-				a[startOfHour(e.createdAt).toISOString()].push({
-					cpuLoad: e.cpuLoad || e.load,
-					cpuSpeed: e.cpuSpeed || e.speed,
-				});
-				return a;
-			}, {});
+			return data.reduce(
+				(
+					a: {
+						[key: string]: {
+							cpuLoad: string | null;
+							cpuSpeed: string | null;
+						}[];
+					},
+
+					e: {
+						cpuLoad?: string | null;
+						cpuSpeed?: string | null;
+						load?: string | null;
+						speed?: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfHour(e.createdAt).toISOString()]) {
+						a[startOfHour(e.createdAt).toISOString()] = [];
+					}
+					a[startOfHour(e.createdAt).toISOString()].push({
+						cpuLoad: e.cpuLoad || e.load || null,
+						cpuSpeed: e.cpuSpeed || e.speed || null,
+					});
+					return a;
+				},
+				{},
+			);
 		case 'day':
 		default:
-			return data.reduce((a, e) => {
-				if (!a[startOfDay(e.createdAt).toISOString()]) {
-					a[startOfDay(e.createdAt).toISOString()] = [];
-				}
-				a[startOfDay(e.createdAt).toISOString()].push({
-					cpuLoad: e.cpuLoad || e.load,
-					cpuSpeed: e.cpuSpeed | e.speed,
-				});
-				return a;
-			}, {});
+			return data.reduce(
+				(
+					a: {
+						[key: string]: {
+							cpuLoad: string | null;
+							cpuSpeed: string | null;
+						}[];
+					},
+
+					e: {
+						cpuLoad?: string | null;
+						cpuSpeed?: string | null;
+						load?: string | null;
+						speed?: string | null;
+						createdAt: Date;
+					},
+				) => {
+					if (!a[startOfDay(e.createdAt).toISOString()]) {
+						a[startOfDay(e.createdAt).toISOString()] = [];
+					}
+					a[startOfDay(e.createdAt).toISOString()].push({
+						cpuLoad: e.cpuLoad || e.load || null,
+						cpuSpeed: e.cpuSpeed | e.speed || null,
+					});
+					return a;
+				},
+				{},
+			);
 	}
 }
 
-function grouper(group) {
+function grouper(group: {
+	[key: string]: {
+		cpuLoad: string | null;
+		cpuSpeed: string | null;
+	}[];
+}) {
 	return Object.entries(group)
 		.map(([k, v]) => {
 			return {
@@ -66,7 +94,7 @@ function grouper(group) {
 				cpuSpeed: v.reduce(
 					(a, e) => Math.max(Number(a), Number(e.cpuSpeed)),
 					0,
-				), // a + Number(e.cpuSpeed), 0) / v.length,
+				),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
@@ -79,12 +107,13 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
+	invariant(params.monitorId);
 	const url = new URL(request.url);
 	let {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range'),
+		url.searchParams.get('range') || 'last_24_hours',
 	);
 
 	const monitor = await getCpuUsage({
@@ -104,8 +133,6 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		startDate = undefined;
 		endDate = undefined;
 	}
-
-	let grouped = {};
 
 	if (groupSize === 'minute') {
 		return json({

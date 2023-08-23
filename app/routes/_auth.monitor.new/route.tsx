@@ -27,7 +27,11 @@ const jsonParser = (str: any) => {
 	}
 };
 
-const checkBase = function ({ values }) {
+const checkBase = function ({
+	values,
+}: {
+	values: { title?: string; type?: string };
+}) {
 	if (isNullOrEmpty(values.title)) {
 		return json({ form: { error: 'Name is required.' } });
 	}
@@ -36,7 +40,11 @@ const checkBase = function ({ values }) {
 	}
 };
 
-const checkHttp = function ({ values }) {
+const checkHttp = function ({
+	values,
+}: {
+	values: { type?: string; httpUrl?: string };
+}) {
 	if (values.type !== 'http') return null;
 
 	if (isNullOrEmpty(values.httpUrl)) {
@@ -44,7 +52,11 @@ const checkHttp = function ({ values }) {
 	}
 };
 
-const checkSql = function ({ values }) {
+const checkSql = function ({
+	values,
+}: {
+	values: { type?: string; sqlConnectionString?: string };
+}) {
 	if (values.type !== 'sqlServer') return null;
 
 	if (isNullOrEmpty(values.sqlConnectionString)) {
@@ -52,7 +64,17 @@ const checkSql = function ({ values }) {
 	}
 };
 
-const checkSsh = function ({ values }) {
+const checkSsh = function ({
+	values,
+}: {
+	values: {
+		type?: string;
+		host?: string;
+		username?: string;
+		password?: string;
+		privateKey?: string;
+	};
+}) {
 	if (values.type !== 'windows' && values.type !== 'ubuntu') return null;
 
 	if (isNullOrEmpty(values.host)) {
@@ -219,7 +241,7 @@ export async function action({ request }: ActionArgs) {
 			const formData = await request.formData();
 			const { _action, ...values } = Object.fromEntries(formData);
 
-			await deleteMonitor({ id: values.id });
+			await deleteMonitor({ id: values.id.toString() });
 			return redirect('/');
 		},
 		async test() {
@@ -265,7 +287,7 @@ export async function action({ request }: ActionArgs) {
 			}
 
 			if (values.type?.toString() === 'http') {
-				let startTime = new Date();
+				let startTime = Date.now();
 
 				const { res, error } = await HttpCheck({
 					httpBody: values.httpBody?.toString(),
@@ -291,8 +313,7 @@ export async function action({ request }: ActionArgs) {
 
 				// console.log(res)
 				const msg = res?.status + res?.statusText;
-				const ping = new Date() - startTime;
-				console.log(msg, ping);
+				const ping = Date.now() - startTime;
 				return json({
 					success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,
 				});
@@ -316,7 +337,7 @@ export async function action({ request }: ActionArgs) {
 				}
 			}
 
-			return null;
+			return json({});
 		},
 	});
 }
