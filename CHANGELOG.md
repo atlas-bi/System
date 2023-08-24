@@ -1,3 +1,8 @@
+## <small>1.27.1 (2023-08-23)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([982f2b3](https://github.com/atlas-bi/System/commit/982f2b3))
+* fix(saml): fixed blank metadata page when saml is not configured ([4d2aad7](https://github.com/atlas-bi/System/commit/4d2aad7))
+
 ## 1.27.0 (2023-08-23)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([5507c70](https://github.com/atlas-bi/System/commit/5507c70))
