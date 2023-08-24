@@ -233,6 +233,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					stack: 'line-stack',
 				},
 				{
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Free',
 					fill: true,
 					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
@@ -254,6 +255,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					stack: 'line-stack',
 				},
 				{
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Limit',
 					fill: true,
 					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
