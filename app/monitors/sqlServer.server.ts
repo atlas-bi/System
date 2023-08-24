@@ -123,7 +123,7 @@ SELECT SERVERPROPERTY('SERVERNAME') AS servername
 			model = systemInfo.edition;
 			manufacturer = systemInfo.manufacturer;
 
-			lastBootTime = systemInfo.lastBootTime;
+			lastBootTime = systemInfo.lastBootTime.toISOString();
 			targetMemory = systemInfo.targetMemory;
 			usedMemory = systemInfo.usedMemory;
 			cpuLoad = systemInfo.cpu;
@@ -339,9 +339,11 @@ OPTION (
 					state: d.stateDesc,
 					recoveryModel: d.recoveryModel,
 					compatLevel: d.compatLevel.toString(),
-					backupDataDate: d.backupDataDate,
+					backupDataDate: d.backupDataDate
+						? d.backupDataDate.toISOString()
+						: null,
 					backupDataSize: d.backupDataSize ? d.backupDataSize.toString() : null,
-					backupLogDate: d.backupLogDate,
+					backupLogDate: d.backupLogDate ? d.backupLogDate.toISOString() : null,
 					backupLogSize: d.backupLogSize ? d.backupLogSize.toString() : null,
 				},
 				files: fileInfo

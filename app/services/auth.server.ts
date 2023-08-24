@@ -49,6 +49,8 @@ try {
 			privateKeyPass: process.env.SAML_PRIVATE_KEY_PASS,
 			// optional
 			encPrivateKey: process.env.SAML_ENC_PRIVATE_KEY,
+			signingCert: process.env.SAML_SIGNING_CERT,
+			encryptCert: process.env.SAML_ENC_CERT,
 		},
 		async ({ extract, data }) => {
 			if (!extract.nameID) {
