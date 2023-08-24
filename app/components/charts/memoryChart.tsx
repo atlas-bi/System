@@ -139,7 +139,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 
 		const xUnit =
 			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
-
+		type MemoryData = { createdAt: string; free: number; used: number };
 		const chartData = {
 			datasets: [
 				{
@@ -148,15 +148,12 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) => ({
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MemoryData) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(
-								(Number(x?.memoryTotal) || 0) - (Number(x?.memoryFree) || 0),
-								{
-									unit: 'GB',
-								},
-							).replace('GB', ''),
+							bytes(Number(x.used), {
+								unit: 'GB',
+							}).replace('GB', ''),
 						),
 					})),
 					segment: {
@@ -208,13 +205,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.monitor?.feeds?.map((x: MonitorFeeds) => ({
+					data: usageFetcher.data?.monitor?.feeds?.map((x: MemoryData) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.memoryFree) || 0, { unit: 'GB' }).replace(
-								'GB',
-								'',
-							),
+							bytes(Number(x.free) || 0, { unit: 'GB' }).replace('GB', ''),
 						),
 					})),
 					borderColor: '#cbd5e1',

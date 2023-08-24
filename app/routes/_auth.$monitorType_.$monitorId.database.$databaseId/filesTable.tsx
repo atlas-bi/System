@@ -44,7 +44,7 @@ export const FilesTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'fileName', desc: true },
+		{ id: 'fileName', desc: false },
 	]);
 
 	const table = useReactTable({

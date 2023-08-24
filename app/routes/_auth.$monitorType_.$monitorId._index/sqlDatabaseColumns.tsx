@@ -19,6 +19,7 @@ export const columns: ColumnDef<any>[] = [
 		),
 		enableSorting: true,
 		enableHiding: false,
+		sortingFn: 'alphanumeric',
 	},
 
 	{
@@ -59,6 +60,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Title" />
 		),
 		cell: ({ row }) => row.getValue('title'),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'state',
@@ -74,6 +76,7 @@ export const columns: ColumnDef<any>[] = [
 				{row.getValue('state')}
 			</div>
 		),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'recoveryModel',
@@ -81,6 +84,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Recovery Model" />
 		),
 		cell: ({ row }) => row.getValue('recoveryModel'),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'compatLevel',
@@ -88,6 +92,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Compatibility" />
 		),
 		cell: ({ row }) => row.getValue('compatLevel'),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'backupDataDate',
@@ -118,6 +123,7 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'backupLogDate',
@@ -145,5 +151,6 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
+		sortingFn: 'alphanumeric',
 	},
 ];

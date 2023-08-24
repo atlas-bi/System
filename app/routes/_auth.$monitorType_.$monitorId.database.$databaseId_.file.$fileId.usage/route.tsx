@@ -1,27 +1,17 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	addDays,
-	differenceInDays,
-	endOfDay,
-	endOfToday,
-	endOfWeek,
-	startOfDay,
-	startOfHour,
-	startOfMonth,
-	startOfToday,
-	startOfWeek,
-	startOfYear,
-	subDays,
-	subHours,
-	subYears,
-} from 'date-fns';
+import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
-import { getFileUsage } from '~/models/monitor.server';
+import {
+	DatabaseFile,
+	DatabaseFileUsage,
+	getFileUsage,
+} from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
 
-function calcGrowth({ usage }) {
+function calcGrowth({ usage }: { usage: DatabaseFileUsage[] }) {
 	if (!usage) {
 		return { daysTillFull: -1, growthRage: -1 };
 	}
@@ -35,14 +25,20 @@ function calcGrowth({ usage }) {
 
 	const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
 
-	const usedGrowth = Number(end.used) - Number(start.used);
+	const usedGrowth = Number(end.usedSize) - Number(start.usedSize);
 
 	if (usedGrowth === 0) {
 		return { daysTillFull: -1, growthRate: 0 };
 	}
 
 	const daysTillFull =
-		Math.max(Math.round((Number(end.free) * diffDays) / usedGrowth), -1) || -1;
+		Math.max(
+			Math.round(
+				((Number(end.currentSize) - Number(end.usedSize)) * diffDays) /
+					usedGrowth,
+			),
+			-1,
+		) || -1;
 
 	const growthRate = usedGrowth / diffDays;
 
@@ -55,6 +51,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			new URL(request.url).pathname,
 		)}`,
 	});
+
+	invariant(params.fileId);
 
 	const url = new URL(request.url);
 	let {
@@ -85,7 +83,19 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		case 'minute':
 			// minute is db default
 			return json({
-				file: { ...file, daysTillFull, growthRate, startDate, endDate },
+				file: {
+					...file,
+					usage: file.usage.map((x) => ({
+						createdAt: x.createdAt,
+						maxSize: Number(x.maxSize),
+						free: Number(x.currentSize) - Number(x.usedSize),
+						used: Number(x.usedSize),
+					})),
+					daysTillFull,
+					growthRate,
+					startDate,
+					endDate,
+				},
 			});
 		case 'hour':
 			grouped = file.usage.reduce((a, e) => {
@@ -119,17 +129,22 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	// return max value for the period.
 	const usage = Object.entries(grouped)
 		.map(([k, v]) => {
+			type vType = {
+				maxSize: string | null;
+				currentSize: string | null;
+				usedSize: string | null;
+			}[];
 			return {
 				createdAt: k,
-				maxSize: v.reduce((a, e) => Math.max(Number(a), Number(e.maxSize)), 0), //a + Number(e.free), 0) / v.length,
-				currentSize: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.currentSize)),
-					0,
-				), //a + Number(e.used), 0) / v.length,
-				usedSize: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.usedSize)),
-					0,
-				), //a + Number(e.used), 0) / v.length,
+				maxSize: Math.max(...(v as vType).map((x) => Number(x.maxSize))),
+				// free
+				free: Math.min(
+					...(v as vType).map(
+						(x) => Number(x.currentSize) - Number(x.usedSize),
+					),
+				),
+				// used
+				used: Math.max(...(v as vType).map((x) => Number(x.usedSize))),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

@@ -4,7 +4,14 @@ import { json } from '@remix-run/node';
 import { getMonitorPublic } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useLoaderData } from '@remix-run/react';
-import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
+import {
+	Activity,
+	AlertTriangle,
+	BellRing,
+	MoveLeft,
+	MoveRight,
+	Settings,
+} from 'lucide-react';
 import invariant from 'tiny-invariant';
 import { LogTable } from '~/components/logTable/table';
 import { monitorTypes } from '~/models/monitor';
@@ -86,9 +93,13 @@ export default function Index() {
 				</div>
 			</div>
 			<div className="flex flex-wrap justify-between">
-				<H1 className="space-x-2">
-					{monitor.enabled === false && (
+				<H1 className="space-x-2 flex">
+					{monitor.enabled === false ? (
 						<span className="!text-slate-400">(Disabled)</span>
+					) : monitor.hasError ? (
+						<AlertTriangle className="text-red-500 my-auto" size={18} />
+					) : (
+						<Activity className="text-emerald-600 my-auto" size={18} />
 					)}
 					<span>{monitor.title}</span>
 					{monitor.type === 'http' && monitor.httpUrl ? (

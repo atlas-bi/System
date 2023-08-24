@@ -46,7 +46,18 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	switch (groupSize) {
 		case 'minute':
 			// minute is db default
-			return json({ monitor: { ...monitor, startDate, endDate } });
+			return json({
+				monitor: {
+					...monitor,
+					feeds: monitor.feeds.map((x) => ({
+						createdAt: x.createdAt,
+						used: Number(x.memoryTotal) - Number(x.memoryFree),
+						free: Number(x.memoryFree),
+					})),
+					startDate,
+					endDate,
+				},
+			});
 		case 'hour':
 			grouped = monitor.feeds.reduce(
 				(
@@ -109,30 +120,19 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	// return max value for the period.
 	const feeds = Object.entries(grouped)
 		.map(([k, v]) => {
+			type vType = {
+				memoryTotal: string | null;
+				memoryFree: string | null;
+				createdAt: string;
+			}[];
 			return {
 				createdAt: k,
-				memoryTotal: (
-					v as {
-						memoryTotal: string | null;
-						memoryFree: string | null;
-						createdAt: string;
-					}[]
-				).reduce(
-					(a: number, e: { memoryTotal: string | null }) =>
-						Math.max(Number(a), Number(e.memoryTotal || 0)),
-					0,
+				used: Math.max(
+					...(v as vType).map(
+						(x) => Number(x.memoryTotal) - Number(x.memoryFree),
+					),
 				),
-				memoryFree: (
-					v as {
-						memoryTotal: string | null;
-						memoryFree: string | null;
-						createdAt: string;
-					}[]
-				).reduce(
-					(a: number, e: { memoryFree: string | null }) =>
-						Math.max(Number(a), Number(e.memoryFree)),
-					0,
-				),
+				free: Math.min(...(v as vType).map((x) => Number(x.memoryFree))),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

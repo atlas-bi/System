@@ -5,7 +5,7 @@ import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
 import { DriveChart } from '~/components/charts/driveChart';
 import { H1 } from '~/components/ui/typography';
-import { MoveLeft, Settings } from 'lucide-react';
+import { Activity, AlertTriangle, MoveLeft, Settings } from 'lucide-react';
 import { BellRing } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
@@ -101,10 +101,15 @@ export default function Index() {
 				</div>
 			</div>
 
-			<H1 className="space-x-2">
-				{drive.enabled === false && (
+			<H1 className="space-x-2 flex">
+				{drive.enabled === false ? (
 					<span className="!text-slate-400">(Disabled)</span>
+				) : drive.hasError ? (
+					<AlertTriangle className="text-red-500 my-auto" size={18} />
+				) : (
+					<Activity className="text-emerald-600 my-auto" size={18} />
 				)}
+
 				{drive.title ? (
 					<>
 						<span>{drive.title}</span>

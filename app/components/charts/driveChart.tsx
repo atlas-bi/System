@@ -69,7 +69,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 						display: false,
 					},
 					tooltip: {
-						position: 'mouse',
+						// position: 'mouse',
 						callbacks: {
 							label: function (tooltipItem: { formattedValue: string }) {
 								return tooltipItem.formattedValue + sizeUnit;
@@ -226,7 +226,6 @@ export const DriveChart = ({ url }: { url: string }) => {
 					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
-					borderRadius: { topLeft: 2, topRight: 2 },
 					cubicInterpolationMode: 'monotone',
 					pointStyle: false,
 					tension: 0.4,

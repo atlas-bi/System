@@ -7,34 +7,29 @@ import { getCpuUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
 
-function reducer(
-	unit: string,
-	data: {
-		createdAt: Date;
-		cpuLoad?: string | null;
-		cpuSpeed?: string | null;
-		load?: string | null;
-		speed?: string | null;
-	}[],
-) {
+type dataType = {
+	createdAt: Date;
+	cpuLoad?: string | null;
+	cpuSpeed?: string | null;
+	load?: string | null;
+	speed?: string | null;
+};
+
+type aType = {
+	[key: string]: {
+		cpuLoad: string | null;
+		cpuSpeed: string | null;
+	}[];
+};
+
+function reducer(unit: string, data: dataType[]) {
 	switch (unit) {
 		case 'hour':
 			return data.reduce(
 				(
-					a: {
-						[key: string]: {
-							cpuLoad: string | null;
-							cpuSpeed: string | null;
-						}[];
-					},
+					a: aType,
 
-					e: {
-						cpuLoad?: string | null;
-						cpuSpeed?: string | null;
-						load?: string | null;
-						speed?: string | null;
-						createdAt: Date;
-					},
+					e: dataType,
 				) => {
 					if (!a[startOfHour(e.createdAt).toISOString()]) {
 						a[startOfHour(e.createdAt).toISOString()] = [];
@@ -51,27 +46,16 @@ function reducer(
 		default:
 			return data.reduce(
 				(
-					a: {
-						[key: string]: {
-							cpuLoad: string | null;
-							cpuSpeed: string | null;
-						}[];
-					},
+					a: aType,
 
-					e: {
-						cpuLoad?: string | null;
-						cpuSpeed?: string | null;
-						load?: string | null;
-						speed?: string | null;
-						createdAt: Date;
-					},
+					e: dataType,
 				) => {
 					if (!a[startOfDay(e.createdAt).toISOString()]) {
 						a[startOfDay(e.createdAt).toISOString()] = [];
 					}
 					a[startOfDay(e.createdAt).toISOString()].push({
 						cpuLoad: e.cpuLoad || e.load || null,
-						cpuSpeed: e.cpuSpeed | e.speed || null,
+						cpuSpeed: e.cpuSpeed || e.speed || null,
 					});
 					return a;
 				},
@@ -88,13 +72,11 @@ function grouper(group: {
 }) {
 	return Object.entries(group)
 		.map(([k, v]) => {
+			type vType = { cpuLoad: string | null; cpuSpeed: string | null }[];
 			return {
 				createdAt: k,
-				cpuLoad: v.reduce((a, e) => Math.max(Number(a), Number(e.cpuLoad)), 0), //a + Number(e.cpuLoad), 0) / v.length,
-				cpuSpeed: v.reduce(
-					(a, e) => Math.max(Number(a), Number(e.cpuSpeed)),
-					0,
-				),
+				cpuLoad: Math.max(...(v as vType).map((x) => Number(x.cpuLoad))),
+				cpuSpeed: Math.max(...(v as vType).map((x) => Number(x.cpuSpeed))),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

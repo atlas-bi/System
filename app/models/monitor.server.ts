@@ -122,6 +122,7 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			model: true,
 			version: true,
 			enabled: true,
+			hasError: true,
 			host: true,
 			password: true,
 			username: true,
@@ -471,6 +472,7 @@ export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 			id: true,
 			title: true,
 			enabled: true,
+			hasError: true,
 			monitorId: true,
 			location: true,
 			name: true,
@@ -546,7 +548,7 @@ export function getFileUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Drive, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<DatabaseFile, 'id'> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.databaseFile.findUnique({

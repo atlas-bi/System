@@ -1,21 +1,7 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	addDays,
-	differenceInDays,
-	endOfDay,
-	endOfToday,
-	endOfWeek,
-	startOfDay,
-	startOfHour,
-	startOfMonth,
-	startOfToday,
-	startOfWeek,
-	startOfYear,
-	subDays,
-	subHours,
-	subYears,
-} from 'date-fns';
+import { startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import { getDatabaseUsage } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -27,7 +13,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			new URL(request.url).pathname,
 		)}`,
 	});
-
+	invariant(params.databaseId);
 	const url = new URL(request.url);
 	let {
 		startDate,
@@ -55,7 +41,16 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	}
 
 	let grouped = {};
+	type aType = {
+		[key: string]: {
+			memory: string | null;
+		}[];
+	};
 
+	type eType = {
+		memory: string | null;
+		createdAt: Date;
+	};
 	switch (groupSize) {
 		case 'minute':
 			// minute is db default
@@ -63,7 +58,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				database: { ...database, startDate, endDate },
 			});
 		case 'hour':
-			grouped = database.usage.reduce((a, e) => {
+			grouped = database.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfHour(e.createdAt).toISOString()]) {
 					a[startOfHour(e.createdAt).toISOString()] = [];
 				}
@@ -75,7 +70,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			break;
 		case 'day':
 		default:
-			grouped = database.usage.reduce((a, e) => {
+			grouped = database.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfDay(e.createdAt).toISOString()]) {
 					a[startOfDay(e.createdAt).toISOString()] = [];
 				}
@@ -90,9 +85,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	// return max value for the period.
 	const usage = Object.entries(grouped)
 		.map(([k, v]) => {
+			type vType = { memory: string | null }[];
 			return {
 				createdAt: k,
-				memory: v.reduce((a, e) => Math.max(Number(a), Number(e.memory)), 0), //a + Number(e.free), 0) / v.length,
+				memory: Math.max(...(v as vType).map((x) => Number(x.memory))),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

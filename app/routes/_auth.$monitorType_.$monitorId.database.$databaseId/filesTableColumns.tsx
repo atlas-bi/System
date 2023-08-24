@@ -17,6 +17,7 @@ export const columns: ColumnDef<any>[] = [
 		),
 		enableSorting: true,
 		enableHiding: false,
+		sortingFn: 'alphanumeric',
 	},
 
 	{
@@ -33,6 +34,7 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'filePath',
@@ -55,6 +57,7 @@ export const columns: ColumnDef<any>[] = [
 				{row.getValue('state')}
 			</div>
 		),
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'currentSize',
@@ -75,5 +78,6 @@ export const columns: ColumnDef<any>[] = [
 				</div>
 			);
 		},
+		sortingFn: 'alphanumeric',
 	},
 ];

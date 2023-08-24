@@ -1,20 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	addDays,
-	endOfDay,
-	endOfToday,
-	endOfWeek,
-	startOfDay,
-	startOfHour,
-	startOfMonth,
-	startOfToday,
-	startOfWeek,
-	startOfYear,
-	subDays,
-	subHours,
-	subYears,
-} from 'date-fns';
+import { startOfDay, startOfHour } from 'date-fns';
 import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import { getDatabaseMemoryUsage } from '~/models/monitor.server';
@@ -116,13 +102,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	// return max value for the period.
 	const usage = Object.entries(grouped)
 		.map(([k, v]) => {
+			type vType = { memory: string | null }[];
 			return {
 				createdAt: k,
-				memory: (v as { memory: string | null }[]).reduce(
-					(a: number, e: { memory: string | null }) =>
-						Math.max(Number(), Number(e.memory || 0), 0),
-					0,
-				),
+				memory: Math.max(...(v as vType).map((x) => Number(x.memory))),
 			};
 		})
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));

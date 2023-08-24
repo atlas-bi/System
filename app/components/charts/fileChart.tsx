@@ -91,7 +91,6 @@ export const FileChart = ({ url }: { url: string }) => {
 						stacked: true,
 					},
 					x: {
-						stacked: true,
 						type: 'time',
 						min: () => usageFetcher.data?.file?.startDate,
 						max: () => usageFetcher.data?.file?.endDate,
@@ -164,6 +163,12 @@ export const FileChart = ({ url }: { url: string }) => {
 		const xUnit =
 			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
 
+		type usageType = {
+			createdAt: string;
+			maxSize: number;
+			free: number;
+			used: number;
+		};
 		const chartData = {
 			datasets: [
 				{
@@ -172,10 +177,10 @@ export const FileChart = ({ url }: { url: string }) => {
 					label: 'Used',
 					cubicInterpolationMode: 'monotone',
 					tension: 0.4,
-					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
+					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
 						x: x.createdAt,
 						y: Number(
-							bytes(Number(x.usedSize), { unit: sizeUnit as Unit }).replace(
+							bytes(Number(x.used), { unit: sizeUnit as Unit }).replace(
 								sizeUnit,
 								'',
 							),
@@ -225,20 +230,18 @@ export const FileChart = ({ url }: { url: string }) => {
 						},
 					},
 					pointStyle: false,
+					stack: 'line-stack',
 				},
 				{
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
+					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
 						x: x.createdAt,
-						y: x.currentSize
+						y: x.free
 							? Number(
-									bytes(
-										Math.max(Number(x.currentSize) - Number(x.usedSize), 0),
-										{
-											unit: sizeUnit as Unit,
-										},
-									).replace(sizeUnit, ''),
+									bytes(Number(x.free), {
+										unit: sizeUnit as Unit,
+									}).replace(sizeUnit, ''),
 							  )
 							: null,
 					})),
@@ -248,20 +251,18 @@ export const FileChart = ({ url }: { url: string }) => {
 					cubicInterpolationMode: 'monotone',
 					pointStyle: false,
 					tension: 0.4,
+					stack: 'line-stack',
 				},
 				{
 					label: 'Limit',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: DatabaseFileUsage) => ({
+					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
 						x: x.createdAt,
 						y: x.maxSize
 							? Number(
-									bytes(
-										Math.max(Number(x.maxSize) - Number(x.currentSize), 0),
-										{
-											unit: sizeUnit as Unit,
-										},
-									).replace(sizeUnit, ''),
+									bytes(Number(x.maxSize), {
+										unit: sizeUnit as Unit,
+									}).replace(sizeUnit, ''),
 							  )
 							: undefined,
 					})),

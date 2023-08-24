@@ -63,7 +63,7 @@ export default function Index() {
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'title', desc: true },
+		{ id: 'title', desc: false },
 	]);
 
 	const table = useReactTable({

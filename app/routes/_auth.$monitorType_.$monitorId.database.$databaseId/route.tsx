@@ -4,7 +4,6 @@ import { getDatabaseNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import {
 	Link,
-	Outlet,
 	useFetcher,
 	useLoaderData,
 	useParams,
@@ -20,7 +19,6 @@ import { useEffect, useState } from 'react';
 
 import { LogTable } from '~/components/logTable/table';
 import { Button } from '~/components/ui/button';
-import Drive from '~/components/driveForms/base';
 import Database from '~/components/databaseForms/base';
 import { format, formatDistance } from 'date-fns';
 import { Badge } from '~/components/ui/badge';
@@ -28,6 +26,7 @@ import { FilesTable } from './filesTable';
 import { columns } from './filesTableColumns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { MemoryChart } from '~/components/charts/databaseMemoryChart';
+import invariant from 'tiny-invariant';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -36,9 +35,13 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
+	invariant(params.databaseId);
+
 	const databaseLoad = await getDatabaseNotifications({
 		id: params.databaseId,
 	});
+
+	invariant(databaseLoad);
 
 	return json({ databaseLoad });
 };
@@ -72,7 +75,7 @@ export default function Index() {
 	useEffect(() => {
 		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
 			usageFetcher.load(
-				`/${database.monitor.type}/${database.monitor.id}/database/${database.id}/usage`,
+				`/${monitorType}/${monitorId}/database/${database.id}/usage`,
 			);
 		}
 	}, [usageFetcher]);
@@ -216,14 +219,14 @@ export default function Index() {
 								</TableCell>
 							</TableRow>
 							<TableRow>
-								<TableCell className="py-1">Memory Used</TableCell>
-								<TableCell className="py-1">
+								<TableCell className="py-1 font-medium">Memory Used</TableCell>
+								<TableCell className="py-1 text-slate-700">
 									{bytes(Number(database.usage?.[0]?.memory)) || '-1'}
 								</TableCell>
 							</TableRow>
 							<TableRow>
-								<TableCell className="py-1">Free</TableCell>
-								<TableCell className="py-1"></TableCell>
+								<TableCell className="py-1 font-medium">Free</TableCell>
+								<TableCell className="py-1 text-slate-700"></TableCell>
 							</TableRow>
 						</TableBody>
 					</Table>

@@ -12,7 +12,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { format } from 'date-fns';
 import { useFetcher } from '@remix-run/react';
 import { useEffect } from 'react';
 
@@ -39,6 +38,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 		},
 		enableSorting: true,
 		enableHiding: false,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'enabled',
@@ -78,6 +78,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Host" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('host')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'caption',
@@ -85,6 +86,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Caption" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('caption')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'model',
@@ -92,6 +94,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Model" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('model')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'name',
@@ -99,6 +102,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Name" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('name')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'dnsHostName',
@@ -106,6 +110,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="DNS Hostname" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('dnsHostName')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'domain',
@@ -113,6 +118,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Domain" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('domain')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'manufacturer',
@@ -120,6 +126,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Manufacturer" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('manufacturer')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'os',
@@ -127,6 +134,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Operating System" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('os')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'osVersion',
@@ -134,6 +142,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="OS Version" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue('osVersion')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 ];
 
@@ -160,6 +169,7 @@ export const columnsPing: ColumnDef<any>[] = [
 		},
 		enableSorting: true,
 		enableHiding: false,
+		sortingFn: 'alphanumeric',
 	},
 	{
 		accessorKey: 'enabled',

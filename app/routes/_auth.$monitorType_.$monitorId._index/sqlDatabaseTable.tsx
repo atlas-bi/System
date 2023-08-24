@@ -46,7 +46,7 @@ export const SqlDatabaseTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'name', desc: true },
+		{ id: 'name', desc: false },
 	]);
 
 	const table = useReactTable({
