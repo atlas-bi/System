@@ -1,3 +1,8 @@
+## <small>1.27.2 (2023-08-24)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([8b329c5](https://github.com/atlas-bi/System/commit/8b329c5))
+* fix(charts): improved chart performance ([a49ef93](https://github.com/atlas-bi/System/commit/a49ef93))
+
 ## <small>1.27.1 (2023-08-23)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([982f2b3](https://github.com/atlas-bi/System/commit/982f2b3))
