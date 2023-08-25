@@ -1,3 +1,8 @@
+## <small>1.29.1 (2023-08-25)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([d71dc16](https://github.com/atlas-bi/System/commit/d71dc16))
+* fix(cpu speed): fixed cpu speed in tooltip ([031db8d](https://github.com/atlas-bi/System/commit/031db8d))
+
 ## 1.29.0 (2023-08-25)
 
 * fix(sql db mem usage): fixed units on sql db mem usage ([c0a9872](https://github.com/atlas-bi/System/commit/c0a9872))
