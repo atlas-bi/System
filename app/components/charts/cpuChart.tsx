@@ -87,13 +87,13 @@ const SubChart = ({
 						label: function (tooltipItem: {
 							datasetIndex: number;
 							formattedValue: string;
-							raw: number;
+							raw: {y: number};
 						}) {
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + '% Used';
 							}
 							if (tooltipItem.datasetIndex > 0) {
-								if (speed) return tooltipItem.raw / 1000 + 'GHz';
+								if (speed) return tooltipItem.raw?.y / 1000 + 'GHz';
 								return '';
 							}
 						},
