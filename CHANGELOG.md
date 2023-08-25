@@ -1,3 +1,8 @@
+## 1.29.0 (2023-08-25)
+
+* fix(sql db mem usage): fixed units on sql db mem usage ([c0a9872](https://github.com/atlas-bi/System/commit/c0a9872))
+* feat(file storage chart): added span gaps function to show gaps in data collection ([56d656a](https://github.com/atlas-bi/System/commit/56d656a))
+
 ## 1.28.0 (2023-08-24)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([6ac5045](https://github.com/atlas-bi/System/commit/6ac5045))
