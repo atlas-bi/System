@@ -1,3 +1,8 @@
+## 1.28.0 (2023-08-24)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([6ac5045](https://github.com/atlas-bi/System/commit/6ac5045))
+* feat(saml): added option for saml crt ([ee42da3](https://github.com/atlas-bi/System/commit/ee42da3))
+
 ## <small>1.27.2 (2023-08-24)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([8b329c5](https://github.com/atlas-bi/System/commit/8b329c5))

@@ -173,7 +173,8 @@ from sys.dm_os_windows_info`)
 					`
     drop table if exists #mem;
 	SELECT database_id
-        , COUNT_BIG(*) AS db_buffer_pages
+				-- 8kb files
+        , cast(COUNT_BIG(*) as bigint) * 8 * 1024 AS db_buffer_pages
 		into #mem
     FROM sys.dm_os_buffer_descriptors
     GROUP BY database_id
