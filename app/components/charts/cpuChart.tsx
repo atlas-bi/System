@@ -87,7 +87,7 @@ const SubChart = ({
 						label: function (tooltipItem: {
 							datasetIndex: number;
 							formattedValue: string;
-							raw: {y: number};
+							raw: { y: number };
 						}) {
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + '% Used';
