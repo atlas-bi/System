@@ -1,3 +1,8 @@
+## <small>1.29.4 (2023-08-28)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([40d724e](https://github.com/atlas-bi/System/commit/40d724e))
+* fix(server): fixed startup order ([2d3c725](https://github.com/atlas-bi/System/commit/2d3c725))
+
 ## <small>1.29.3 (2023-08-28)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([3f3ef2b](https://github.com/atlas-bi/System/commit/3f3ef2b))
