@@ -11,6 +11,7 @@ import { authenticator } from '~/services/auth.server';
 import { HttpCheck } from '~/monitors/http.server';
 import mssql from 'mssql';
 import { encrypt } from '@/lib/utils';
+import { TcpCheck } from '~/monitors/tcp.server';
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	if (str === undefined || str === null || str.toString().trim() === '') {
 		return true;
@@ -92,6 +93,26 @@ const checkSsh = function ({
 	}
 };
 
+const checkTcp = function ({
+	values,
+}: {
+	values: {
+		type?: string;
+		host?: string;
+		port?: string;
+	};
+}) {
+	if (values.type !== 'tcp') return null;
+
+	if (isNullOrEmpty(values.host)) {
+		return json({ form: { error: 'Host is required.' } });
+	}
+
+	if (isNullOrEmpty(values.port)) {
+		return json({ form: { error: 'Port is required.' } });
+	}
+};
+
 export async function action({ request }: ActionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
@@ -123,6 +144,11 @@ export async function action({ request }: ActionArgs) {
 			const sqlErrors = checkSql({ values });
 			if (sqlErrors) {
 				return sqlErrors;
+			}
+
+			const tcpErrors = checkTcp({ values });
+			if (tcpErrors) {
+				return tcpErrors;
 			}
 
 			let monitor = {};
@@ -269,6 +295,11 @@ export async function action({ request }: ActionArgs) {
 				return sqlErrors;
 			}
 
+			const tcpErrors = checkTcp({ values });
+			if (tcpErrors) {
+				return tcpErrors;
+			}
+
 			if (
 				values.type?.toString() === 'windows' ||
 				values.type?.toString() === 'ubuntu'
@@ -333,6 +364,18 @@ export async function action({ request }: ActionArgs) {
 					if (pool) {
 						pool.close();
 					}
+					return json({ error: { message: e.toString() } });
+				}
+			}
+
+			if (values.type?.toString() == 'tcp') {
+				try {
+					await TcpCheck({
+						address: values.host?.toString(),
+						port: Number(values.port),
+					});
+					return json({ success: 'Connection successful.' });
+				} catch (e) {
 					return json({ error: { message: e.toString() } });
 				}
 			}

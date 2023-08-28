@@ -30,6 +30,7 @@ import SshForm from './ssh';
 import { Switch } from '~/components/ui/switch';
 import HttpForm from './http';
 import SqlForm from './sql';
+import TcpForm from './tcp';
 
 export default function Monitor({
 	monitor,
@@ -159,6 +160,7 @@ export default function Monitor({
 							{data.type === 'sqlServer' && (
 								<SqlForm data={data} setData={setData} />
 							)}
+							{data.type === 'tcp' && <TcpForm data={data} setData={setData} />}
 						</div>
 					</div>
 					<DialogFooter className="sm:justify-between md:justify-end">

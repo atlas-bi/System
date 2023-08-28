@@ -106,11 +106,15 @@ export default function Index() {
 						<span>({monitor.httpUrl})</span>
 					) : monitor.type === 'sqlServer' ? (
 						<span>({sqlConnectionString?.['data source']})</span>
+					) : monitor.type === 'tcp' ? (
+						<span>
+							({monitor.host}:{monitor.port})
+						</span>
 					) : (
 						monitor.host && <span>({monitor.host})</span>
 					)}
 				</H1>
-				{monitor.type == 'http' && (
+				{(monitor.type == 'http' || monitor.type == 'tcp') && (
 					<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
 				)}
 			</div>
@@ -131,7 +135,7 @@ export default function Index() {
 					</>
 				)}
 
-				{monitor.type == 'http' && (
+				{(monitor.type == 'http' || monitor.type == 'tcp') && (
 					<PingChart url={`/${monitor.type}/${monitor.id}/ping`} />
 				)}
 

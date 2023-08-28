@@ -4,7 +4,7 @@ import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
-import { spawn, spawnSync } from 'child_process';
+import { ChildProcess, spawn, spawnSync } from 'child_process';
 /*
 
 1. start quirrel
@@ -19,103 +19,18 @@ kill -9 <<PID>>
 */
 
 const port = process.env.PORT || 3000;
-
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), 'build');
 
-const child = spawn(
-	'node',
-	[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
-	{ env: { ...process.env, PORT: process.env.QUIRREL_PORT || 9891 } },
-);
-// const child = spawn('ls', {cwd: process.cwd()});
-child.on('exit', function (code, signal, message) {
-	throw Error(
-		'child process exited with ' +
-			`code ${code} and signal ${signal} ${message}`,
-	);
-});
+let child: ChildProcess | undefined;
 
-child.stdout.on('data', (data) => {
-	console.log(`quirrel: ${data}`);
-});
-child.stderr.on('data', (data) => {
-	console.log(`quirrel error: ${data}`);
-});
+if (MODE === 'production') child = startQuirrel();
 
 (async () => {
-	console.log('Quirrel: getting token...');
-
-	const sleep = (ms) => {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms);
-		});
-	};
-
-	const fetchWithRetries = async (url, options, retryCount = 0) => {
-		// split out the maxRetries option from the remaining
-		// options (with a default of 3 retries)
-		if (retryCount > 0) console.log(`retry ${retryCount}...`);
-		const { maxRetries = 3, ...remainingOptions } = options;
-		let response;
-		try {
-			response = await fetch(url, remainingOptions);
-			if (response.status !== 201) {
-				const x = await response.text();
-				console.log(x);
-				throw Error(response.status.toString());
-			}
-			return response;
-		} catch (error) {
-			// if the retryCount has not been exceeded, call again
-			if (retryCount > 0) console.log(error);
-			if (retryCount < maxRetries) {
-				await sleep(5000);
-				return fetchWithRetries(url, options, retryCount + 1);
-			}
-			console.log('Failed to connect to quirrel: max retries exceeded');
-			// max retries exceeded
-			child.kill('SIGINT');
-			throw error;
-		}
-	};
-
-	const response = await fetchWithRetries(
-		`http://localhost:${process.env.QUIRREL_PORT || 9181}/tokens/prod`,
-		{
-			method: 'PUT',
-			headers: {
-				Authorization:
-					'Basic ' + btoa('ignored:' + process.env.QUIRREL_PROCESS),
-			},
-			maxRetries: 5,
-		},
-	);
-	process.env.QUIRREL_TOKEN = await response.text();
-
-	// load cron jobs
-	console.log('Quirrel: loading cron jobs');
-	try {
-		const ci = spawnSync(
-			'node',
-			[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/cli/index.js`, 'ci'],
-			{
-				env: {
-					...process.env,
-					PORT: process.env.QUIRREL_PORT || 9891,
-				},
-				stdio: 'inherit',
-				encoding: 'utf-8',
-			},
-		);
-	} catch (error) {
-		child.kill('SIGINT');
-		throw error;
-	}
+	if (MODE === 'production') await getQuirrelToken();
 
 	const app = express();
 	app.listen(port, () => {
-		console.log(process.env);
 		// require the built app so we're ready when the first request comes in
 		require(BUILD_DIR);
 		console.log(`✅ app ready: http://localhost:${port}`);
@@ -194,6 +109,34 @@ child.stderr.on('data', (data) => {
 	);
 })();
 
+function startQuirrel() {
+	const child: ChildProcess = spawn(
+		'node',
+		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
+		{
+			env: {
+				...process.env,
+				PORT: (process.env.QUIRREL_PORT || 9891).toString(),
+			},
+		},
+	);
+
+	child.on('exit', function (code, signal) {
+		throw Error(
+			'child process exited with ' + `code ${code} and signal ${signal}`,
+		);
+	});
+
+	child.stdout?.on('data', (data) => {
+		console.log(`quirrel: ${data}`);
+	});
+	child.stderr?.on('data', (data) => {
+		console.log(`quirrel error: ${data}`);
+	});
+
+	return child;
+}
+
 function purgeRequireCache() {
 	// purge require cache on requests for "server side HMR" this won't let
 	// you have in-memory objects between requests in development,
@@ -205,5 +148,90 @@ function purgeRequireCache() {
 			// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
 			delete require.cache[key];
 		}
+	}
+}
+
+async function getQuirrelToken() {
+	console.log('Quirrel: getting token...');
+	const sleep = (ms: number) => {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	};
+
+	type FetchWithRetries = (
+		url: string,
+		options: {
+			[x: string]: any;
+			method?: string;
+			headers?: { Authorization: string };
+			maxRetries: any;
+		},
+		retryCount?: number,
+	) => Promise<Response>;
+
+	const fetchWithRetries: FetchWithRetries = async (
+		url,
+		options,
+		retryCount = 0,
+	) => {
+		// split out the maxRetries option from the remaining
+		// options (with a default of 3 retries)
+		if (retryCount > 0) console.log(`retry ${retryCount}...`);
+		const { maxRetries = 3, ...remainingOptions } = options;
+		let response;
+		try {
+			response = await fetch(url, remainingOptions);
+			if (response.status !== 201) {
+				const x = await response.text();
+				console.log(x);
+				throw Error(response.status.toString());
+			}
+			return response;
+		} catch (error) {
+			// if the retryCount has not been exceeded, call again
+			if (retryCount > 0) console.log(error);
+			if (retryCount < maxRetries) {
+				await sleep(5000);
+				return fetchWithRetries(url, options, retryCount + 1);
+			}
+			console.log('Failed to connect to quirrel: max retries exceeded');
+			// max retries exceeded
+			child?.kill('SIGINT');
+			throw error;
+		}
+	};
+
+	const response = await fetchWithRetries(
+		`http://localhost:${process.env.QUIRREL_PORT || 9181}/tokens/prod`,
+		{
+			method: 'PUT',
+			headers: {
+				Authorization:
+					'Basic ' + btoa('ignored:' + process.env.QUIRREL_PROCESS),
+			},
+			maxRetries: 5,
+		},
+	);
+	process.env.QUIRREL_TOKEN = await response.text();
+
+	// load cron jobs
+	console.log('Quirrel: loading cron jobs');
+	try {
+		const ci = spawnSync(
+			'node',
+			[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/cli/index.js`, 'ci'],
+			{
+				env: {
+					...process.env,
+					PORT: (process.env.QUIRREL_PORT || 9891).toString(),
+				},
+				stdio: 'inherit',
+				encoding: 'utf-8',
+			},
+		);
+	} catch (error) {
+		child?.kill('SIGINT');
+		throw error;
 	}
 }

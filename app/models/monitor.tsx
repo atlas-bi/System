@@ -3,7 +3,7 @@ import {
 	SiWindows95,
 	SiMicrosoftsqlserver,
 } from '@icons-pack/react-simple-icons';
-import { Laptop } from 'lucide-react';
+import { Laptop, SmartphoneNfc } from 'lucide-react';
 
 export const monitorTypes = [
 	{
@@ -21,5 +21,10 @@ export const monitorTypes = [
 		name: 'Sql Server',
 		value: 'sqlServer',
 		icon: <SiMicrosoftsqlserver className="h-auto w-auto" />,
+	},
+	{
+		name: 'TCP Ping',
+		value: 'tcp',
+		icon: <SmartphoneNfc className="h-auto w-auto" />,
 	},
 ];
