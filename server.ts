@@ -44,7 +44,7 @@ child.stderr.on('data', (data) => {
 });
 
 (async () => {
-	console.log('getting token!');
+	console.log('Quirrel: getting token...');
 
 	const sleep = (ms) => {
 		return new Promise((resolve) => {
@@ -95,18 +95,23 @@ child.stderr.on('data', (data) => {
 
 	// load cron jobs
 	console.log('Quirrel: loading cron jobs');
-	const ci = spawnSync(
-		'node',
-		[`${process.cwd()}/node_modules/.bin/dotenv`, 'quirrel', 'ci'],
-		{
-			env: {
-				...process.env,
-				PORT: process.env.QUIRREL_PORT || 9891,
+	try {
+		const ci = spawnSync(
+			'node',
+			[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/cli/index.js`, 'ci'],
+			{
+				env: {
+					...process.env,
+					PORT: process.env.QUIRREL_PORT || 9891,
+				},
+				stdio: 'inherit',
+				encoding: 'utf-8',
 			},
-			stdio: 'inherit',
-			encoding: 'utf-8',
-		},
-	);
+		);
+	} catch (error) {
+		child.kill('SIGINT');
+		throw error;
+	}
 
 	app.listen(port, () => {
 		// require the built app so we're ready when the first request comes in
