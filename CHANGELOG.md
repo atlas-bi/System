@@ -1,3 +1,8 @@
+## <small>1.29.2 (2023-08-28)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([4ee3c86](https://github.com/atlas-bi/System/commit/4ee3c86))
+* fix(quirrel): moved quirrel startup into server.js ([04b323c](https://github.com/atlas-bi/System/commit/04b323c)), closes [#7](https://github.com/atlas-bi/System/issues/7)
+
 ## <small>1.29.1 (2023-08-25)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([d71dc16](https://github.com/atlas-bi/System/commit/d71dc16))
