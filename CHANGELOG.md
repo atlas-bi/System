@@ -1,3 +1,8 @@
+## <small>1.29.3 (2023-08-28)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([3f3ef2b](https://github.com/atlas-bi/System/commit/3f3ef2b))
+* fix(quirrel): fixed cron loader ([131c16c](https://github.com/atlas-bi/System/commit/131c16c))
+
 ## <small>1.29.2 (2023-08-28)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([4ee3c86](https://github.com/atlas-bi/System/commit/4ee3c86))
