@@ -1,3 +1,8 @@
+## 1.31.0 (2023-08-29)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit ([49acc3e](https://github.com/atlas-bi/System/commit/49acc3e))
+* feat(headers): added ping headers to all pages ([8b92586](https://github.com/atlas-bi/System/commit/8b92586))
+
 ## 1.30.0 (2023-08-28)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([fc69411](https://github.com/atlas-bi/System/commit/fc69411))
