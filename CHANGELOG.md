@@ -1,3 +1,8 @@
+## 1.30.0 (2023-08-28)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([fc69411](https://github.com/atlas-bi/System/commit/fc69411))
+* feat(tcp): added tcp ping monitor ([2bc15f2](https://github.com/atlas-bi/System/commit/2bc15f2))
+
 ## <small>1.29.4 (2023-08-28)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([40d724e](https://github.com/atlas-bi/System/commit/40d724e))
