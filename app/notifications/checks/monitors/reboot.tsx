@@ -2,6 +2,8 @@ import { Monitor, setMonitorRebootSentAt } from '~/models/monitor.server';
 import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
+import { SuccessEmail } from '~/notifications/email/reboot';
+import { render } from '@react-email/render';
 
 export default async function rebootNotifier({
 	monitor,
@@ -17,10 +19,20 @@ export default async function rebootNotifier({
 	if (monitor.lastBootTime != oldMonitor.lastBootTime) {
 		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
 		const message = `[${monitor.host}] Reboot time changed.`;
+		const html = render(
+			<SuccessEmail
+				hostname={process.env.HOSTNAME}
+				subject={subject}
+				monitor={monitor}
+			/>,
+			{
+				pretty: false,
+			},
+		);
 
 		monitor.rebootNotifyTypes.map(async (notification: Notification) => {
 			try {
-				return sendNotification({ notification, subject, message });
+				return sendNotification({ notification, subject, message: html });
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,

@@ -39,7 +39,7 @@ export default async function SMTP({
 			: notification.smtpFromEmail,
 		to: notification.smtpToEmail,
 		subject: subject,
-		text: message,
+		html: message,
 	});
 
 	return 'Sent Successfully.';

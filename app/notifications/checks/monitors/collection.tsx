@@ -5,6 +5,10 @@ import {
 } from '~/models/monitor.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
+import { render } from '@react-email/render';
+
+import { ErrorEmail, SuccessEmail } from '~/notifications/email/collection';
+
 export default async function collectionNotifier({
 	monitor,
 	message,
@@ -36,11 +40,20 @@ export default async function collectionNotifier({
 		if (monitor.connectionNotifySentAt && monitor.connectionNotify) {
 			await reset({ monitor });
 			const subject = `💚 [${name}] Data collection restored.`;
-			const message = `Data collection restored on ${name}.`;
+			const html = render(
+				<SuccessEmail
+					hostname={process.env.HOSTNAME}
+					subject={subject}
+					monitor={monitor}
+				/>,
+				{
+					pretty: false,
+				},
+			);
 
 			monitor.connectionNotifyTypes.map(async (notification: Notification) => {
 				try {
-					return sendNotification({ notification, subject, message });
+					return sendNotification({ notification, subject, message: html });
 				} catch (e) {
 					return Logger({
 						message: `Failed to send ${notification.name}: ${e}`,
@@ -88,7 +101,17 @@ export default async function collectionNotifier({
 			0,
 			20,
 		)}`;
-		const errorMessage = `Alert: data collection failed on ${name}.\n ${message}`;
+		const html = render(
+			<ErrorEmail
+				hostname={process.env.HOSTNAME}
+				subject={subject}
+				monitor={monitor}
+				message={message}
+			/>,
+			{
+				pretty: false,
+			},
+		);
 
 		monitor.connectionNotifyTypes.map(async (notification: Notification) => {
 			console.log('sending!', notification);
@@ -96,7 +119,7 @@ export default async function collectionNotifier({
 				return await sendNotification({
 					notification,
 					subject,
-					message: errorMessage,
+					message: html,
 				});
 			} catch (e) {
 				console.log('failed to send!');

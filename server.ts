@@ -4,7 +4,8 @@ import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
-import { ChildProcess, spawn, spawnSync } from 'child_process';
+import { ChildProcess, spawnSync } from 'child_process';
+import { execa } from 'execa';
 /*
 
 1. start quirrel
@@ -110,7 +111,7 @@ if (MODE === 'production') child = startQuirrel();
 })();
 
 function startQuirrel() {
-	const child: ChildProcess = spawn(
+	const child: ChildProcess = execa(
 		'node',
 		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
 		{
@@ -118,6 +119,7 @@ function startQuirrel() {
 				...process.env,
 				PORT: (process.env.QUIRREL_PORT || 9891).toString(),
 			},
+			stdio: 'inherit',
 		},
 	);
 
@@ -125,13 +127,6 @@ function startQuirrel() {
 		throw Error(
 			'child process exited with ' + `code ${code} and signal ${signal}`,
 		);
-	});
-
-	child.stdout?.on('data', (data) => {
-		console.log(`quirrel: ${data}`);
-	});
-	child.stderr?.on('data', (data) => {
-		console.log(`quirrel error: ${data}`);
 	});
 
 	return child;
