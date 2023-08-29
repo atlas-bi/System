@@ -16,6 +16,7 @@ import { LogTable } from '~/components/logTable/table';
 import { Button } from '~/components/ui/button';
 import Drive from '~/components/driveForms/base';
 import { Badge } from '~/components/ui/badge';
+import { PingStat } from '../_auth.$monitorType_.$monitorId._index/responseTime';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -101,28 +102,32 @@ export default function Index() {
 				</div>
 			</div>
 
-			<H1 className="space-x-2 flex">
-				{drive.enabled === false ? (
-					<span className="!text-slate-400">(Disabled)</span>
-				) : drive.hasError ? (
-					<AlertTriangle className="text-red-500 my-auto" size={18} />
-				) : (
-					<Activity className="text-emerald-600 my-auto" size={18} />
-				)}
+			<div className="flex flex-wrap justify-between">
+				<H1 className="space-x-2 flex">
+					{drive.enabled === false ? (
+						<span className="!text-slate-400">(Disabled)</span>
+					) : drive.hasError ? (
+						<AlertTriangle className="text-red-500 my-auto" size={18} />
+					) : (
+						<Activity className="text-emerald-600 my-auto" size={18} />
+					)}
 
-				{drive.title ? (
-					<>
-						<span>{drive.title}</span>
-						<span>({drive.root})</span>
-					</>
-				) : (
-					<>
-						{drive.root}
-						{drive.location}
-					</>
-				)}
-			</H1>
-
+					{drive.title ? (
+						<>
+							<span>{drive.title}</span>
+							<span>({drive.root})</span>
+						</>
+					) : (
+						<>
+							{drive.root}
+							{drive.location}
+						</>
+					)}
+				</H1>
+				<PingStat
+					url={`/${monitorType}/${monitorId}/drive/${drive.id}/ping-latest`}
+				/>
+			</div>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{drive.description}</div>
 				<div className="space-y-2 flex-grow">

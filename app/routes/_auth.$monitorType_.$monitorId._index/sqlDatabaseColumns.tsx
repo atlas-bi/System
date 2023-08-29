@@ -5,6 +5,16 @@ import { Minus } from 'lucide-react';
 import { formatInTimeZone, formatInTimeZone } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Badge } from '~/components/ui/badge';
+import { useFetcher } from '@remix-run/react';
+import { useEffect } from 'react';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '~/components/ui/tooltip';
+import { DatabaseUsage } from '@prisma/client';
+import { PingStat } from './responseTime';
 
 export const columns: ColumnDef<any>[] = [
 	{
@@ -152,5 +162,17 @@ export const columns: ColumnDef<any>[] = [
 			</div>
 		),
 		sortingFn: 'alphanumeric',
+	},
+	{
+		accessorKey: 'feeds',
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Ping" />
+		),
+		cell: ({ row }) => (
+			<PingStat
+				url={`/${row.original.monitor.type}/${row.original.monitor.id}/database/${row.original.id}/ping-latest`}
+			/>
+		),
+		enableSorting: false,
 	},
 ];

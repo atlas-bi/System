@@ -114,9 +114,7 @@ export default function Index() {
 						monitor.host && <span>({monitor.host})</span>
 					)}
 				</H1>
-				{(monitor.type == 'http' || monitor.type == 'tcp') && (
-					<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
-				)}
+				<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
 			</div>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{monitor.description}</div>

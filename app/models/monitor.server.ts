@@ -979,6 +979,12 @@ export function getMonitorDatabases({
 			backupDataSize: true,
 			backupLogDate: true,
 			backupLogSize: true,
+			monitor: {
+				select: {
+					id: true,
+					type: true,
+				},
+			},
 			usage: {
 				select: {
 					id: true,
@@ -1279,6 +1285,36 @@ export function getEnabledMonitors() {
 		},
 		select: {
 			id: true,
+		},
+	});
+}
+
+export function getDatabaseLatestFeeds({ id }: Pick<Database, 'id'>) {
+	return prisma.databaseUsage.findMany({
+		where: { databaseId: id },
+		select: {
+			id: true,
+			hasError: true,
+			createdAt: true,
+		},
+		take: 30,
+		orderBy: {
+			createdAt: 'desc',
+		},
+	});
+}
+
+export function getDriveLatestFeeds({ id }: Pick<Drive, 'id'>) {
+	return prisma.driveUsage.findMany({
+		where: { driveId: id },
+		select: {
+			id: true,
+			hasError: true,
+			createdAt: true,
+		},
+		take: 30,
+		orderBy: {
+			createdAt: 'desc',
 		},
 	});
 }
