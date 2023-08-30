@@ -120,7 +120,7 @@ export const columns: ColumnDef<any>[] = [
 							)}{' '}
 							ago.
 						</span>
-						<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
+						<Badge className="whitespace-nowrap my-auto bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
 							{formatInTimeZone(
 								row.original.backupDataDate,
 								Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -148,7 +148,7 @@ export const columns: ColumnDef<any>[] = [
 							{formatDistance(new Date(row.original.backupLogDate), new Date())}{' '}
 							ago.
 						</span>
-						<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
+						<Badge className="whitespace-nowrap my-auto bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
 							{formatInTimeZone(
 								row.original.backupLogDate,
 								Intl.DateTimeFormat().resolvedOptions().timeZone,

@@ -40,6 +40,7 @@ export const SqlDatabaseTable = ({
 			recoveryModel: false,
 			compatLevel: false,
 			backupLogDate: false,
+			backupDataDate: false,
 		});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
 		[],
