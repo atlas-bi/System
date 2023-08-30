@@ -11,15 +11,13 @@ import { Container } from '@react-email/container';
 import { Section } from '@react-email/section';
 import { Heading } from '@react-email/heading';
 import { Hr } from '@react-email/hr';
-import { Header } from './helpers';
+import { Header } from '../helpers';
 
 export const SuccessEmail = ({
 	hostname,
-	subject,
 	monitor,
 }: {
 	hostname?: string;
-	subject: string;
 	monitor: Monitor;
 }) => {
 	const title = `${monitor.name || monitor.title} reboot time changed.`;
@@ -28,9 +26,10 @@ export const SuccessEmail = ({
 			<Head>
 				<title>{title}</title>
 			</Head>
-			<Preview>{title}</Preview>
+
 			<Tailwind>
 				<Body className="bg-white my-auto mx-auto font-sans">
+					<Preview>{title}</Preview>
 					<Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
 						<Header hostname={hostname} />
 

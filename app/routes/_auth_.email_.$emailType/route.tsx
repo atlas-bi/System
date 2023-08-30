@@ -2,8 +2,15 @@ import { json } from '@remix-run/node';
 import { useLoaderData, useParams } from '@remix-run/react';
 import { prisma } from '~/db.server';
 
-import { SuccessEmail, ErrorEmail } from '~/notifications/email/collection';
-import { SuccessEmail as RebootEmail } from '~/notifications/email/reboot';
+import {
+	SuccessEmail,
+	ErrorEmail,
+} from '~/notifications/email/monitors/collection';
+import { SuccessEmail as RebootEmail } from '~/notifications/email/monitors/reboot';
+import {
+	SuccessEmail as PercentFreeSuccessEmail,
+	ErrorEmail as PercentFreeErrorEmail,
+} from '~/notifications/email/drives/percentFree';
 import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ request, params }: LoaderArgs) => {
@@ -30,7 +37,6 @@ export default function Index() {
 		return (
 			<ErrorEmail
 				hostname={hostname}
-				subject={errorSubject}
 				monitor={monitor}
 				message={errorMessage}
 			/>
@@ -48,10 +54,24 @@ export default function Index() {
 	}
 
 	if (emailType == 'reboot') {
+		return <RebootEmail hostname={hostname} monitor={monitor} />;
+	}
+
+	if (emailType == 'percentFreeSuccess') {
 		return (
-			<RebootEmail
+			<PercentFreeSuccessEmail
 				hostname={hostname}
 				subject={successSubject}
+				monitor={monitor}
+			/>
+		);
+	}
+
+	if (emailType == 'percentFreeError') {
+		return (
+			<PercentFreeErrorEmail
+				hostname={hostname}
+				message={errorMessage}
 				monitor={monitor}
 			/>
 		);

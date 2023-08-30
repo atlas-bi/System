@@ -166,7 +166,7 @@ export async function HttpCheck({
 		// return res;
 	} catch (e) {
 		console.log(e);
-		return { error: { message: e.code || e.message } };
+		throw Error(e.code || e.message);
 		// Fix #2253
 		// Read more: https://stackoverflow.com/questions/1759956/curl-error-18-transfer-closed-with-outstanding-read-data-remaining
 		// if (!finalCall && typeof e.message === "string" && e.message.includes("maxContentLength size of -1 exceeded")) {
@@ -204,23 +204,27 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 	} = monitor;
 
 	let startTime = Date.now();
-
 	try {
-		const { res, error } = await HttpCheck({
-			httpBody,
-			httpAuthentication,
-			httpUsername,
-			httpPassword,
-			httpIgnoreSsl,
-			httpBodyEncoding,
-			httpUrl,
-			httpMethod,
-			httpHeaders,
-			httpMaxRedirects,
-			httpAcceptedStatusCodes,
-			httpDomain,
-			httpWorkstation,
-		});
+		let error;
+		try {
+			await HttpCheck({
+				httpBody,
+				httpAuthentication,
+				httpUsername,
+				httpPassword,
+				httpIgnoreSsl,
+				httpBodyEncoding,
+				httpUrl,
+				httpMethod,
+				httpHeaders,
+				httpMaxRedirects,
+				httpAcceptedStatusCodes,
+				httpDomain,
+				httpWorkstation,
+			});
+		} catch (e) {
+			error = e.message;
+		}
 
 		const ping = Date.now() - startTime;
 
@@ -240,7 +244,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 					message: error.message || error,
 				});
 			}
-			throw new Error(error.message || error);
+			throw Error(error.message || error);
 		}
 
 		await Notifier({ job: monitor.id });

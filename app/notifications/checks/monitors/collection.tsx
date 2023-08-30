@@ -7,7 +7,10 @@ import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 import { render } from '@react-email/render';
 
-import { ErrorEmail, SuccessEmail } from '~/notifications/email/collection';
+import {
+	ErrorEmail,
+	SuccessEmail,
+} from '~/notifications/email/monitors/collection';
 
 export default async function collectionNotifier({
 	monitor,
@@ -53,7 +56,11 @@ export default async function collectionNotifier({
 
 			monitor.connectionNotifyTypes.map(async (notification: Notification) => {
 				try {
-					return sendNotification({ notification, subject, message: html });
+					return await sendNotification({
+						notification,
+						subject,
+						message: html,
+					});
 				} catch (e) {
 					return Logger({
 						message: `Failed to send ${notification.name}: ${e}`,
@@ -75,19 +82,21 @@ export default async function collectionNotifier({
 		});
 	}
 
-	Logger({ message, type: 'error', monitor });
+	await Logger({ message, type: 'error', monitor });
 
 	let resend = !monitor.connectionNotifySentAt;
 
 	if (
+		monitor.connectionNotifySentAt !== null &&
 		monitor.connectionNotifyResendAfterMinutes &&
 		monitor.connectionNotifyResendAfterMinutes > 0
 	) {
-		const diff =
-			+new Date() - +new Date(monitor.connectionNotifySentAt || new Date());
+		const diff = Date.now() - +new Date(monitor.connectionNotifySentAt);
 
+		// allow nearly 2 mins off
 		resend =
-			Math.round(diff / 1000 / 60) > monitor.connectionNotifyResendAfterMinutes;
+			Math.round(diff / 1000 / 60) + 0.8 >
+			monitor.connectionNotifyResendAfterMinutes;
 	}
 
 	// only send if we have reached the retry count.
@@ -104,7 +113,6 @@ export default async function collectionNotifier({
 		const html = render(
 			<ErrorEmail
 				hostname={process.env.HOSTNAME}
-				subject={subject}
 				monitor={monitor}
 				message={message}
 			/>,
@@ -114,7 +122,6 @@ export default async function collectionNotifier({
 		);
 
 		monitor.connectionNotifyTypes.map(async (notification: Notification) => {
-			console.log('sending!', notification);
 			try {
 				return await sendNotification({
 					notification,

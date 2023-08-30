@@ -3,6 +3,12 @@ import type { Drive, Monitor } from '~/models/monitor.server';
 import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
+import { render } from '@react-email/render';
+
+import {
+	ErrorEmail,
+	SuccessEmail,
+} from '~/notifications/email/drives/percentFree';
 
 async function allClear({
 	monitor,
@@ -14,11 +20,21 @@ async function allClear({
 	if (drive.percFreeNotifySentAt) {
 		// send an all clear alert
 		const subject = `💚 [${monitor.host} ${drive.name}:\\] Free space now below limit.`;
-		const message = `All Clear: free space now below limit on ${monitor.host} ${drive.name}:\\.`;
+
+		const html = render(
+			<SuccessEmail
+				subject={subject}
+				hostname={process.env.HOSTNAME}
+				monitor={monitor}
+			/>,
+			{
+				pretty: false,
+			},
+		);
 
 		drive.percFreeNotifyTypes.map(async (notification: Notification) => {
 			try {
-				return sendNotification({ notification, subject, message });
+				return await sendNotification({ notification, subject, message: html });
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
@@ -75,26 +91,38 @@ export default async function percentFreeNotifier({
 		drive,
 	});
 
-	let resend = false;
+	let resend = !drive.percFreeNotifySentAt;
 
 	if (
+		drive.percFreeNotifySentAt !== null &&
 		drive.percFreeNotifyResendAfterMinutes &&
 		drive.percFreeNotifyResendAfterMinutes > 0
 	) {
-		const diff =
-			Date.now() - +new Date(drive.percFreeNotifySentAt || new Date());
+		const diff = Date.now() - +new Date(drive.percFreeNotifySentAt);
 
+		// allow nearly 2 mins off
 		resend =
-			Math.round(diff / 1000 / 60) > drive.percFreeNotifyResendAfterMinutes;
+			Math.round(diff / 1000 / 60) + 0.8 >
+			drive.percFreeNotifyResendAfterMinutes;
 	}
 
 	if (resend && drive.percFreeNotifyTypes) {
 		const subject = `💔 [${monitor.host} ${drive.name}:\\] Alert: free space limit exceeded on `;
-		const message = `Alert: free space limit exceeded on ${monitor.host} drive ${drive.name}`;
+		const html = render(
+			<ErrorEmail
+				hostname={process.env.HOSTNAME}
+				monitor={monitor}
+				message={message}
+			/>,
+			{
+				pretty: false,
+			},
+		);
 
 		drive.percFreeNotifyTypes.map(async (notification: Notification) => {
 			try {
-				return sendNotification({ notification, subject, message });
+				// await to prevent error from bubbling
+				return await sendNotification({ notification, subject, message: html });
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,

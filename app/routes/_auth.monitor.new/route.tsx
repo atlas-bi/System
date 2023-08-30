@@ -320,30 +320,28 @@ export async function action({ request }: ActionArgs) {
 			if (values.type?.toString() === 'http') {
 				let startTime = Date.now();
 
-				const { res, error } = await HttpCheck({
-					httpBody: values.httpBody?.toString(),
-					httpAuthentication: values.httpAuthentication?.toString(),
-					httpUsername: values.httpUsername?.toString(),
-					httpPassword: values.httpPassword
-						? encrypt(values.httpPassword?.toString())
-						: undefined,
-					httpIgnoreSsl: !!values.httpIgnoreSsl,
-					httpBodyEncoding: values.httpBodyEncoding?.toString(),
-					httpUrl: values.httpUrl?.toString(),
-					httpMethod: values.httpMethod?.toString(),
-					httpHeaders: values.httpHeaders?.toString(),
-					httpMaxRedirects: values.httpMaxRedirects?.toString(),
-					httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
-					httpDomain: values.httpDomain?.toString(),
-					httpWorkstation: values.httpWorkstation?.toString(),
-				});
-
-				if (error) {
-					return json({ error });
+				try {
+					await HttpCheck({
+						httpBody: values.httpBody?.toString(),
+						httpAuthentication: values.httpAuthentication?.toString(),
+						httpUsername: values.httpUsername?.toString(),
+						httpPassword: values.httpPassword
+							? encrypt(values.httpPassword?.toString())
+							: undefined,
+						httpIgnoreSsl: !!values.httpIgnoreSsl,
+						httpBodyEncoding: values.httpBodyEncoding?.toString(),
+						httpUrl: values.httpUrl?.toString(),
+						httpMethod: values.httpMethod?.toString(),
+						httpHeaders: values.httpHeaders?.toString(),
+						httpMaxRedirects: values.httpMaxRedirects?.toString(),
+						httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
+						httpDomain: values.httpDomain?.toString(),
+						httpWorkstation: values.httpWorkstation?.toString(),
+					});
+				} catch (e) {
+					return json({ error: { message: e.message } });
 				}
 
-				// console.log(res)
-				const msg = res?.status + res?.statusText;
 				const ping = Date.now() - startTime;
 				return json({
 					success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,

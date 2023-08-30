@@ -11,6 +11,7 @@ import { Container } from '@react-email/container';
 import { Section } from '@react-email/section';
 import { Heading } from '@react-email/heading';
 import { Hr } from '@react-email/hr';
+import { Header } from '../helpers';
 
 export const SuccessEmail = ({
 	hostname,
@@ -24,16 +25,16 @@ export const SuccessEmail = ({
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
-				<title>Data collection restored.</title>
+				<title>{subject}</title>
 			</Head>
-			<Preview>Data collection restored.</Preview>
 			<Tailwind>
 				<Body className="bg-white my-auto mx-auto font-sans">
+					<Preview>Percentage of free space now below limit.</Preview>
 					<Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Data collection restored on{' '}
+							Percentage of free space now below limit on{' '}
 							<strong>{monitor.name || monitor.title}</strong>
 						</Heading>
 
@@ -67,28 +68,27 @@ export const SuccessEmail = ({
 
 export const ErrorEmail = ({
 	hostname,
-	subject,
 	monitor,
 	message,
 }: {
-	hostname: string;
-	subject: string;
+	hostname?: string;
 	monitor: Monitor;
 	message: string;
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
-				<title>{message || 'Data collection failed.'}</title>
+				<title>{message || 'Free space limit exceeded.'}</title>
 			</Head>
-			<Preview>{message || 'Data collection failed.'}</Preview>
+
 			<Tailwind>
 				<Body className="bg-white my-auto mx-auto font-sans">
+					<Preview>{message || 'Free space limit exceeded.'}</Preview>
 					<Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Data collection failed on{' '}
+							Percentage of free space limit exceeded on{' '}
 							<strong>{monitor.name || monitor.title}</strong>
 						</Heading>
 						{message && (

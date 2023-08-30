@@ -172,27 +172,19 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 										</div>
 
 										<div className="space-y-2 flex-grow min-w-[1px]">
-											<div className="flex justify-between space-x-2">
-												<H3 className="space-x-2 flex-shrink-0">
-													{drive.title ? (
-														<>
-															<span>{drive.title}</span>
-															<span>({drive.root})</span>
-														</>
-													) : (
-														<>
-															{drive.root}
-															{drive.location}
-														</>
-													)}
-												</H3>
-												<div className="min-w-[1px] my-auto overflow-y-hidden p-1">
-													<PingStat
-														url={`/${monitor.type}/${monitor.id}/drive/${drive.id}/ping-latest`}
-													/>
-												</div>
-											</div>
-
+											<H3 className="space-x-2 flex-shrink-0">
+												{drive.title ? (
+													<>
+														<span>{drive.title}</span>
+														<span>({drive.root})</span>
+													</>
+												) : (
+													<>
+														{drive.root}
+														{drive.location}
+													</>
+												)}
+											</H3>
 											<Table>
 												<TableBody>
 													<TableRow>
