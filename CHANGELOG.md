@@ -1,3 +1,8 @@
+## 1.32.0 (2023-08-29)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([9e78fff](https://github.com/atlas-bi/System/commit/9e78fff))
+* feat(email): added email templates, updated background runner ([fd3be0f](https://github.com/atlas-bi/System/commit/fd3be0f))
+
 ## 1.31.0 (2023-08-29)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit ([49acc3e](https://github.com/atlas-bi/System/commit/49acc3e))
