@@ -1,3 +1,8 @@
+## 1.33.0 (2023-08-30)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([5e1bdab](https://github.com/atlas-bi/System/commit/5e1bdab))
+* feat(notifications): added email for drive percent free ([d94e667](https://github.com/atlas-bi/System/commit/d94e667))
+
 ## 1.32.0 (2023-08-29)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([9e78fff](https://github.com/atlas-bi/System/commit/9e78fff))
