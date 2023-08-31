@@ -1,3 +1,8 @@
+## 1.35.0 (2023-08-31)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([4062373](https://github.com/atlas-bi/System/commit/4062373))
+* feat(http cert check): check expiry on https certs ([770a0d5](https://github.com/atlas-bi/System/commit/770a0d5))
+
 ## 1.34.0 (2023-08-30)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([bf2c01c](https://github.com/atlas-bi/System/commit/bf2c01c))
