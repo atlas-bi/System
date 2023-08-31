@@ -1,3 +1,8 @@
+## 1.34.0 (2023-08-30)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([bf2c01c](https://github.com/atlas-bi/System/commit/bf2c01c))
+* feat(database list): fixed column appearance ([97c44ed](https://github.com/atlas-bi/System/commit/97c44ed))
+
 ## 1.33.0 (2023-08-30)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([5e1bdab](https://github.com/atlas-bi/System/commit/5e1bdab))
