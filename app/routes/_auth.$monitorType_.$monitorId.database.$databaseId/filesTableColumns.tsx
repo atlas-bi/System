@@ -65,7 +65,6 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Size" />
 		),
 		cell: ({ row }) => {
-			console.log(row.original);
 			return (
 				<div
 					className={`${

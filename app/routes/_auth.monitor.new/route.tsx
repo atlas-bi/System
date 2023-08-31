@@ -210,6 +210,7 @@ export async function action({ request }: ActionArgs) {
 
 				return json({ monitor });
 			} else {
+				console.log(values.httpCheckCert);
 				monitor = await createMonitor({
 					title: values.title.toString(),
 					host: values.host ? values.host.toString() : null,

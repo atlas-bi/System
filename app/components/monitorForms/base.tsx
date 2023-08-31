@@ -70,10 +70,10 @@ export default function Monitor({
 			<DialogContent className="sm:min-w-[425px] sm:max-w-fit">
 				<DialogHeader>
 					<DialogTitle>
-						{monitor.name ? `${monitor.name}` : 'Add Monitor'}
+						{monitor.title ? `${monitor.title}` : 'Add Monitor'}
 					</DialogTitle>
 					<DialogDescription>
-						{monitor.name ? `Editing monitor.` : 'Add a new monitor.'}
+						{monitor.title ? `Editing monitor.` : 'Add a new monitor.'}
 					</DialogDescription>
 				</DialogHeader>
 				{testFetcher.data?.error?.code ? (

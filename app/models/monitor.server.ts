@@ -1087,7 +1087,7 @@ export async function createMonitor({
 	enabled,
 	httpUrl,
 	httpIgnoreSsl,
-	httpCertCheck,
+	httpCheckCert,
 	httpAcceptedStatusCodes,
 	httpMaxRedirects,
 	httpRequestMethod,
@@ -1113,7 +1113,7 @@ export async function createMonitor({
 	| 'enabled'
 	| 'httpUrl'
 	| 'httpIgnoreSsl'
-	| 'httpCertCheck'
+	| 'httpCheckCert'
 	| 'httpAcceptedStatusCodes'
 	| 'httpMaxRedirects'
 	| 'httpRequestMethod'
@@ -1140,7 +1140,7 @@ export async function createMonitor({
 			enabled,
 			httpUrl,
 			httpIgnoreSsl,
-			httpCertCheck,
+			httpCheckCert,
 			httpAcceptedStatusCodes,
 			httpMaxRedirects,
 			httpRequestMethod,
@@ -1161,8 +1161,11 @@ export async function createMonitor({
 			type: true,
 		},
 	});
-	// check monitor as soon as it is added
-	monitorMonitor.enqueue(monitor.id);
+
+	if (enabled) {
+		// check monitor as soon as it is added
+		monitorMonitor.enqueue(monitor.id);
+	}
 	return monitor;
 }
 

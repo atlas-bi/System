@@ -136,25 +136,27 @@ export const ErrorEmail = ({
 export const InvalidEmail = ({
 	hostname,
 	monitor,
+	message,
 }: {
 	hostname?: string;
 	monitor: Monitor;
+	message: string;
 }) => {
+	const title = `${message}.`;
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
-				<title>{'Certificate is invalid.'}</title>
+				<title>{title}</title>
 			</Head>
 
 			<Tailwind>
 				<Body className="bg-white my-auto mx-auto font-sans">
-					<Preview>Certificate is invalid.</Preview>
+					<Preview>{title}</Preview>
 					<Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Certificate is invalid on{' '}
-							<strong>{monitor.name || monitor.title}</strong>.
+							{message} on <strong>{monitor.name || monitor.title}</strong>.
 							<br />
 							<Link
 								className="text-[#666666] text-[12px] leading-[24px]"

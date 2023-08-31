@@ -31,17 +31,25 @@ export default async function httpCertNotifier({
 		message: string | undefined = undefined;
 
 	// check for invalid cert or cert near expiry
-	if (monitor.certValid === false) {
+	if (monitor.certValid === false || monitor.certDays == null) {
+		const snippet =
+			monitor.certDays == null
+				? 'Certificate could not be determined'
+				: 'Certificate is invalid';
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
-		})] Certificate is invalid.`;
+		})] ${snippet}.`;
 		html = render(
-			<InvalidEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
+			<InvalidEmail
+				hostname={process.env.HOSTNAME}
+				monitor={monitor}
+				message={snippet}
+			/>,
 			{
 				pretty: false,
 			},
 		);
-		message = 'Certificate is invalid';
+		message = `${snippet}.`;
 	} else if (monitor.certDays <= 21) {
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl

@@ -176,7 +176,11 @@ export default function HttpForm({
 
 			<Select
 				onValueChange={(httpAuthentication: string) =>
-					setData({ ...data, httpAuthentication })
+					setData({
+						...data,
+						httpAuthentication:
+							httpAuthentication == '' ? undefined : httpAuthentication,
+					})
 				}
 				value={data.httpAuthentication}
 			>
@@ -188,6 +192,7 @@ export default function HttpForm({
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
+						<SelectItem value="">None</SelectItem>
 						{authTypes.map((type) => (
 							<SelectItem key={type.value} value={type.value}>
 								{type.label}
