@@ -52,6 +52,20 @@ export default function HttpForm({
 					}
 				/>
 			</div>
+			{data.httpUrl && data.httpUrl.startsWith('https') && (
+				<>
+					<Label className="text-right">Cert Expiration Warning</Label>
+					<div className="self-start col-span-3">
+						<Switch
+							name="httpCheckCert"
+							checked={data.httpCheckCert || false}
+							onCheckedChange={(httpCheckCert) =>
+								setData({ ...data, httpCheckCert })
+							}
+						/>
+					</div>
+				</>
+			)}
 			{/*- Upside down (should be off)*/}
 			<Label className="text-right">Accepted status codes</Label>
 			<MultiSelect

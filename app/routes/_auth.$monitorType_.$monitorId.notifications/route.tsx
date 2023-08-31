@@ -56,6 +56,13 @@ export async function action({ request, params }: ActionArgs) {
 				? Number(values.connectionNotifyResendAfterMinutes || '0')
 				: 0,
 		connectionNotifyRetries: Number(values.connectionNotifyRetries || '0'),
+		httpCertNotify: values.httpCertNotify == 'on',
+		httpCertNotifyTypes: formData.getAll('httpCertNotifyTypes'),
+		httpCertNotifyResendAfterMinutes:
+			values.httpCertNotifyResend == 'on'
+				? Number(values.httpCertNotifyResendAfterMinutes || '0')
+				: 0,
+		httpCertNotifyRetries: Number(values.httpCertNotifyRetries || '0'),
 		rebootNotify: values.rebootNotify == 'on',
 		rebootNotifyTypes: formData.getAll('rebootNotifyTypes'),
 	});
@@ -81,9 +88,17 @@ export default function Index() {
 		monitor.connectionNotify == true,
 	);
 	const [reboot, setReboot] = useState(monitor.rebootNotify == true);
+	const [httpCert, setHttpCert] = useState(monitor.httpCertNotify == true);
 
 	const [connectionResendValue, setConnectionResendValue] = useState(
 		monitor.connectionNotifyResendAfterMinutes,
+	);
+
+	const [httpCertResendValue, setHttpCertResendValue] = useState(
+		monitor.httpCertNotifyResendAfterMinutes,
+	);
+	const [httpCertNotifyResend, setHttpCertNotifyResend] = useState(
+		monitor.httpCertNotifyResendAfterMinutes !== 0,
 	);
 
 	const [connectionRetries, setConnectionRetries] = useState(
@@ -265,6 +280,92 @@ export default function Index() {
 							</div>
 						</div>
 					)}
+					{monitor.type == 'http' &&
+						monitor.httpUrl?.startsWith('https:') &&
+						monitor.httpCheckCert && (
+							<div className=" rounded-lg border p-4 max-w-[500px]">
+								<div className="space-y-2">
+									<div className="space-y-2 flex justify-between">
+										<div className="flex-grow">
+											<H3 className="text-2xl">Certificate</H3>
+											<div className="text-muted-foreground pb-2">
+												Recieve notification when certificate is invalid or near
+												expiry.
+											</div>
+										</div>
+										<div className="self-start pt-2">
+											<Switch
+												name="httpCertNotify"
+												checked={httpCert}
+												onCheckedChange={setHttpCert}
+											/>
+										</div>
+									</div>
+									<div
+										className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+											httpCert ? '' : 'opacity-50 text-slate-600'
+										}`}
+									></div>
+									<Collapsible open={httpCert}>
+										<CollapsibleContent className="space-y-2">
+											<div>
+												<MultiSelect
+													label="Notification Methods"
+													placeholder="choose"
+													data={notificationsMap}
+													active={notificationsMap.filter(
+														(x: { value: string }) =>
+															monitor.httpCertNotifyTypes.filter(
+																(t: { id: string }) => t.id == x.value,
+															).length > 0,
+													)}
+													name="httpCertNotifyTypes"
+													onChange={() => {
+														submit(form.current);
+													}}
+												/>
+												<Link
+													to="/admin/notifications"
+													className="text-sm text-sky-600/80"
+												>
+													Manage notification types.
+												</Link>
+											</div>
+											<div
+												className={`space-y-2 ${
+													httpCertNotifyResend
+														? ''
+														: 'opacity-50 text-slate-600'
+												}`}
+											>
+												<div className={`flex justify-between `}>
+													<div className='flex-grow"'>
+														<Label className="text-slate-700">
+															Resend Frequency (Minutes)
+														</Label>
+													</div>
+													<Switch
+														checked={httpCertNotifyResend}
+														onCheckedChange={setHttpCertNotifyResend}
+														name="httpCertNotifyResend"
+													/>
+												</div>
+												<Input
+													disabled={httpCertNotifyResend != true}
+													type="number"
+													name="httpCertNotifyResendAfterMinutes"
+													value={httpCertResendValue || undefined}
+													onChange={(e) =>
+														setHttpCertResendValue(Number(e.target.value))
+													}
+													placeholder="60"
+												/>
+											</div>
+										</CollapsibleContent>
+									</Collapsible>
+								</div>
+							</div>
+						)}
 				</div>
 			</Form>
 		</>

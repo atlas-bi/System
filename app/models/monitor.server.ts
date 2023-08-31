@@ -140,6 +140,7 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			cpuMaxSpeed: true,
 			httpUrl: true,
 			httpIgnoreSsl: true,
+			httpCheckCert: true,
 			httpAcceptedStatusCodes: true,
 			httpMaxRedirects: true,
 			httpRequestMethod: true,
@@ -194,6 +195,18 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 			connectionNotifySentAt: true,
 			connectionNotifyRetries: true,
 			connectionNotifyRetried: true,
+			httpCheckCert: true,
+			httpUrl: true,
+			httpCertNotify: true,
+			httpCertNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			httpCertNotifyResendAfterMinutes: true,
+			httpCertNotifySentAt: true,
 			rebootNotify: true,
 			rebootNotifyTypes: {
 				select: {
@@ -220,12 +233,13 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			password: true,
 			port: true,
 			privateKey: true,
-			connectionNotify: true,
 			manufacturer: true,
 			model: true,
 			version: true,
 			os: true,
 			osVersion: true,
+
+			connectionNotify: true,
 			connectionNotifyTypes: {
 				select: {
 					id: true,
@@ -237,11 +251,27 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			connectionNotifySentAt: true,
 			connectionNotifyRetried: true,
 			connectionNotifyRetries: true,
+
+			httpCertNotify: true,
+			httpCertNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			httpCertNotifyResendAfterMinutes: true,
+			httpCertNotifySentAt: true,
+			certDays: true,
+			certValid: true,
+
 			rebootNotify: true,
 			rebootNotifyTypes: true,
 			rebootNotifySentAt: true,
+
 			httpUrl: true,
 			httpIgnoreSsl: true,
+			httpCheckCert: true,
 			httpAcceptedStatusCodes: true,
 			httpMaxRedirects: true,
 			httpRequestMethod: true,
@@ -1057,6 +1087,7 @@ export async function createMonitor({
 	enabled,
 	httpUrl,
 	httpIgnoreSsl,
+	httpCertCheck,
 	httpAcceptedStatusCodes,
 	httpMaxRedirects,
 	httpRequestMethod,
@@ -1082,6 +1113,7 @@ export async function createMonitor({
 	| 'enabled'
 	| 'httpUrl'
 	| 'httpIgnoreSsl'
+	| 'httpCertCheck'
 	| 'httpAcceptedStatusCodes'
 	| 'httpMaxRedirects'
 	| 'httpRequestMethod'
@@ -1108,6 +1140,7 @@ export async function createMonitor({
 			enabled,
 			httpUrl,
 			httpIgnoreSsl,
+			httpCertCheck,
 			httpAcceptedStatusCodes,
 			httpMaxRedirects,
 			httpRequestMethod,
@@ -1200,6 +1233,7 @@ export async function editMonitor({
 	enabled,
 	httpUrl,
 	httpIgnoreSsl,
+	httpCheckCert,
 	httpAcceptedStatusCodes,
 	httpMaxRedirects,
 	httpRequestMethod,
@@ -1226,6 +1260,7 @@ export async function editMonitor({
 	| 'enabled'
 	| 'httpUrl'
 	| 'httpIgnoreSsl'
+	| 'httpCheckCert',
 	| 'httpAcceptedStatusCodes'
 	| 'httpMaxRedirects'
 	| 'httpRequestMethod'
@@ -1253,6 +1288,7 @@ export async function editMonitor({
 			enabled,
 			httpUrl,
 			httpIgnoreSsl,
+			httpCheckCert,
 			httpAcceptedStatusCodes,
 			httpMaxRedirects,
 			httpRequestMethod,
@@ -1456,9 +1492,12 @@ export function updateMonitorNotifications({
 	connectionNotify,
 	connectionNotifyTypes,
 	connectionNotifyResendAfterMinutes,
+	connectionNotifyRetries,
 	rebootNotify,
 	rebootNotifyTypes,
-	connectionNotifyRetries,
+	httpCertNotify,
+	httpCertNotifyTypes,
+	httpCertNotifyResendAfterMinutes,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -1466,6 +1505,9 @@ export function updateMonitorNotifications({
 	| 'connectionNotifyResendAfterMinutes'
 	| 'rebootNotify'
 	| 'connectionNotifyRetries'
+	| 'httpCertNotify',
+	'httpCertNotifyTypes',
+	'httpCertNotifyResendAfterMinutes'
 > & { connectionNotifyTypes: string[]; rebootNotifyTypes: string[] }) {
 	return prisma.monitor.update({
 		where: { id },
@@ -1480,6 +1522,11 @@ export function updateMonitorNotifications({
 			rebootNotifyTypes: rebootNotifyTypes
 				? { set: rebootNotifyTypes.map((x: string) => ({ id: x })) }
 				: undefined,
+			httpCertNotify,
+			httpCertNotifyTypes: httpCertNotifyTypes
+				? { set: httpCertNotifyTypes.map((x) => ({ id: x })) }
+				: undefined,
+			httpCertNotifyResendAfterMinutes,
 		},
 	});
 }
@@ -1508,6 +1555,8 @@ export function updateMonitor({
 		cpuProcessors?: string;
 		lastBootTime?: string | null | Date;
 		cpuMaxSpeed?: string | null;
+		certDays?: string;
+		certValid?: boolean;
 	};
 	feed?: {
 		memoryFree?: string;
@@ -1875,6 +1924,16 @@ export function setMonitorRebootSentAt({
 	return prisma.monitor.update({
 		where: { id },
 		data: { rebootNotifySentAt },
+	});
+}
+
+export function setMonitorHttpCertSentAt({
+	id,
+	httpCertNotifySentAt,
+}: Pick<Monitor, 'id' | 'httpCertNotifySentAt'>) {
+	return prisma.monitor.update({
+		where: { id },
+		data: { httpCertNotifySentAt },
 	});
 }
 

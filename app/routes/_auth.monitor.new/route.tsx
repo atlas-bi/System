@@ -173,6 +173,7 @@ export async function action({ request }: ActionArgs) {
 							: null,
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
+					httpCheckCert: values.httpCheckCert?.toString() == 'true',
 					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
 						? jsonParser(values.httpAcceptedStatusCodes)
 						: [],
@@ -227,6 +228,7 @@ export async function action({ request }: ActionArgs) {
 							: null,
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
+					httpCheckCert: values.httpCheckCert?.toString() == 'true',
 					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
 						? jsonParser(values.httpAcceptedStatusCodes)
 						: [],
@@ -321,14 +323,14 @@ export async function action({ request }: ActionArgs) {
 				let startTime = Date.now();
 
 				try {
-					await HttpCheck({
+					const { res } = await HttpCheck({
 						httpBody: values.httpBody?.toString(),
 						httpAuthentication: values.httpAuthentication?.toString(),
 						httpUsername: values.httpUsername?.toString(),
 						httpPassword: values.httpPassword
 							? encrypt(values.httpPassword?.toString())
 							: undefined,
-						httpIgnoreSsl: !!values.httpIgnoreSsl,
+						httpIgnoreSsl: values.httpIgnoreSsl?.toString() === 'true',
 						httpBodyEncoding: values.httpBodyEncoding?.toString(),
 						httpUrl: values.httpUrl?.toString(),
 						httpMethod: values.httpMethod?.toString(),
@@ -337,15 +339,15 @@ export async function action({ request }: ActionArgs) {
 						httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
 						httpDomain: values.httpDomain?.toString(),
 						httpWorkstation: values.httpWorkstation?.toString(),
+						httpCheckCert: values.httpCheckCert?.toString() === 'true',
+					});
+					const ping = Date.now() - startTime;
+					return json({
+						success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,
 					});
 				} catch (e) {
 					return json({ error: { message: e.message } });
 				}
-
-				const ping = Date.now() - startTime;
-				return json({
-					success: `Connected with ${res?.status} ${res?.statusText} (${ping}ms)`,
-				});
 			}
 
 			if (values.type?.toString() === 'sqlServer') {

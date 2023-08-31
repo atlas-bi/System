@@ -8,9 +8,11 @@ import https from 'https';
 
 import Notifier from '~/notifications/notifier';
 import { decrypt } from '@/lib/utils';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { NtlmClient, NtlmCredentials } from 'axios-ntlm';
 import { jsonParser } from '~/utils';
+import { differenceInDays } from 'date-fns';
+import { checkCertificate } from './helpers.server';
 
 const checkStatusCode = (
 	status: number,
@@ -66,12 +68,14 @@ export async function HttpCheck({
 	httpWorkstation,
 	httpBodyText,
 	httpHeaderText,
+	httpCheckCert,
 }: {
 	httpBody?: string;
 	httpAuthentication?: string;
 	httpUsername?: string;
 	httpPassword?: string;
 	httpIgnoreSsl?: boolean;
+	httpCheckCert?: boolean;
 	httpBodyEncoding?: string;
 	httpUrl?: string;
 	httpMethod?: string;
@@ -144,6 +148,7 @@ export async function HttpCheck({
 	}
 
 	let res;
+	let certValid, certDays;
 
 	try {
 		if (httpAuthentication === 'ntlm') {
@@ -161,6 +166,16 @@ export async function HttpCheck({
 			res = await client(options);
 		} else {
 			res = await axios.request(options);
+		}
+
+		if (httpCheckCert && httpUrl?.startsWith('https')) {
+			try {
+				let tlsInfoObject = checkCertificate(res);
+				certValid = tlsInfoObject?.valid;
+				certDays = tlsInfoObject?.certInfo?.daysRemaining;
+			} catch (e) {
+				throw Error(e.message);
+			}
 		}
 
 		// return res;
@@ -181,7 +196,7 @@ export async function HttpCheck({
 		// }
 	}
 
-	return { res };
+	return { res, certValid, certDays };
 }
 
 export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
@@ -193,6 +208,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		httpUsername,
 		httpPassword,
 		httpIgnoreSsl,
+		httpCheckCert,
 		httpBodyEncoding,
 		httpUrl,
 		httpMethod,
@@ -205,14 +221,15 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 
 	let startTime = Date.now();
 	try {
-		let error;
+		let error, certValid, certDays;
 		try {
-			await HttpCheck({
+			const data = await HttpCheck({
 				httpBody,
 				httpAuthentication,
 				httpUsername,
 				httpPassword,
 				httpIgnoreSsl,
+				httpCheckCert,
 				httpBodyEncoding,
 				httpUrl,
 				httpMethod,
@@ -222,6 +239,8 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 				httpDomain,
 				httpWorkstation,
 			});
+			certValid = data.certValid;
+			certDays = data.certDays;
 		} catch (e) {
 			error = e.message;
 		}
@@ -230,6 +249,10 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 
 		const data = await updateMonitor({
 			id: monitor.id,
+			data: {
+				certValid,
+				certDays: certDays?.toString(),
+			},
 			feed: {
 				ping: ping.toString(),
 			},
