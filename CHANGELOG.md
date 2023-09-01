@@ -1,3 +1,8 @@
+## <small>1.36.1 (2023-09-01)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([4e92c83](https://github.com/atlas-bi/System/commit/4e92c83))
+* fix(sql monitor): fixed name in sql notifications ([5cfe275](https://github.com/atlas-bi/System/commit/5cfe275))
+
 ## 1.36.0 (2023-09-01)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([7cf9b03](https://github.com/atlas-bi/System/commit/7cf9b03))
