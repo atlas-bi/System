@@ -34,10 +34,19 @@ export default async function collectionNotifier({
 	// no reporting if disabled.
 	if (monitor.connectionNotify == false) return;
 
-	const name =
-		monitor.type === 'windows' || monitor.type === 'ubuntu'
-			? `${monitor.title} (${monitor.host})`
-			: `${monitor.title} (${monitor.httpUrl})`;
+	let name = monitor.title;
+
+	if(monitor.type === 'windows' || monitor.type === 'ubuntu') {
+		name = `${monitor.title} (${monitor.host})`;
+	}
+
+	if (monitor.type === 'http') {
+		name = `${monitor.title} (${monitor.httpUrl})`;
+	}
+
+	if (monitor.type === 'sqlServer') {
+		name = `${monitor.title} (${monitor.name})`;
+	}
 
 	if (!message) {
 		if (monitor.connectionNotifySentAt && monitor.connectionNotify) {
