@@ -1,3 +1,8 @@
+## 1.36.0 (2023-09-01)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([7cf9b03](https://github.com/atlas-bi/System/commit/7cf9b03))
+* feat(sql file size): added notification for sql file size % free ([de974c7](https://github.com/atlas-bi/System/commit/de974c7))
+
 ## <small>1.35.1 (2023-08-31)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([4956ef4](https://github.com/atlas-bi/System/commit/4956ef4))
