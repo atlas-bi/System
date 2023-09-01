@@ -113,6 +113,11 @@ model Monitor {
   httpCertNotifyTypes              Notification[] @relation("httpCertNotifyTypesTable")
   httpCertNotifySentAt             DateTime?
   httpCertNotifyResendAfterMinutes Int?
+
+  sqlFileSizePercentFreeNotify                   Boolean?
+  sqlFileSizePercentFreeNotifyTypes              Notification[] @relation("sqlFileSizePercentFreeNotifyTypesTable")
+  sqlFileSizePercentFreeValue                    Int?
+  sqlFileSizePercentFreeNotifyResendAfterMinutes Int?
 }
 
 model MonitorFeeds {
@@ -228,6 +233,9 @@ model DatabaseFile {
   online  Boolean @default(true)
 
   createdAt DateTime @default(now())
+
+  // notification sent at. notification is controlled from the monitor level.
+  sqlFileSizePercentFreeNotifySentAt DateTime?
 
   sqlDatabaseId String
   fileName      String?
@@ -364,9 +372,10 @@ model Notification {
   driveSizeFreeNotify   Drive[] @relation("sizeFreeNotifyTypesTable")
   driveGrowthRateNotify Drive[] @relation("growthRateNotifyTypesTable")
 
-  monitorConnectionNotify Monitor[] @relation("connectionNotifyTypesTable")
-  monitorRebootNotify     Monitor[] @relation("rebootNotifyTypesTable")
-  monitorHtpCertNotify    Monitor[] @relation("httpCertNotifyTypesTable")
+  monitorConnectionNotify             Monitor[] @relation("connectionNotifyTypesTable")
+  monitorRebootNotify                 Monitor[] @relation("rebootNotifyTypesTable")
+  monitorHtpCertNotify                Monitor[] @relation("httpCertNotifyTypesTable")
+  monitorSqlFileSizePercentFreeNotify Monitor[] @relation("sqlFileSizePercentFreeNotifyTypesTable")
 }
 
 model DriveUsage {

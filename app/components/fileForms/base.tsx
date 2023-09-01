@@ -1,5 +1,5 @@
 import { Form, useFetcher } from '@remix-run/react';
-import { ReactNode, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -17,9 +17,11 @@ import { Switch } from '../ui/switch';
 
 export default function File({
 	file,
+	setter,
 	children,
 }: {
 	file: DatabaseFile;
+	setter: Dispatch<DatabaseFile>;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
@@ -73,6 +75,7 @@ export default function File({
 										},
 										{ method: 'post', action: '/file/edit' },
 									);
+									setter(data);
 								}}
 							>
 								Save

@@ -10,6 +10,7 @@ import percentFreeNotifier from './checks/drives/percentFree';
 import rebootNotifier from './checks/monitors/reboot';
 import collectionNotifier from './checks/monitors/collection';
 import httpCertNotifier from './checks/monitors/httpCert';
+import sqlFilePercentFreeNotifier from './checks/monitors/sqlFiles';
 
 // 1. send error notification
 // 2. when error clears send an "all clear"
@@ -28,6 +29,7 @@ export default async function Notifier({
 
 	await collectionNotifier({ monitor, message });
 	await httpCertNotifier({ monitor });
+	await sqlFilePercentFreeNotifier({ monitor });
 
 	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier

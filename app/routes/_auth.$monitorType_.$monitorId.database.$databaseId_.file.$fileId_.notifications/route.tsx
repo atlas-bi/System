@@ -88,7 +88,30 @@ export default function Index() {
 				) : null}
 			</div>
 			<H1>Notifications for {file.fileName}</H1>
-			coming soon.
+			<div className="space-y-4">
+				<div className=" rounded-lg border p-4 max-w-[500px]">
+					<div className="space-y-2">
+						<div className="space-y-2 flex justify-between">
+							<div className="flex-grow">
+								<H3 className="text-2xl">Free Space</H3>
+								<div className="text-muted-foreground pb-2">
+									Recieve notification when files free space meets certain
+									criteria.{' '}
+									<strong>
+										This only applies to files with auto growth disabled.
+									</strong>
+								</div>
+								<Link
+									to={`/${monitorType}/${monitorId}/notifications`}
+									className="text-sm text-sky-600/80"
+								>
+									Edit this notification is managed at the server level.
+								</Link>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</>
 	);
 }

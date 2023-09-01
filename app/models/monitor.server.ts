@@ -215,6 +215,16 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 					name: true,
 				},
 			},
+			sqlFileSizePercentFreeNotify: true,
+			sqlFileSizePercentFreeNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			sqlFileSizePercentFreeValue: true,
+			sqlFileSizePercentFreeNotifyResendAfterMinutes: true,
 		},
 	});
 }
@@ -223,6 +233,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 		where: { id },
 		select: {
 			id: true,
+			name: true,
 			type: true,
 			title: true,
 			description: true,
@@ -251,6 +262,17 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			connectionNotifySentAt: true,
 			connectionNotifyRetried: true,
 			connectionNotifyRetries: true,
+
+			sqlFileSizePercentFreeNotify: true,
+			sqlFileSizePercentFreeNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			sqlFileSizePercentFreeValue: true,
+			sqlFileSizePercentFreeNotifyResendAfterMinutes: true,
 
 			httpCertNotify: true,
 			httpCertNotifyTypes: {
@@ -285,6 +307,35 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			httpWorkstation: true,
 			sqlConnectionString: true,
 			lastBootTime: true,
+			databases: {
+				select: {
+					id: true,
+					title: true,
+					name: true,
+					enabled: true,
+					files: {
+						select: {
+							id: true,
+							enabled: true,
+							fileName: true,
+							growth: true,
+							sqlFileSizePercentFreeNotifySentAt: true,
+							usage: {
+								select: {
+									id: true,
+									usedSize: true,
+									currentSize: true,
+									maxSize: true,
+								},
+								take: 1,
+								orderBy: {
+									createdAt: 'desc',
+								},
+							},
+						},
+					},
+				},
+			},
 			drives: {
 				select: {
 					id: true,
@@ -378,11 +429,16 @@ export function monitorError({ id }: Pick<Monitor, 'id'>) {
 export function monitorLog({
 	monitorId,
 	driveId,
+	databaseId,
+	fileId,
 	type,
 	message,
-}: Pick<MonitorLogs, 'monitorId' | 'type' | 'message' | 'driveId'>) {
+}: Pick<
+	MonitorLogs,
+	'monitorId' | 'type' | 'message' | 'driveId' | 'databaseId' | 'fileId'
+>) {
 	return prisma.monitorLogs.create({
-		data: { monitorId, type, message, driveId },
+		data: { monitorId, type, message, driveId, databaseId, fileId },
 	});
 }
 
@@ -398,6 +454,7 @@ export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
 			isPercentGrowth: true,
 			fileId: true,
 			filePath: true,
+			enabled: true,
 			database: {
 				select: {
 					id: true,
@@ -859,11 +916,19 @@ export function getMemoryUsage({
 export function getLatestMonitorLog({
 	driveId,
 	monitorId,
-}: Pick<MonitorLogs, 'monitorId'> & { driveId?: string }) {
+	databaseId,
+	fileId,
+}: Pick<MonitorLogs, 'monitorId'> & {
+	driveId?: string;
+	databaseId?: string;
+	fileId?: string;
+}) {
 	return prisma.monitorLogs.findFirst({
 		where: {
 			driveId,
 			monitorId,
+			databaseId,
+			fileId,
 		},
 		orderBy: {
 			createdAt: 'desc',
@@ -1501,6 +1566,10 @@ export function updateMonitorNotifications({
 	httpCertNotify,
 	httpCertNotifyTypes,
 	httpCertNotifyResendAfterMinutes,
+	sqlFileSizePercentFreeNotify,
+	sqlFileSizePercentFreeNotifyTypes,
+	sqlFileSizePercentFreeNotifyResendAfterMinutes,
+	sqlFileSizePercentFreeValue,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -1508,10 +1577,17 @@ export function updateMonitorNotifications({
 	| 'connectionNotifyResendAfterMinutes'
 	| 'rebootNotify'
 	| 'connectionNotifyRetries'
-	| 'httpCertNotify',
-	'httpCertNotifyTypes',
-	'httpCertNotifyResendAfterMinutes'
-> & { connectionNotifyTypes: string[]; rebootNotifyTypes: string[] }) {
+	| 'httpCertNotify'
+	| 'httpCertNotifyResendAfterMinutes'
+	| 'sqlFileSizePercentFreeNotify'
+	| 'sqlFileSizePercentFreeNotifyResendAfterMinutes'
+	| 'sqlFileSizePercentFreeValue'
+> & {
+	sqlFileSizePercentFreeNotifyTypes: string[];
+	httpCertNotifyTypes: string[];
+	connectionNotifyTypes: string[];
+	rebootNotifyTypes: string[];
+}) {
 	return prisma.monitor.update({
 		where: { id },
 		data: {
@@ -1530,6 +1606,12 @@ export function updateMonitorNotifications({
 				? { set: httpCertNotifyTypes.map((x) => ({ id: x })) }
 				: undefined,
 			httpCertNotifyResendAfterMinutes,
+			sqlFileSizePercentFreeNotify,
+			sqlFileSizePercentFreeNotifyTypes: sqlFileSizePercentFreeNotifyTypes
+				? { set: sqlFileSizePercentFreeNotifyTypes.map((x) => ({ id: x })) }
+				: undefined,
+			sqlFileSizePercentFreeNotifyResendAfterMinutes,
+			sqlFileSizePercentFreeValue,
 		},
 	});
 }
@@ -1890,6 +1972,15 @@ export function setDriveGrowth({
 	});
 }
 
+export function setFilePercFreeSentAt({
+	id,
+	sqlFileSizePercentFreeNotifySentAt,
+}: Pick<DatabaseFile, 'id' | 'sqlFileSizePercentFreeNotifySentAt'>) {
+	return prisma.databaseFile.update({
+		where: { id },
+		data: { sqlFileSizePercentFreeNotifySentAt },
+	});
+}
 export function setDrivePercFreeSentAt({
 	id,
 	percFreeNotifySentAt,

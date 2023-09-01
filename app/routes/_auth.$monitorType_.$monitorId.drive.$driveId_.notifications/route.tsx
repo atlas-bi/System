@@ -163,7 +163,7 @@ export default function Index() {
 			</H1>
 			<Form ref={form} method="post" onChange={handleChange}>
 				<div className="space-y-4">
-					<div className=" rounded-lg border p-4 max-w-[500px]">
+					{/*<div className=" rounded-lg border p-4 max-w-[500px]">
 						<div className="space-y-2">
 							<H3 className="text-2xl">General</H3>
 							<div className="text-muted-foreground pb-2">
@@ -245,7 +245,7 @@ export default function Index() {
 								</CollapsibleContent>
 							</Collapsible>
 						</div>
-					</div>
+					</div>*/}
 					<div className=" rounded-lg border p-4 max-w-[500px]">
 						<div className="space-y-2">
 							<H3 className="text-2xl">Free Space</H3>
@@ -254,7 +254,7 @@ export default function Index() {
 							</div>
 							<Separator />
 							<div
-								className={`space-x-6 flex flex-row items-center justify-between transition-colors border-l-2 pl-2 border-green-400 ${
+								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
 									perc ? '' : 'opacity-50 text-slate-600'
 								}`}
 							>
@@ -339,7 +339,7 @@ export default function Index() {
 								</CollapsibleContent>
 							</Collapsible>
 
-							<Separator />
+							{/*<Separator />
 							<div
 								className={`space-x-6 flex flex-row items-center justify-between transition-colors  ${
 									size ? '' : 'opacity-50 text-slate-600'
@@ -427,12 +427,11 @@ export default function Index() {
 										/>
 									</div>
 								</CollapsibleContent>
-							</Collapsible>
-							<div></div>
+							</Collapsible>*/}
 						</div>
 					</div>
 
-					<div className=" rounded-lg border p-4 max-w-[500px]">
+					{/*<div className=" rounded-lg border p-4 max-w-[500px]">
 						<div className="space-y-2">
 							<H3 className="text-2xl">Growth</H3>
 							<div className="text-muted-foreground pb-2">
@@ -527,7 +526,7 @@ export default function Index() {
 								</CollapsibleContent>
 							</Collapsible>
 						</div>
-					</div>
+					</div>*/}
 				</div>
 			</Form>
 		</>

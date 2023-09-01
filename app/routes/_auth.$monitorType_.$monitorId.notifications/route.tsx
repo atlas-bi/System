@@ -19,6 +19,7 @@ import { Input } from '~/components/ui/input';
 import { MultiSelect } from '~/components/ui/multiselect';
 import { getNotifications } from '~/models/notification.server';
 import invariant from 'tiny-invariant';
+import { Separator } from '~/components/ui/separator';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -46,25 +47,44 @@ export async function action({ request, params }: ActionArgs) {
 	const formData = await request.formData();
 	const { ...values } = Object.fromEntries(formData);
 
+	invariant(params.monitorId);
+
 	await updateMonitorNotifications({
 		id: params.monitorId,
 
 		connectionNotify: values.connectionNotify == 'on',
-		connectionNotifyTypes: formData.getAll('connectionNotifyTypes'),
+		connectionNotifyTypes: formData
+			.getAll('connectionNotifyTypes')
+			.map((x) => x.toString()),
 		connectionNotifyResendAfterMinutes:
 			values.connectionNotifyResend == 'on'
 				? Number(values.connectionNotifyResendAfterMinutes || '0')
 				: 0,
 		connectionNotifyRetries: Number(values.connectionNotifyRetries || '0'),
 		httpCertNotify: values.httpCertNotify == 'on',
-		httpCertNotifyTypes: formData.getAll('httpCertNotifyTypes'),
+		httpCertNotifyTypes: formData
+			.getAll('httpCertNotifyTypes')
+			.map((x) => x.toString()),
 		httpCertNotifyResendAfterMinutes:
 			values.httpCertNotifyResend == 'on'
 				? Number(values.httpCertNotifyResendAfterMinutes || '0')
 				: 0,
-		httpCertNotifyRetries: Number(values.httpCertNotifyRetries || '0'),
 		rebootNotify: values.rebootNotify == 'on',
-		rebootNotifyTypes: formData.getAll('rebootNotifyTypes'),
+		rebootNotifyTypes: formData
+			.getAll('rebootNotifyTypes')
+			.map((x) => x.toString()),
+
+		sqlFileSizePercentFreeNotify: values.sqlFileSizePercentFreeNotify == 'on',
+		sqlFileSizePercentFreeNotifyTypes: formData
+			.getAll('sqlFileSizePercentFreeNotifyTypes')
+			.map((x) => x.toString()),
+		sqlFileSizePercentFreeNotifyResendAfterMinutes:
+			values.percFreeNotifyResend == 'on'
+				? Number(values.sqlFileSizePercentFreeNotifyResendAfterMinutes || '0')
+				: 0,
+		sqlFileSizePercentFreeValue: Number(
+			values.sqlFileSizePercentFreeValue || 0,
+		),
 	});
 
 	return null;
@@ -89,9 +109,14 @@ export default function Index() {
 	);
 	const [reboot, setReboot] = useState(monitor.rebootNotify == true);
 	const [httpCert, setHttpCert] = useState(monitor.httpCertNotify == true);
-
+	const [perc, setPerc] = useState(
+		monitor.sqlFileSizePercentFreeNotify == true,
+	);
 	const [connectionResendValue, setConnectionResendValue] = useState(
 		monitor.connectionNotifyResendAfterMinutes,
+	);
+	const [percValue, setPercValue] = useState(
+		monitor.sqlFileSizePercentFreeValue,
 	);
 
 	const [httpCertResendValue, setHttpCertResendValue] = useState(
@@ -107,6 +132,12 @@ export default function Index() {
 
 	const [connectionNotifyResend, setConnectionNotifyResend] = useState(
 		monitor.connectionNotifyResendAfterMinutes !== 0,
+	);
+	const [percResendValue, setPercResendValue] = useState(
+		monitor.sqlFileSizePercentFreeNotifyResendAfterMinutes,
+	);
+	const [percFreeNotifyResend, setPercFreeNotifyResend] = useState(
+		monitor.sqlFileSizePercentFreeNotifyResendAfterMinutes !== 0,
 	);
 
 	function handleChange(event: { currentTarget: HTMLFormElement }) {
@@ -366,6 +397,107 @@ export default function Index() {
 								</div>
 							</div>
 						)}
+					{monitor.type === 'sqlServer' && (
+						<div className=" rounded-lg border p-4 max-w-[500px]">
+							<div className="space-y-2">
+								<H3 className="text-2xl">File Free Space</H3>
+								<div className="text-muted-foreground pb-2">
+									Recieve notification when files free space meets certain
+									criteria.{' '}
+									<strong>
+										This applies to files with auto growth disabled or file with
+										a max size.
+									</strong>
+								</div>
+								<Separator />
+								<div
+									className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
+										perc ? '' : 'opacity-50 text-slate-600'
+									}`}
+								>
+									<div className="flex-grow">
+										<Label className="text-base">Percentage</Label>
+
+										<div className="text-muted-foreground pb-2">
+											When free space falls below a percentage (%).
+										</div>
+									</div>
+									<div className="self-start  pt-3">
+										<Switch
+											name="sqlFileSizePercentFreeNotify"
+											checked={perc}
+											onCheckedChange={setPerc}
+										/>
+									</div>
+								</div>
+								<Collapsible open={perc}>
+									<CollapsibleContent className="space-y-2">
+										<div>
+											<Label className="text-slate-700">Percentage</Label>
+											<Input
+												name="sqlFileSizePercentFreeValue"
+												type="number"
+												placeholder="10"
+												value={percValue}
+												onChange={(e) => setPercValue(Number(e.target.value))}
+											/>
+										</div>
+										<div>
+											<MultiSelect
+												label="Notification Methods"
+												placeholder="choose"
+												data={notificationsMap}
+												active={notificationsMap.filter(
+													(x: { value: string }) =>
+														monitor.sqlFileSizePercentFreeNotifyTypes.filter(
+															(t) => t.id == x.value,
+														).length > 0,
+												)}
+												name="sqlFileSizePercentFreeNotifyTypes"
+												onChange={() => {
+													submit(form.current);
+												}}
+											/>
+											<Link
+												to="/admin/notifications"
+												className="text-sm text-sky-600/80"
+											>
+												Manage notification types.
+											</Link>
+										</div>
+										<div
+											className={`space-y-2 ${
+												percFreeNotifyResend ? '' : 'opacity-50 text-slate-600'
+											}`}
+										>
+											<div className={`flex justify-between `}>
+												<div className='flex-grow"'>
+													<Label className="text-slate-700">
+														Resend Frequency (Minutes)
+													</Label>
+												</div>
+												<Switch
+													checked={percFreeNotifyResend}
+													onCheckedChange={setPercFreeNotifyResend}
+													name="percFreeNotifyResend"
+												/>
+											</div>
+											<Input
+												disabled={percFreeNotifyResend != true}
+												type="number"
+												name="sqlFileSizePercentFreeNotifyResendAfterMinutes"
+												value={percResendValue || undefined}
+												onChange={(e) =>
+													setPercResendValue(Number(e.target.value))
+												}
+												placeholder="60"
+											/>
+										</div>
+									</CollapsibleContent>
+								</Collapsible>
+							</div>
+						</div>
+					)}
 				</div>
 			</Form>
 		</>

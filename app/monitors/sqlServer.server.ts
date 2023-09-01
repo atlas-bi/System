@@ -265,7 +265,7 @@ SELECT d.database_id, ''?''
         , mf.type_desc
         , total_size = cast(mf.size AS BIGINT) * 8 * 1024
         , used_size = CAST(FILEPROPERTY(mf.[name], ''SpaceUsed'') as bigint) * 8 * 1024
-        , mf.growth
+        , case when mf.is_percent_growth = 1 then mf.growth else mf.growth * 8 * 1024 end growth
         , CASE
             WHEN mf.max_size < 0
                 THEN NULL
@@ -275,8 +275,6 @@ SELECT d.database_id, ''?''
     inner join sys.databases d on mf.database_id=d.database_id
     where d.name=''?''
    '
-
-print @command
 INSERT INTO @DBInfo
 EXEC sp_MSForEachDB @command
 
@@ -370,9 +368,9 @@ OPTION (
 			})),
 			feed: {
 				ping: ping.toString(),
-				cpuLoad: cpuLoad.toString(),
+				cpuLoad: cpuLoad?.toString(),
 				memoryFree: (Number(targetMemory) - Number(usedMemory)).toString(),
-				memoryTotal: targetMemory.toString(),
+				memoryTotal: targetMemory?.toString(),
 			},
 		});
 
@@ -404,21 +402,7 @@ OPTION (
 				),
 		);
 
-		// if (error) {
-		// 	// update feed to be an error
-		// 	if (data?.feeds) {
-		// 		await setFeedError({
-		// 			id: data?.feeds?.[0]?.id,
-		// 			hasError: true,
-		// 			message: error.message || error,
-		// 		});
-		// 	}
-		// 	throw new Error(error.message || error);
-		// }
-
-		// const msg = (res?.status || '') + (res?.statusText || '');
-
-		// await Notifier({ job: monitor.id });
+		await Notifier({ job: monitor.id });
 
 		console.log(`successfully ran ${monitor.type} monitor: ${monitor.id}`);
 	} catch (e) {

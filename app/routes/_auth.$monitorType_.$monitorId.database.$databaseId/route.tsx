@@ -98,12 +98,12 @@ export default function Index() {
 					Database
 				</Badge>
 				<div className="flex divide-x">
-					<Database database={database}>
+					<Database database={database} setter={setDatabase}>
 						<Button variant="link" className="text-slate-700 h-6 ">
 							<Settings size={16} />
 						</Button>
 					</Database>
-					<Link
+					{/*<Link
 						to={`/${monitorType}/${monitorId}/database/${database.id}/notifications`}
 						className="flex content-center space-x-2 pl-3 text-slate-600"
 						prefetch="intent"
@@ -111,7 +111,7 @@ export default function Index() {
 						<BellRing size={16} className="my-auto" />
 						<span className="my-auto">Manage Notifications</span>
 						<MoveRight size={16} className="my-auto" />
-					</Link>
+					</Link>*/}
 				</div>
 			</div>
 
@@ -125,7 +125,7 @@ export default function Index() {
 						<span>({database.name})</span>
 					</>
 				) : (
-					<>{database.name}</>
+					<span>{database.name}</span>
 				)}
 			</H1>
 
