@@ -1,3 +1,8 @@
+## <small>1.35.1 (2023-08-31)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([4956ef4](https://github.com/atlas-bi/System/commit/4956ef4))
+* fix(http cert): updated notification for certs that cannot be determined ([2c1c679](https://github.com/atlas-bi/System/commit/2c1c679))
+
 ## 1.35.0 (2023-08-31)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([4062373](https://github.com/atlas-bi/System/commit/4062373))
