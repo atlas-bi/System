@@ -5,7 +5,7 @@ import { Preview } from '@react-email/preview';
 import { Link } from '@react-email/link';
 import { Tailwind } from '@react-email/tailwind';
 import { Text } from '@react-email/text';
-import { Monitor } from '~/models/monitor.server';
+import { Drive, Monitor } from '~/models/monitor.server';
 import { Body } from '@react-email/body';
 import { Container } from '@react-email/container';
 import { Section } from '@react-email/section';
@@ -17,10 +17,12 @@ export const SuccessEmail = ({
 	hostname,
 	subject,
 	monitor,
+	drive,
 }: {
 	hostname?: string;
 	subject: string;
 	monitor: Monitor;
+	drive: Drive;
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
@@ -35,7 +37,7 @@ export const SuccessEmail = ({
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
 							Percentage of free space now below limit on{' '}
-							<strong>{monitor.name || monitor.title}</strong>
+							<strong>{monitor.name || monitor.title} {drive.name}</strong> drive
 						</Heading>
 
 						<Section className="text-center mt-[32px] mb-[32px]">
@@ -70,10 +72,12 @@ export const ErrorEmail = ({
 	hostname,
 	monitor,
 	message,
+	drive,
 }: {
 	hostname?: string;
 	monitor: Monitor;
 	message: string;
+	drive: Drive,
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
@@ -89,7 +93,7 @@ export const ErrorEmail = ({
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
 							Percentage of free space limit exceeded on{' '}
-							<strong>{monitor.name || monitor.title}</strong>
+							<strong>{monitor.name || monitor.title} {drive.name}</strong> drive.
 						</Heading>
 						{message && (
 							<>

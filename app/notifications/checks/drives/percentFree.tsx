@@ -107,7 +107,7 @@ export default async function percentFreeNotifier({
 	}
 
 	if (resend && drive.percFreeNotifyTypes) {
-		const subject = `💔 [${monitor.host} ${drive.name}:\\] Alert: free space limit exceeded on `;
+		const subject = `💔 [${monitor.host} ${drive.name}:\\] Alert: free space limit exceeded.`;
 		const html = render(
 			<ErrorEmail
 				hostname={process.env.HOSTNAME}
