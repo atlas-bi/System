@@ -9,7 +9,8 @@ import type {
 	User,
 } from '@prisma/client';
 import { prisma } from '~/db.server';
-import monitorMonitor from '~/queues/monitor.server';
+import monitorRunner from '~/queues/monitor.server';
+import searchLoader from '~/queues/searchService.server';
 
 export type {
 	DatabaseFile,
@@ -43,6 +44,7 @@ export async function deleteDrive({ id }: Pick<Drive, 'id'>) {
 	await prisma.drive.deleteMany({
 		where: { id },
 	});
+	searchLoader.enqueue(id);
 }
 
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
@@ -106,9 +108,11 @@ export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
 		where: { monitorId: id },
 	});
 
-	return prisma.monitor.deleteMany({
+	await prisma.monitor.deleteMany({
 		where: { id },
 	});
+
+	searchLoader.enqueue(id);
 }
 
 export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
@@ -1229,8 +1233,10 @@ export async function createMonitor({
 
 	if (enabled) {
 		// check monitor as soon as it is added
-		monitorMonitor.enqueue(monitor.id);
+		monitorRunner.enqueue(monitor.id);
 	}
+	searchLoader.enqueue(monitor.id);
+
 	return monitor;
 }
 
@@ -1377,8 +1383,11 @@ export async function editMonitor({
 			type: true,
 		},
 	});
-	// check monitor as soon as it is added
-	monitorMonitor.enqueue(monitor.id);
+	if (enabled) {
+		// check monitor as soon as it is added
+		monitorRunner.enqueue(monitor.id);
+	}
+	searchLoader.enqueue(monitor.id);
 	return monitor;
 }
 
@@ -1460,19 +1469,6 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 			enabled: true,
 			type: true,
 			hasError: true,
-			// feeds: {
-			// 	select: {
-			// 		id: true,
-			// 		ping: true,
-			// 		hasError: true,
-			// 		createdAt: true,
-			// 		message: true,
-			// 	},
-			// 	take: 1,
-			// 	orderBy: {
-			// 		createdAt: 'desc',
-			// 	},
-			// },
 		},
 		orderBy: [
 			{

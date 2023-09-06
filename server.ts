@@ -24,8 +24,10 @@ const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), 'build');
 
 let child: ChildProcess | undefined;
+let search: ChildProcess | undefined;
 
 if (MODE === 'production') child = startQuirrel();
+if (MODE === 'production') search = startMeili();
 
 (async () => {
 	if (MODE === 'production') await getQuirrelToken();
@@ -132,6 +134,26 @@ function startQuirrel() {
 	return child;
 }
 
+function startMeili() {
+	const child: ChildProcess = execa('meilisearch', {
+		env: {
+			...process.env,
+			MEILI_HTTP_ADDR: `localhost:${(
+				process.env.MEILI_PORT || 7700
+			).toString()}`,
+		},
+		stdio: 'inherit',
+	});
+
+	child.on('exit', function (code, signal) {
+		throw Error(
+			'child process exited with ' + `code ${code} and signal ${signal}`,
+		);
+	});
+
+	return child;
+}
+
 function purgeRequireCache() {
 	// purge require cache on requests for "server side HMR" this won't let
 	// you have in-memory objects between requests in development,
@@ -193,6 +215,7 @@ async function getQuirrelToken() {
 			console.log('Failed to connect to quirrel: max retries exceeded');
 			// max retries exceeded
 			child?.kill('SIGINT');
+			search?.kill('SIGINT');
 			throw error;
 		}
 	};
@@ -227,6 +250,7 @@ async function getQuirrelToken() {
 		);
 	} catch (error) {
 		child?.kill('SIGINT');
+		search?.kill('SIGINT');
 		throw error;
 	}
 }

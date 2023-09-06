@@ -36,7 +36,7 @@ export default async function collectionNotifier({
 
 	let name = monitor.title;
 
-	if(monitor.type === 'windows' || monitor.type === 'ubuntu') {
+	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		name = `${monitor.title} (${monitor.host})`;
 	}
 
