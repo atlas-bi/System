@@ -1,3 +1,8 @@
+## 1.37.0 (2023-09-06)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([fd7c3db](https://github.com/atlas-bi/System/commit/fd7c3db))
+* feat(search): added meilisearch ([7d0e3f2](https://github.com/atlas-bi/System/commit/7d0e3f2))
+
 ## <small>1.36.2 (2023-09-05)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([b88708a](https://github.com/atlas-bi/System/commit/b88708a))
