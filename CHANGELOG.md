@@ -1,3 +1,8 @@
+## <small>1.37.1 (2023-09-06)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([0f7e3e4](https://github.com/atlas-bi/System/commit/0f7e3e4))
+* fix(build): added missing build dep ([5698bef](https://github.com/atlas-bi/System/commit/5698bef))
+
 ## 1.37.0 (2023-09-06)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([fd7c3db](https://github.com/atlas-bi/System/commit/fd7c3db))
