@@ -1,3 +1,8 @@
+## <small>1.36.2 (2023-09-05)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([b88708a](https://github.com/atlas-bi/System/commit/b88708a))
+* fix(notification): fixed drive notification to include drive name ([f00669a](https://github.com/atlas-bi/System/commit/f00669a))
+
 ## <small>1.36.1 (2023-09-01)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([4e92c83](https://github.com/atlas-bi/System/commit/4e92c83))
