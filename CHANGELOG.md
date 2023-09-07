@@ -1,3 +1,8 @@
+## 1.40.0 (2023-09-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([05c3153](https://github.com/atlas-bi/System/commit/05c3153))
+* feat(search): cleaned up search results ([a9372a1](https://github.com/atlas-bi/System/commit/a9372a1))
+
 ## 1.39.0 (2023-09-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([eebacd0](https://github.com/atlas-bi/System/commit/eebacd0))
