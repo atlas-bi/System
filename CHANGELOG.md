@@ -1,3 +1,8 @@
+## 1.39.0 (2023-09-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System ([eebacd0](https://github.com/atlas-bi/System/commit/eebacd0))
+* feat(memeroy): attempt to reduce mem usage on windows monitors by awaiting ([65b9f73](https://github.com/atlas-bi/System/commit/65b9f73))
+
 ## 1.38.0 (2023-09-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([5e3fe2e](https://github.com/atlas-bi/System/commit/5e3fe2e))
