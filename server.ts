@@ -29,8 +29,6 @@ if (!process.env.MEILI_PORT) {
 }
 
 process.env.SESSION_SECRET = `atlas-${port}`;
-process.env.MEILISEARCH_URL = `http://127.0.0.1:${process.env.MEILI_PORT}`;
-process.env.MEILI_MASTER_KEY = `atlas-meili-${process.env.MEILI_PORT}`;
 
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), 'build');
@@ -40,6 +38,11 @@ let search: ChildProcess | undefined;
 
 (async () => {
 	if (MODE === 'production') {
+		process.env.MEILISEARCH_URL = `http://127.0.0.1:${process.env.MEILI_PORT}`;
+		process.env.MEILI_MASTER_KEY = `atlas-meili-${process.env.MEILI_PORT}`;
+		process.env.QUIRREL_API_URL = `http://127.0.0.1:${process.env.QUIRREL_PORT}`;
+		process.env.QUIRREL_BASE_URL = `http://127.0.0.1:${port}`;
+
 		child = startQuirrel();
 		search = startMeili();
 		await getQuirrelToken();
@@ -133,8 +136,6 @@ function startQuirrel() {
 			env: {
 				...process.env,
 				PORT: process.env.QUIRREL_PORT,
-				QUIRREL_API_URL: `http://127.0.0.1:${process.env.QUIRREL_PORT}`,
-				QUIRREL_BASE_URL: `http://127.0.0.1:${port}`,
 				PASSPHRASES: `atlas`,
 				DISABLE_TELEMETRY: '1',
 			},

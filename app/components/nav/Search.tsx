@@ -113,7 +113,6 @@ export function Search({ ...props }: DialogProps) {
 										))}
 									</div>
 								</div>
-								{h.description}
 							</CommandItem>
 						))}
 				</CommandList>
