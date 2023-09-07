@@ -1,3 +1,8 @@
+## <small>1.37.3 (2023-09-07)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([035a2b9](https://github.com/atlas-bi/System/commit/035a2b9))
+* fix(meilisearch): moved import into subdir ([8951196](https://github.com/atlas-bi/System/commit/8951196))
+
 ## <small>1.37.2 (2023-09-07)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([0b23e93](https://github.com/atlas-bi/System/commit/0b23e93))
