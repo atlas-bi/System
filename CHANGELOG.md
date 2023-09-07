@@ -1,3 +1,8 @@
+## <small>1.37.2 (2023-09-07)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([0b23e93](https://github.com/atlas-bi/System/commit/0b23e93))
+* fix(css): removed css bundler ([1efd615](https://github.com/atlas-bi/System/commit/1efd615))
+
 ## <small>1.37.1 (2023-09-06)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([0f7e3e4](https://github.com/atlas-bi/System/commit/0f7e3e4))
