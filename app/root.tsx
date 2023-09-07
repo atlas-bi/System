@@ -11,7 +11,6 @@ import {
 
 import remixImageStyles from 'remix-image/remix-image.css';
 
-
 export const links: LinksFunction = () => [
 	{ rel: 'stylesheet', href: remixImageStyles },
 	{ rel: 'stylesheet', href: stylesheet },

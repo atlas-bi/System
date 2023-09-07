@@ -135,7 +135,7 @@ function startQuirrel() {
 }
 
 function startMeili() {
-	const child: ChildProcess = execa('meilisearch', {
+	const child: ChildProcess = execa('./etc/meilisearch', {
 		env: {
 			...process.env,
 			MEILI_HTTP_ADDR: `localhost:${(
