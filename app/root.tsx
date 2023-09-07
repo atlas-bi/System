@@ -1,3 +1,4 @@
+import { cssBundleHref } from '@remix-run/css-bundle';
 import stylesheet from '@/styles/globals.css';
 import { LinksFunction, MetaFunction } from '@remix-run/node';
 import {
@@ -12,8 +13,8 @@ import {
 import remixImageStyles from 'remix-image/remix-image.css';
 
 export const links: LinksFunction = () => [
-	{ rel: 'stylesheet', href: remixImageStyles },
 	{ rel: 'stylesheet', href: stylesheet },
+	...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
 export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
