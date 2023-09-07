@@ -13,18 +13,18 @@ export default Queue('queues/monitor', async (job: string, meta) => {
 		return;
 	}
 	if (monitor.type == 'windows') {
-		return WindowsMonitor({ monitor });
+		return await WindowsMonitor({ monitor });
 	}
 	if (monitor.type == 'ubuntu') {
-		return UbuntuMonitor({ monitor });
+		return await UbuntuMonitor({ monitor });
 	}
 	if (monitor.type == 'http') {
-		return HttpMonitor({ monitor });
+		return await HttpMonitor({ monitor });
 	}
 	if (monitor.type == 'sqlServer') {
-		return SqlServerMonitor({ monitor });
+		return await SqlServerMonitor({ monitor });
 	}
 	if (monitor.type == 'tcp') {
-		return TcpMonitor({ monitor });
+		return await TcpMonitor({ monitor });
 	}
 });

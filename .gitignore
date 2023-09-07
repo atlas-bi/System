@@ -2,6 +2,7 @@
 .DS_Store
 .cache
 data.ms/
+etc/
 meilisearch
 # We don't want lockfiles in stacks, as people could use a different package manager
 # This part will be removed by `remix.init`

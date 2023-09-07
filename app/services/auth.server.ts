@@ -16,71 +16,73 @@ const host = process.env.HOSTNAME;
 
 let metadata;
 
-try {
-	invariant(process.env.SAML_IDP_METADATA);
-	invariant(host, 'HOSTNAME is required for saml.');
+if (process.env.SAML_IDP_METADAT) {
+	try {
+		invariant(host, 'HOSTNAME is required for saml.');
 
-	const samlStrategy = new SamlStrategy(
-		{
-			validator,
-			authURL: host,
-			callbackURL: host + '/auth/callback',
-			idpMetadataURL: process.env.SAML_IDP_METADATA,
-			spAuthnRequestSigned:
-				(process.env.SAML_SP_AUTHNREQUESTSSIGNED || '').toLowerCase() ===
-				'true',
-			spWantAssertionSigned:
-				(process.env.SAML_SP_WANTASSERTIONSIGNED || '').toLowerCase() ===
-				'true',
-			spWantMessageSigned:
-				(process.env.SAML_SP_WANTMESSAGESIGNED || '').toLowerCase() === 'true',
-			spWantLogoutRequestSigned:
-				(process.env.SAML_SP_WANTLOGOUTRESPONSESIGNED || '').toLowerCase() ===
-				'true',
-			spWantLogoutResponseSigned:
-				(process.env.SAML_SP_WANTLOGOUTREQUESTSIGNED || '').toLowerCase() ===
-				'true',
-			spIsAssertionEncrypted:
-				(process.env.SAML_SP_ISASSERTIONENCRYPTED || '').toLowerCase() ===
-				'true',
-			// optional
-			privateKey: process.env.SAML_PRIVATE_KEY,
-			// optional
-			privateKeyPass: process.env.SAML_PRIVATE_KEY_PASS,
-			// optional
-			encPrivateKey: process.env.SAML_ENC_PRIVATE_KEY,
-			signingCert: process.env.SAML_SIGNING_CERT,
-			encryptCert: process.env.SAML_ENC_CERT,
-		},
-		async ({ extract, data }) => {
-			if (!extract.nameID) {
-				throw 'failed to login.';
-			}
-			const email = extract.nameID;
-
-			if (process.env.SAML_AUTH_GROUP) {
-				if (
-					!extract.attributes?.groups ||
-					extract.attributes.groups.indexOf(process.env.SAML_AUTH_GROUP) == -1
-				) {
-					throw 'missing required groups.';
+		const samlStrategy = new SamlStrategy(
+			{
+				validator,
+				authURL: host,
+				callbackURL: host + '/auth/callback',
+				idpMetadataURL: process.env.SAML_IDP_METADATA,
+				spAuthnRequestSigned:
+					(process.env.SAML_SP_AUTHNREQUESTSSIGNED || '').toLowerCase() ===
+					'true',
+				spWantAssertionSigned:
+					(process.env.SAML_SP_WANTASSERTIONSIGNED || '').toLowerCase() ===
+					'true',
+				spWantMessageSigned:
+					(process.env.SAML_SP_WANTMESSAGESIGNED || '').toLowerCase() ===
+					'true',
+				spWantLogoutRequestSigned:
+					(process.env.SAML_SP_WANTLOGOUTRESPONSESIGNED || '').toLowerCase() ===
+					'true',
+				spWantLogoutResponseSigned:
+					(process.env.SAML_SP_WANTLOGOUTREQUESTSIGNED || '').toLowerCase() ===
+					'true',
+				spIsAssertionEncrypted:
+					(process.env.SAML_SP_ISASSERTIONENCRYPTED || '').toLowerCase() ===
+					'true',
+				// optional
+				privateKey: process.env.SAML_PRIVATE_KEY,
+				// optional
+				privateKeyPass: process.env.SAML_PRIVATE_KEY_PASS,
+				// optional
+				encPrivateKey: process.env.SAML_ENC_PRIVATE_KEY,
+				signingCert: process.env.SAML_SIGNING_CERT,
+				encryptCert: process.env.SAML_ENC_CERT,
+			},
+			async ({ extract, data }) => {
+				if (!extract.nameID) {
+					throw 'failed to login.';
 				}
-			}
+				const email = extract.nameID;
 
-			return updateUserProps(
-				email,
-				extract.attributes?.firstName,
-				extract.attributes?.lastName,
-				extract.attributes?.groups,
-				extract.attributes?.profilePhoto,
-			);
-		},
-	);
+				if (process.env.SAML_AUTH_GROUP) {
+					if (
+						!extract.attributes?.groups ||
+						extract.attributes.groups.indexOf(process.env.SAML_AUTH_GROUP) == -1
+					) {
+						throw 'missing required groups.';
+					}
+				}
 
-	authenticator.use(samlStrategy, 'saml');
-	metadata = samlStrategy.metadata();
-} catch (e) {
-	if (process.env.NODE_ENV === 'production') console.log(e);
+				return updateUserProps(
+					email,
+					extract.attributes?.firstName,
+					extract.attributes?.lastName,
+					extract.attributes?.groups,
+					extract.attributes?.profilePhoto,
+				);
+			},
+		);
+
+		authenticator.use(samlStrategy, 'saml');
+		metadata = samlStrategy.metadata();
+	} catch (e) {
+		if (process.env.NODE_ENV === 'production') console.log(e);
+	}
 }
 // use ldap
 

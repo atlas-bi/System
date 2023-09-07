@@ -19,24 +19,37 @@ kill -9 <<PID>>
 
 */
 
-const port = process.env.PORT || 3000;
+const port = process.env.WEB_PORT || 3000;
+
+if (!process.env.QUIRREL_PORT) {
+	process.env.QUIRREL_PORT = '9891';
+}
+if (!process.env.MEILI_PORT) {
+	process.env.MEILI_PORT = '7700';
+}
+
+process.env.SESSION_SECRET = `atlas-${port}`;
+process.env.MEILISEARCH_URL = `http://127.0.0.1:${process.env.MEILI_PORT}`;
+process.env.MEILI_MASTER_KEY = `atlas-meili-${process.env.MEILI_PORT}`;
+
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), 'build');
 
 let child: ChildProcess | undefined;
 let search: ChildProcess | undefined;
 
-if (MODE === 'production') child = startQuirrel();
-if (MODE === 'production') search = startMeili();
-
 (async () => {
-	if (MODE === 'production') await getQuirrelToken();
+	if (MODE === 'production') {
+		child = startQuirrel();
+		search = startMeili();
+		await getQuirrelToken();
+	}
 
 	const app = express();
 	app.listen(port, () => {
 		// require the built app so we're ready when the first request comes in
 		require(BUILD_DIR);
-		console.log(`✅ app ready: http://localhost:${port}`);
+		console.log(`✅ app ready: http://127.0.0.1:${port}`);
 	});
 	app.use((req, res, next) => {
 		// helpful headers:
@@ -119,7 +132,11 @@ function startQuirrel() {
 		{
 			env: {
 				...process.env,
-				PORT: (process.env.QUIRREL_PORT || 9891).toString(),
+				PORT: process.env.QUIRREL_PORT,
+				QUIRREL_API_URL: `http://127.0.0.1:${process.env.QUIRREL_PORT}`,
+				QUIRREL_BASE_URL: `http://127.0.0.1:${port}`,
+				PASSPHRASES: `atlas`,
+				DISABLE_TELEMETRY: '1',
 			},
 			stdio: 'inherit',
 		},
@@ -138,9 +155,8 @@ function startMeili() {
 	const child: ChildProcess = execa('./etc/meilisearch', {
 		env: {
 			...process.env,
-			MEILI_HTTP_ADDR: `localhost:${(
-				process.env.MEILI_PORT || 7700
-			).toString()}`,
+			MEILI_HTTP_ADDR: `127.0.0.1:${process.env.MEILI_PORT}`,
+			MEILI_NO_ANALYTICS: 'true',
 		},
 		stdio: 'inherit',
 	});
@@ -169,6 +185,7 @@ function purgeRequireCache() {
 }
 
 async function getQuirrelToken() {
+	//curl --user ignored:atlas-quirrel-9891 -X PUT http://127.0.0.1:9891/tokens/prod
 	console.log('Quirrel: getting token...');
 	const sleep = (ms: number) => {
 		return new Promise((resolve) => {
@@ -221,12 +238,11 @@ async function getQuirrelToken() {
 	};
 
 	const response = await fetchWithRetries(
-		`http://localhost:${process.env.QUIRREL_PORT || 9181}/tokens/prod`,
+		`http://127.0.0.1:${process.env.QUIRREL_PORT}/tokens/prod`,
 		{
 			method: 'PUT',
 			headers: {
-				Authorization:
-					'Basic ' + btoa('ignored:' + process.env.QUIRREL_PROCESS),
+				Authorization: 'Basic ' + btoa('ignored:atlas'),
 			},
 			maxRetries: 5,
 		},
@@ -242,7 +258,7 @@ async function getQuirrelToken() {
 			{
 				env: {
 					...process.env,
-					PORT: (process.env.QUIRREL_PORT || 9891).toString(),
+					PORT: process.env.QUIRREL_PORT,
 				},
 				stdio: 'inherit',
 				encoding: 'utf-8',
