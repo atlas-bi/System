@@ -1,3 +1,8 @@
+## 1.38.0 (2023-09-07)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to ([5e3fe2e](https://github.com/atlas-bi/System/commit/5e3fe2e))
+* feat(css): added bundle back ([2ee42d5](https://github.com/atlas-bi/System/commit/2ee42d5))
+
 ## <small>1.37.3 (2023-09-07)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([035a2b9](https://github.com/atlas-bi/System/commit/035a2b9))
