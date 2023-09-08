@@ -16,7 +16,7 @@ const host = process.env.HOSTNAME;
 
 let metadata;
 
-if (process.env.SAML_IDP_METADAT) {
+if (process.env.SAML_IDP_METADATA) {
 	try {
 		invariant(host, 'HOSTNAME is required for saml.');
 
