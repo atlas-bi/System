@@ -136,6 +136,8 @@ model MonitorFeeds {
   ping String?
 
   message String?
+
+  @@index([monitorId, createdAt])
 }
 
 model MonitorLogs {
@@ -271,6 +273,8 @@ model DatabaseFileUsage {
   usedSize    String?
   currentSize String?
   maxSize     String?
+
+  @@index([databaseFileId, createdAt])
 }
 
 model DatabaseUsage {
@@ -285,6 +289,8 @@ model DatabaseUsage {
 
   // fields sent from monitor
   memory String?
+
+  @@index([databaseId, createdAt])
 }
 
 model Drive {
@@ -391,4 +397,7 @@ model DriveUsage {
   // fields sent from monitor
   used String?
   free String?
+
+  @@index([driveId, createdAt])
+  @@index([driveId, id])
 }

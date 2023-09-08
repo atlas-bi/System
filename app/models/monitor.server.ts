@@ -1334,7 +1334,7 @@ export async function editMonitor({
 	| 'enabled'
 	| 'httpUrl'
 	| 'httpIgnoreSsl'
-	| 'httpCheckCert',
+	| 'httpCheckCert'
 	| 'httpAcceptedStatusCodes'
 	| 'httpMaxRedirects'
 	| 'httpRequestMethod'

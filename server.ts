@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { ChildProcess, spawnSync } from 'child_process';
 import { execa } from 'execa';
+import { symmetric } from 'secure-webhooks';
 /*
 
 1. start quirrel
@@ -35,6 +36,56 @@ const BUILD_DIR = path.join(process.cwd(), 'build');
 
 let child: ChildProcess | undefined;
 let search: ChildProcess | undefined;
+
+const sleep = (ms: number) => {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+};
+type FetchWithRetries = (
+	url: string,
+	options: {
+		[x: string]: any;
+		method?: string;
+		headers?: { Authorization?: string; 'x-quirrel-signature'?: string };
+		maxRetries: any;
+	},
+	retryCount?: number,
+) => Promise<Response>;
+
+const fetchWithRetries: FetchWithRetries = async (
+	url,
+	options,
+	retryCount = 0,
+) => {
+	// split out the maxRetries option from the remaining
+	// options (with a default of 3 retries)
+	if (retryCount > 0) console.log(`retry ${retryCount}...`);
+	const { maxRetries = 3, ...remainingOptions } = options;
+	let response;
+	try {
+		response = await fetch(url, remainingOptions);
+		if (![201, 200].includes(response.status)) {
+			const x = await response.text();
+			console.log(response);
+			console.log(x);
+			throw Error(response.status.toString());
+		}
+		return response;
+	} catch (error) {
+		// if the retryCount has not been exceeded, call again
+		if (retryCount > 0) console.log(error);
+		if (retryCount < maxRetries) {
+			await sleep(5000);
+			return fetchWithRetries(url, options, retryCount + 1);
+		}
+		console.log('Failed to connect to quirrel: max retries exceeded');
+		// max retries exceeded
+		child?.kill('SIGINT');
+		search?.kill('SIGINT');
+		throw error;
+	}
+};
 
 (async () => {
 	if (MODE === 'production') {
@@ -126,6 +177,23 @@ let search: ChildProcess | undefined;
 					return requestHandler(...args);
 			  },
 	);
+
+	// call search loader for an initial load
+	const response = await fetchWithRetries(
+		`http://127.0.0.1:${port}/queues/searchService`,
+		{
+			body: '',
+			method: 'POST',
+			headers: {
+				'x-quirrel-signature': symmetric.sign(
+					'',
+					process.env.QUIRREL_TOKEN || '',
+				),
+			},
+			maxRetries: 5,
+		},
+	);
+	console.log('🔍 Triggered search load');
 })();
 
 function startQuirrel() {
@@ -188,55 +256,6 @@ function purgeRequireCache() {
 async function getQuirrelToken() {
 	//curl --user ignored:atlas-quirrel-9891 -X PUT http://127.0.0.1:9891/tokens/prod
 	console.log('Quirrel: getting token...');
-	const sleep = (ms: number) => {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms);
-		});
-	};
-
-	type FetchWithRetries = (
-		url: string,
-		options: {
-			[x: string]: any;
-			method?: string;
-			headers?: { Authorization: string };
-			maxRetries: any;
-		},
-		retryCount?: number,
-	) => Promise<Response>;
-
-	const fetchWithRetries: FetchWithRetries = async (
-		url,
-		options,
-		retryCount = 0,
-	) => {
-		// split out the maxRetries option from the remaining
-		// options (with a default of 3 retries)
-		if (retryCount > 0) console.log(`retry ${retryCount}...`);
-		const { maxRetries = 3, ...remainingOptions } = options;
-		let response;
-		try {
-			response = await fetch(url, remainingOptions);
-			if (response.status !== 201) {
-				const x = await response.text();
-				console.log(x);
-				throw Error(response.status.toString());
-			}
-			return response;
-		} catch (error) {
-			// if the retryCount has not been exceeded, call again
-			if (retryCount > 0) console.log(error);
-			if (retryCount < maxRetries) {
-				await sleep(5000);
-				return fetchWithRetries(url, options, retryCount + 1);
-			}
-			console.log('Failed to connect to quirrel: max retries exceeded');
-			// max retries exceeded
-			child?.kill('SIGINT');
-			search?.kill('SIGINT');
-			throw error;
-		}
-	};
 
 	const response = await fetchWithRetries(
 		`http://127.0.0.1:${process.env.QUIRREL_PORT}/tokens/prod`,

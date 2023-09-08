@@ -18,7 +18,10 @@ export const loader = async ({ request }: LoaderArgs) => {
 	const url = new URL(request.url);
 	const search = url.searchParams.get('search');
 
-	const results = await client.index('base').search(search);
+	let results;
+	try {
+		results = await client.index('base').search(search);
+	} catch (e) {}
 
 	return json({ results });
 };
