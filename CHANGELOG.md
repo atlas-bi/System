@@ -1,3 +1,8 @@
+## 1.41.0 (2023-09-08)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([fe49c75](https://github.com/atlas-bi/System/commit/fe49c75))
+* feat(db): added index. added default call to load search. prevent errors on missing search data ([f6495c1](https://github.com/atlas-bi/System/commit/f6495c1))
+
 ## 1.40.0 (2023-09-07)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([05c3153](https://github.com/atlas-bi/System/commit/05c3153))
