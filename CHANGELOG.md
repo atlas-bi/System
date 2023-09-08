@@ -1,3 +1,8 @@
+## <small>1.41.1 (2023-09-08)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([123eab9](https://github.com/atlas-bi/System/commit/123eab9))
+* fix(saml): enabled SAML ([9e32f36](https://github.com/atlas-bi/System/commit/9e32f36))
+
 ## 1.41.0 (2023-09-08)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([fe49c75](https://github.com/atlas-bi/System/commit/fe49c75))
