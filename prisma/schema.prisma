@@ -321,9 +321,6 @@ model Drive {
   systemDescription String?
   size              String?
 
-  daysTillFull String?
-  growthRate   String?
-
   usage DriveUsage[]
 
   // notifications

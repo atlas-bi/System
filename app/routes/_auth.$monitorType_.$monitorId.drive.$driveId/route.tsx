@@ -115,7 +115,7 @@ export default function Index() {
 				<H1 className="space-x-2 flex">
 					{drive.enabled === false ? (
 						<span className="!text-slate-400">(Disabled)</span>
-					) : drive.hasError ? (
+					) : drive.hasError || !drive.online ? (
 						<AlertTriangle className="text-red-500 my-auto" size={18} />
 					) : (
 						<Activity className="text-emerald-600 my-auto" size={18} />

@@ -15,7 +15,7 @@ import { Label } from '~/components/ui/label';
 
 import { Textarea } from '~/components/ui/textarea';
 
-import type { Drive } from '~/models/monitor.server';
+import type { Drive } from '~/models/drive.server';
 import { Switch } from '../ui/switch';
 
 export default function Drive({

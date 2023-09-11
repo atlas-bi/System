@@ -6,11 +6,7 @@ import {
 	updateMonitor,
 } from '~/models/monitor.server';
 
-import {
-	setDriveDays,
-	setDriveGrowth,
-	setDriveOnline,
-} from '~/models/drive.server';
+import { setDriveOnline } from '~/models/drive.server';
 import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
 import { NodeSSH } from 'node-ssh';
@@ -119,12 +115,13 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			'use%': string;
 		};
 
-		// only update drives that are enabled.
+		// only update drives that are enabled and not tmpfs
 		const updateableDrives = drives.discarray.filter((drive: Drive) => {
 			const l =
 				disabledDrives.filter(
 					(d) => d.name == drive.filesystem && d.root == drive.mount,
-				).length == 0;
+				).length == 0 && drive.filesystem !== 'tmpfs';
+
 			return l;
 		});
 		const oldMonitor = await getMonitor({ id: monitor.id });
@@ -170,8 +167,8 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			drives: updateableDrives.map((drive: Drive) => {
 				return {
 					data: {
-						name: drive.filesystem,
-						root: drive.mount,
+						root: drive.filesystem,
+						name: drive.mount,
 						size: (Number(drive.size) * 1000).toString(),
 					},
 					used: (Number(drive.used) * 1000).toString(),
@@ -183,34 +180,19 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 				.map((x: string, i: number) => ({ name: i.toString(), used: x })),
 		});
 
-		const oneDay = 24 * 60 * 60 * 1000;
-		// calculate days till full
+		// online/offline
 		data.drives?.map(
-			async (drive: { size: string; usage: string | any[]; id: any }) => {
-				// if (!drive.usage || drive.usage.length <= 1) {
-				await setDriveDays({ id: drive.id, daysTillFull: null });
-				await setDriveGrowth({ id: drive.id, growthRate: null });
-				// } else {
-				// const end = drive.usage[0];
-				// const start = drive.usage[drive.usage.length - 1];
-				// const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
-				// const usedGrowth = end.used - start.used;
-				// const free = Number(drive.size) - end.used;
-				// const daysTillFull = (
-				// 	Math.max(Math.round((free * diffDays) / usedGrowth), -1) || -1
-				// ).toString();
-				// await setDriveDays({ id: drive.id, daysTillFull });
-				// await setDriveGrowth({
-				// 	id: drive.id,
-				// 	growthRate: (usedGrowth / diffDays).toString(),
-				// });
-				// }
-				// online/offline
+			async (drive: {
+				size: string;
+				usage: string | any[];
+				id: any;
+				name: string;
+			}) => {
 				await setDriveOnline({
 					id: drive.id,
 					online:
 						updateableDrives.filter(
-							(x: { Name: string }) => x.Name == drive.name,
+							(x: { filesystem: string }) => x.filesystem == drive.name,
 						).length > 0,
 				});
 			},

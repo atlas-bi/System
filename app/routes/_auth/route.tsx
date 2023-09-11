@@ -4,12 +4,12 @@ import { Outlet } from '@remix-run/react';
 import Nav from '~/components/nav/Nav';
 import { SidebarNav } from '~/components/sidebar';
 import { getMonitorTypes } from '~/models/monitor.server';
-import { UserSerialized } from '~/models/user.server';
+import { SlimUserFields } from '~/models/user.server';
 import { authenticator } from '~/services/auth.server';
 import { commitSession, getSession } from '~/services/session.server';
 
 export async function loader({ request }: LoaderArgs) {
-	const user: UserSerialized = await authenticator.isAuthenticated(request, {
+	const user: SlimUserFields = await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

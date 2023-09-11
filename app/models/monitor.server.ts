@@ -301,8 +301,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 					description: true,
 					systemDescription: true,
 					size: true,
-					daysTillFull: true,
-					growthRate: true,
 					missingNotify: true,
 					missingNotifyResendAfterMinutes: true,
 					missingNotifySentAt: true,
@@ -904,8 +902,6 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 			description: true,
 			systemDescription: true,
 			size: true,
-			daysTillFull: true,
-			growthRate: true,
 			online: true,
 		},
 		orderBy: [

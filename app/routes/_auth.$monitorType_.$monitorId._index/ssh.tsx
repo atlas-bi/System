@@ -1,18 +1,15 @@
-import { Link, useFetcher, useLocation } from '@remix-run/react';
+import { useFetcher, useLocation } from '@remix-run/react';
 import bytes from 'bytes';
 import { format, formatDistance } from 'date-fns';
-import { AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { CpuChart } from '~/components/charts/cpuChart';
-import { DoughnutChart } from '~/components/charts/driveDoughnut';
 import { MemoryChart } from '~/components/charts/memoryChart';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { H3 } from '~/components/ui/typography';
-import { Drive, DriveUsage, Monitor } from '~/models/monitor.server';
-import { PingStat } from './responseTime';
+import { Monitor } from '~/models/monitor.server';
+import type { Drive } from '~/models/drive.server';
 import { MiniDrive } from './drive';
 
 export const SshSystem = ({ monitor }: { monitor: Monitor }) => {

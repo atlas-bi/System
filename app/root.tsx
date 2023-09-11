@@ -1,6 +1,6 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
 import stylesheet from '@/styles/globals.css';
-import { LinksFunction, MetaFunction } from '@remix-run/node';
+import { LinksFunction, V2_MetaFunction } from '@remix-run/node';
 import {
 	Links,
 	LiveReload,
@@ -17,7 +17,7 @@ export const links: LinksFunction = () => [
 	...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
+export const meta: V2_MetaFunction = () => [{ title: 'Atlas System' }];
 
 export default function App() {
 	return (

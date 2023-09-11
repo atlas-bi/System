@@ -50,8 +50,7 @@ export function getDriveMeta({ id }: Pick<Drive, 'id'>) {
 			systemDescription: true,
 			description: true,
 			size: true,
-			daysTillFull: true,
-			growthRate: true,
+			online: true,
 			monitor: {
 				select: {
 					title: true,
@@ -177,8 +176,6 @@ export function getDriveUsage({
 			description: true,
 			systemDescription: true,
 			size: true,
-			daysTillFull: true,
-			growthRate: true,
 			monitor: {
 				select: {
 					title: true,
@@ -237,16 +234,6 @@ export function getDriveLatestFeeds({ id }: Pick<Drive, 'id'>) {
 	});
 }
 
-export function setDriveGrowth({
-	id,
-	growthRate,
-}: Pick<Drive, 'id' | 'growthRate'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: { growthRate },
-	});
-}
-
 export function editDrive({
 	id,
 	title,
@@ -263,16 +250,6 @@ export function editDrive({
 		select: {
 			id: true,
 		},
-	});
-}
-
-export function setDriveDays({
-	id,
-	daysTillFull,
-}: Pick<Drive, 'id' | 'daysTillFull'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: { daysTillFull },
 	});
 }
 

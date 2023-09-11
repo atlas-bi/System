@@ -96,24 +96,28 @@ export const MiniDrive = ({
 							<span>{drive.title}</span>
 							<span>({drive.root})</span>
 						</>
+					) : monitor.type == 'ubuntu' && drive.name ? (
+						<span>
+							{drive.root} ({drive.name})
+						</span>
 					) : (
-						<>
+						<span>
 							{drive.root}
 							{drive.location}
-						</>
+						</span>
 					)}
 				</H3>
 				<Table>
 					<TableBody>
 						<TableRow>
 							<TableCell className="py-1 font-medium">Size</TableCell>
-							<TableCell className="py-1 text-slate-700">
+							<TableCell className="py-1 text-slate-800">
 								{bytes(Number(drive.size))}
 							</TableCell>
 						</TableRow>
 						<TableRow>
 							<TableCell className="py-1">Used</TableCell>
-							<TableCell className="py-1">
+							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(Number(usageFetcher?.data?.drive?.usage?.[0]?.used)) ||
 									'-1'
@@ -123,8 +127,8 @@ export const MiniDrive = ({
 							</TableCell>
 						</TableRow>
 						<TableRow>
-							<TableCell className="py-1">Free</TableCell>
-							<TableCell className="py-1">
+							<TableCell className="py-1 font-medium">Free</TableCell>
+							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(Number(usageFetcher?.data?.drive?.usage?.[0]?.free)) ||
 									'-1'
@@ -134,8 +138,8 @@ export const MiniDrive = ({
 							</TableCell>
 						</TableRow>
 						<TableRow>
-							<TableCell className="py-1">Days Till Full</TableCell>
-							<TableCell className="py-1">
+							<TableCell className="py-1 font-medium">Days Till Full</TableCell>
+							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(Number(usageFetcher?.data?.drive?.daysTillFull)) || '-1'
 								) : (
@@ -144,8 +148,8 @@ export const MiniDrive = ({
 							</TableCell>
 						</TableRow>
 						<TableRow>
-							<TableCell className="py-1">Growth Rate</TableCell>
-							<TableCell className="py-1">
+							<TableCell className="py-1 font-medium">Growth Rate</TableCell>
+							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(Number(usageFetcher?.data?.drive?.growthRate)) || '-1'
 								) : (

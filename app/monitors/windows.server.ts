@@ -8,11 +8,7 @@ import {
 	updateMonitor,
 } from '~/models/monitor.server';
 
-import {
-	setDriveDays,
-	setDriveOnline,
-	setDriveGrowth,
-} from '~/models/drive.server';
+import { setDriveOnline } from '~/models/drive.server';
 import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
 import { differenceInDays } from 'date-fns';
@@ -273,28 +269,9 @@ export default async function WindowsMonitor({
 			cpus,
 		});
 
-		// calculate days till full
+		// online/offline
 		data.drives?.map(
 			async (drive: { size: string; usage: string | any[]; id: any }) => {
-				// if (!drive.usage || drive.usage.length <= 1) {
-				await setDriveDays({ id: drive.id, daysTillFull: null });
-				await setDriveGrowth({ id: drive.id, growthRate: null });
-				// } else {
-				// 	const end = drive.usage[0];
-				// 	const start = drive.usage[drive.usage.length - 1];
-				// 	const diffDays = differenceInDays(end.createdAt, start.createdAt) + 1;
-				// 	const usedGrowth = end.used - start.used;
-				// 	const free = Number(drive.size) - end.used;
-				// 	const daysTillFull = (
-				// 		Math.max(Math.round((free * diffDays) / usedGrowth), -1) || -1
-				// 	).toString();
-				// 	await setDriveDays({ id: drive.id, daysTillFull });
-				// 	await setDriveGrowth({
-				// 		id: drive.id,
-				// 		growthRate: (usedGrowth / diffDays).toString(),
-				// 	});
-				// }
-				// online/offline
 				await setDriveOnline({
 					id: drive.id,
 					online:

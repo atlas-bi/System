@@ -9,8 +9,12 @@ import {
 	Tooltip,
 	Filler,
 	TimeScale,
+	TooltipItem,
+	Tick,
+	Scale,
+	ChartOptions,
 } from 'chart.js';
-import { Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -31,6 +35,7 @@ import 'chartjs-adapter-date-fns';
 import { H2, H3 } from '../ui/typography';
 import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
+import { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 
 const SubChart = ({
 	speed,
@@ -43,11 +48,11 @@ const SubChart = ({
 	speed?: boolean;
 	unit: string;
 	fetcherState: string;
-	data: MonitorFeeds[];
+	data: Array<{ createdAt: Date; cpuLoad: string; cpuSpeed: string }>;
 	startDate: Date;
 	endDate: Date;
 }) => {
-	const chartRef = useRef<ChartJS>(null);
+	const chartRef = useRef<ChartJSOrUndefined>(null);
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
@@ -63,16 +68,10 @@ const SubChart = ({
 			maintainAspectRatio: false,
 			interaction: {
 				intersect: false,
-				mode: 'index',
+				mode: 'index' as const,
 			},
 			animation: {
 				duration: 300,
-				resize: {
-					duration: 0,
-				},
-				active: {
-					duration: 0,
-				},
 			},
 			plugins: {
 				title: {
@@ -82,13 +81,11 @@ const SubChart = ({
 					display: false,
 				},
 				tooltip: {
-					position: 'mouse',
+					position: 'mouse' as const,
 					callbacks: {
-						label: function (tooltipItem: {
-							datasetIndex: number;
-							formattedValue: string;
-							raw: { y: number };
-						}) {
+						label: function (
+							tooltipItem: TooltipItem<'line'> & { raw: { y: number } },
+						) {
 							if (tooltipItem.datasetIndex === 0) {
 								return tooltipItem.formattedValue + '% Used';
 							}
@@ -107,8 +104,13 @@ const SubChart = ({
 					position: 'left' as const,
 					beginAtZero: true,
 					ticks: {
-						callback: function (value: string) {
-							return value + '%';
+						callback: function (
+							this: Scale,
+							tickValue: number | string,
+							index: number,
+							ticks: Tick[],
+						) {
+							return tickValue + '%';
 						},
 					},
 					stacked: false,
@@ -120,15 +122,20 @@ const SubChart = ({
 					position: 'right' as const,
 					beginAtZero: true,
 					ticks: {
-						callback: function (value: string) {
-							return Number(value) / 1000 + 'GHz';
+						callback: function (
+							this: Scale,
+							tickValue: number | string,
+							index: number,
+							ticks: Tick[],
+						) {
+							return Number(tickValue) / 1000 + 'GHz';
 						},
 					},
 					stacked: false,
 				},
 				x: {
 					stacked: true,
-					type: 'time',
+					type: 'time' as const,
 					min: () => startDate,
 					max: () => endDate,
 					time: {
@@ -143,9 +150,11 @@ const SubChart = ({
 			},
 		};
 	}, [unit, data]);
-	const [options, setOptions] = useState(getOptions());
 
-	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
+	const [options, setOptions] = useState<ChartOptions<'line'>>(getOptions());
+
+	const [chartData, setChartData] =
+		useState<ChartData<'line', { x: Date; y: number }[]>>(emptyDataset);
 	useEffect(() => {
 		if (fetcherState === 'loading') {
 			setChartData(emptyDataset);
@@ -168,14 +177,14 @@ const SubChart = ({
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: speed,
 					label: 'Load',
-					cubicInterpolationMode: 'monotone',
+					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
-					data: data?.map((x: MonitorFeeds) => ({
+					data: data?.map((x) => ({
 						x: x.createdAt,
 						y: Number(x.cpuLoad),
 					})),
 					segment: {
-						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
+						borderColor: (ctx: { p0: { stop?: any }; p1: { stop?: any } }) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
 								chart.ctx,
@@ -184,8 +193,8 @@ const SubChart = ({
 							);
 						},
 						backgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
+							p0: { stop?: any };
+							p1: { stop?: any };
 						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
@@ -195,8 +204,8 @@ const SubChart = ({
 							);
 						},
 						hoverBackgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
+							p0: { stop?: any };
+							p1: { stop?: any };
 						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
@@ -206,8 +215,8 @@ const SubChart = ({
 							);
 						},
 						hoverBorderColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
+							p0: { stop?: any };
+							p1: { stop?: any };
 						}) => {
 							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
 							return createLinearGradient(
@@ -217,21 +226,21 @@ const SubChart = ({
 							);
 						},
 					},
-					pointStyle: false,
+					pointStyle: false as const,
 				},
 				{
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Speed',
 					fill: false,
-					data: data?.map((x: MonitorFeeds) => ({
+					data: data?.map((x) => ({
 						x: x.createdAt,
 						y: Number(x.cpuSpeed),
 					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
 					borderRadius: { topLeft: 2, topRight: 2 },
-					cubicInterpolationMode: 'monotone',
-					pointStyle: false,
+					cubicInterpolationMode: 'monotone' as const,
+					pointStyle: false as const,
 					tension: 0.4,
 					yAxisID: 'y2',
 				},
@@ -300,7 +309,15 @@ export const CpuChart = ({
 
 				<div className="grid sm:grid-cols-1 md:grid-cols-3 ls:grid-cols-4">
 					{usageFetcher.data?.monitor?.cpus.map(
-						(x: Cpu & { usage: CpuUsage }) => (
+						(
+							x: Cpu & {
+								usage: Array<{
+									createdAt: Date;
+									cpuLoad: string;
+									cpuSpeed: string;
+								}>;
+							},
+						) => (
 							<div key={x.id}>
 								<H3 className="text-base">CPU {x.title}</H3>
 								<div className="h-[150px] relative" key={x.id}>
