@@ -1,3 +1,8 @@
+## <small>1.41.3 (2023-09-11)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([ae850c0](https://github.com/atlas-bi/System/commit/ae850c0))
+* fix(ubuntu): fixed drive name mapping ([82cb7d1](https://github.com/atlas-bi/System/commit/82cb7d1))
+
 ## <small>1.41.2 (2023-09-11)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([3ee1cc5](https://github.com/atlas-bi/System/commit/3ee1cc5))
