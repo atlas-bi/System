@@ -1,3 +1,8 @@
+## <small>1.41.2 (2023-09-11)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([3ee1cc5](https://github.com/atlas-bi/System/commit/3ee1cc5))
+* perf(db): added index, split sql queries for the large tables ([56a47ab](https://github.com/atlas-bi/System/commit/56a47ab))
+
 ## <small>1.41.1 (2023-09-08)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message to explain why t ([123eab9](https://github.com/atlas-bi/System/commit/123eab9))
