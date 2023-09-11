@@ -141,7 +141,7 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Days Till Full</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher?.data?.drive?.daysTillFull)) || '-1'
+									usageFetcher?.data?.drive?.daysTillFull
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
@@ -151,7 +151,11 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Growth Rate</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher?.data?.drive?.growthRate)) || '-1'
+									<>
+										{bytes(Number(usageFetcher?.data?.drive?.growthRate)) ||
+											'-1'}
+										/day
+									</>
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}

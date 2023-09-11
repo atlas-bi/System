@@ -192,7 +192,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 					id: drive.id,
 					online:
 						updateableDrives.filter(
-							(x: { filesystem: string }) => x.filesystem == drive.name,
+							(x: { mount: string }) => x.mount == drive.name,
 						).length > 0,
 				});
 			},
