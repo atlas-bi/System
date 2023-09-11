@@ -1,11 +1,7 @@
 import { ActionArgs, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { namedAction } from 'remix-utils';
-import {
-	deleteDrive,
-	editDrive,
-	getDriveMonitor,
-} from '~/models/monitor.server';
+import { editDrive, getDriveMonitor, deleteDrive } from '~/models/drive.server';
 import { authenticator } from '~/services/auth.server';
 
 export async function action({ request }: ActionArgs) {
@@ -41,6 +37,7 @@ export async function action({ request }: ActionArgs) {
 			const drive = await getDriveMonitor({
 				id: values.id.toString(),
 			});
+
 			await deleteDrive({
 				id: values.id.toString(),
 			});

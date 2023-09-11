@@ -3,7 +3,7 @@ import { json } from '@remix-run/node';
 import { getDatabaseFile } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
-import { H1, H3 } from '~/components/ui/typography';
+import { H1 } from '~/components/ui/typography';
 import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import bytes from 'bytes';
@@ -14,6 +14,7 @@ import File from '~/components/fileForms/base';
 import { Badge } from '~/components/ui/badge';
 import { FileChart } from '~/components/charts/fileChart';
 import invariant from 'tiny-invariant';
+import { Skeleton } from '~/components/ui/skeleton';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -21,6 +22,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 			new URL(request.url).pathname,
 		)}`,
 	});
+
+	invariant(params.fileId);
 
 	const fileData = await getDatabaseFile({
 		id: params.fileId,
@@ -46,6 +49,9 @@ export default function Index() {
 		const interval = setInterval(() => {
 			if (document.visibilityState === 'visible') {
 				dataFetcher.load(window.location.pathname);
+				usageFetcher.load(
+					`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}/usage-latest`,
+				);
 			}
 		}, 30 * 1000);
 		return () => clearInterval(interval);
@@ -60,7 +66,7 @@ export default function Index() {
 	useEffect(() => {
 		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
 			usageFetcher.load(
-				`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}/usage`,
+				`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}/usage-latest`,
 			);
 		}
 	}, [usageFetcher]);
@@ -107,7 +113,6 @@ export default function Index() {
 			</H1>
 
 			<div className="space-y-4 pb-4">
-				<div className="text-muted-foreground">{file.description}</div>
 				<div className="space-y-2 flex-grow">
 					<Table>
 						<TableBody>
@@ -147,26 +152,34 @@ export default function Index() {
 							<TableRow>
 								<TableCell className="py-1 font-medium">Data Size</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{' '}
-									{bytes(Number(file.usage?.[0]?.usedSize)) || '-1'}
+									{usageFetcher.data ? (
+										bytes(Number(usageFetcher?.data?.usage?.usedSize)) || '-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="py-1 font-medium">File Size</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{' '}
-									{bytes(Number(file.usage?.[0]?.currentSize)) || '-1'}
+									{usageFetcher.data ? (
+										bytes(Number(usageFetcher?.data?.usage?.currentSize)) ||
+										'-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
 								</TableCell>
 							</TableRow>
-							{file.usage?.[0]?.maxSize && (
-								<TableRow>
-									<TableCell className="py-1 font-medium">Max Size</TableCell>
-									<TableCell className="py-1 text-slate-700">
-										{' '}
-										{bytes(Number(file.usage?.[0]?.maxSize)) || '-1'}
-									</TableCell>
-								</TableRow>
-							)}
+							<TableRow>
+								<TableCell className="py-1 font-medium">Max Size</TableCell>
+								<TableCell className="py-1 text-slate-700">
+									{usageFetcher.data ? (
+										bytes(Number(usageFetcher?.data?.usage?.maxSize)) || '-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
+								</TableCell>
+							</TableRow>
 						</TableBody>
 					</Table>
 				</div>

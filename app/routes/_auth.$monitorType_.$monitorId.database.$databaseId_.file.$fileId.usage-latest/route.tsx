@@ -1,8 +1,9 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import invariant from 'tiny-invariant';
-import { getDriveLatestFeeds } from '~/models/drive.server';
+import { getFileUsageLatest } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
+import { dateRange } from '~/utils';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -11,10 +12,9 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
-	invariant(params.driveId, 'Drive ID is required.');
-	const feeds = await getDriveLatestFeeds({
-		id: params.driveId,
-	});
+	invariant(params.fileId);
 
-	return json({ feeds });
+	const usage = await getFileUsageLatest({ databaseFileId: params.fileId });
+
+	return json({ usage });
 };

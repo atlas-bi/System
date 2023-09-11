@@ -1,5 +1,6 @@
-import { DriveUsage, setDrivePercFreeSentAt } from '~/models/monitor.server';
-import type { Drive, Monitor } from '~/models/monitor.server';
+import { DriveUsage, setDrivePercFreeSentAt } from '~/models/drive.server';
+import type { Monitor } from '~/models/monitor.server';
+import type { Drive } from '~/models/drive.server';
 import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
@@ -19,13 +20,14 @@ async function allClear({
 }) {
 	if (drive.percFreeNotifySentAt) {
 		// send an all clear alert
-		const subject = `💚 [${monitor.host} ${drive.name}:\\] Free space now below limit.`;
+		const subject = `💚 [${monitor.host} ${drive.name} drive] Free space now below limit.`;
 
 		const html = render(
 			<SuccessEmail
 				subject={subject}
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
+				drive={drive}
 			/>,
 			{
 				pretty: false,
@@ -64,15 +66,17 @@ async function reset({ drive }: { drive: Drive }) {
 export default async function percentFreeNotifier({
 	drive,
 	monitor,
+	usage,
 }: {
-	drive: Drive & { usage: DriveUsage[]; percFreeNotifyTypes: Notification[] };
+	drive: Drive & { percFreeNotifyTypes: Notification[] };
 	monitor: Monitor;
+	usage: DriveUsage;
 }) {
 	// don't notify if disabled.
 	if (!drive.percFreeNotify) return reset({ drive });
 
 	// calculate % free.
-	const percFree = (Number(drive.usage[0].free) / Number(drive.size)) * 100;
+	const percFree = (Number(usage.free) / Number(drive.size)) * 100;
 
 	// don't send if there is no error.
 	if (percFree > (drive.percFreeValue || 0)) {
@@ -107,12 +111,13 @@ export default async function percentFreeNotifier({
 	}
 
 	if (resend && drive.percFreeNotifyTypes) {
-		const subject = `💔 [${monitor.host} ${drive.name}:\\] Alert: free space limit exceeded.`;
+		const subject = `💔 [${monitor.host} ${drive.name} drive] Alert: free space limit exceeded.`;
 		const html = render(
 			<ErrorEmail
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
 				message={message}
+				drive={drive}
 			/>,
 			{
 				pretty: false,

@@ -1,6 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { getDatabaseNotifications } from '~/models/monitor.server';
+import { getDatabaseMeta } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import {
 	Link,
@@ -11,8 +11,6 @@ import {
 } from '@remix-run/react';
 import { H1, H3 } from '~/components/ui/typography';
 import { MoveLeft, Settings } from 'lucide-react';
-import { BellRing } from 'lucide-react';
-import { MoveRight } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import bytes from 'bytes';
 import { useEffect, useState } from 'react';
@@ -22,11 +20,11 @@ import { Button } from '~/components/ui/button';
 import Database from '~/components/databaseForms/base';
 import { format, formatDistance } from 'date-fns';
 import { Badge } from '~/components/ui/badge';
-import { FilesTable } from './filesTable';
-import { columns } from './filesTableColumns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { MemoryChart } from '~/components/charts/databaseMemoryChart';
 import invariant from 'tiny-invariant';
+import { FilesMeta } from './files';
+import { Skeleton } from '~/components/ui/skeleton';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -37,25 +35,25 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 
 	invariant(params.databaseId);
 
-	const databaseLoad = await getDatabaseNotifications({
+	const databaseMeta = await getDatabaseMeta({
 		id: params.databaseId,
 	});
 
-	invariant(databaseLoad);
+	invariant(databaseMeta);
 
-	return json({ databaseLoad });
+	return json({ databaseMeta });
 };
 
 export default function Index() {
-	const { databaseLoad } = useLoaderData<typeof loader>();
+	const { databaseMeta } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType } = useParams();
 	const usageFetcher = useFetcher();
 	const dataFetcher = useFetcher();
 
-	const [database, setDatabase] = useState(databaseLoad);
+	const [database, setDatabase] = useState(databaseMeta);
 
 	// Get fresh header data every 30 seconds.
-	useEffect(() => setDatabase(databaseLoad), [databaseLoad]);
+	useEffect(() => setDatabase(databaseMeta), [databaseMeta]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -67,8 +65,8 @@ export default function Index() {
 	}, []);
 
 	useEffect(() => {
-		if (dataFetcher.data?.databaseLoad) {
-			setDatabase(dataFetcher.data.databaseLoad);
+		if (dataFetcher.data?.databaseMeta) {
+			setDatabase(dataFetcher.data.databaseMeta);
 		}
 	}, [dataFetcher.data]);
 
@@ -79,6 +77,7 @@ export default function Index() {
 			);
 		}
 	}, [usageFetcher]);
+
 	const [searchParams] = useSearchParams();
 
 	return (
@@ -198,19 +197,19 @@ export default function Index() {
 									Last Logs Backup
 								</TableCell>
 								<TableCell className="py-1 text-slate-700 space-x-2">
-									<span>{bytes(Number(database.backupLogsSize)) || '-1'}</span>
-									{database.backupLogsDate && (
+									<span>{bytes(Number(database.backupLogSize)) || '-1'}</span>
+									{database.backupLogDate && (
 										<>
 											<span>
 												{formatDistance(
-													new Date(database.backupLogsDate),
+													new Date(database.backupLogDate),
 													new Date(),
 												)}{' '}
 												ago.
 											</span>
 											<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
 												{format(
-													new Date(database.backupLogsDate),
+													new Date(database.backupLogDate),
 													'MMM dd, yyyy k:mm',
 												)}
 											</Badge>
@@ -221,7 +220,13 @@ export default function Index() {
 							<TableRow>
 								<TableCell className="py-1 font-medium">Memory Used</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{bytes(Number(database.usage?.[0]?.memory)) || '-1'}
+									{usageFetcher.data ? (
+										bytes(
+											Number(usageFetcher?.data?.database?.usage?.[0]?.memory),
+										) || '-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -246,13 +251,7 @@ export default function Index() {
 						/>
 					</TabsContent>
 					<TabsContent value="files">
-						{database.files && (
-							<FilesTable
-								files={database.files}
-								columns={columns}
-								database={database}
-							/>
-						)}
+						<FilesMeta database={databaseMeta} />
 					</TabsContent>
 				</Tabs>
 

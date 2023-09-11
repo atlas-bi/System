@@ -1,5 +1,6 @@
 import { Monitor, getMonitor } from '~/models/monitor.server';
-import type { Drive, DriveUsage } from '~/models/monitor.server';
+import { getDriveLatestFeed } from '~/models/drive.server';
+import type { Drive } from '~/models/drive.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
 import {
@@ -27,6 +28,8 @@ export default async function Notifier({
 }) {
 	const monitor = await getMonitor({ id: job });
 
+	if (!monitor) return;
+
 	await collectionNotifier({ monitor, message });
 	await httpCertNotifier({ monitor });
 	await sqlFilePercentFreeNotifier({ monitor });
@@ -36,18 +39,19 @@ export default async function Notifier({
 		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
 
 		// drive notifications
-		monitor?.drives?.map(async (drive: Drive & { usage: DriveUsage[] }) => {
+		monitor?.drives?.map(async (drive: Drive) => {
 			// don't report inactive drives.
 			if (drive.enabled == false) return;
 
+			const usage = await getDriveLatestFeed({ id: drive.id });
 			// drive has no usages, ignore.
-			if (drive.usage.length <= 0) return;
+			if (!usage) return;
 
 			if (drive.missingNotify) {
 				// notify if drive was missing
 			}
 
-			await percentFreeNotifier({ drive, monitor });
+			await percentFreeNotifier({ drive, monitor, usage });
 
 			if (drive.sizeFreeNotify) {
 			}
@@ -68,6 +72,7 @@ export const sendNotification = async ({
 	message: string;
 }) => {
 	const meta = await getNotificationConnection({ id: notification.id });
+	if (!meta) return;
 
 	if (meta.type == 'smtp') {
 		return SMTP({ notification: meta, subject, message });

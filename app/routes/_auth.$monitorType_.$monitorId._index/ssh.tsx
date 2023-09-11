@@ -13,12 +13,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { H3 } from '~/components/ui/typography';
 import { Drive, DriveUsage, Monitor } from '~/models/monitor.server';
 import { PingStat } from './responseTime';
+import { MiniDrive } from './drive';
 
-export const SshSystem = ({
-	monitor,
-}: {
-	monitor: Monitor & { feeds: MonitorFeeds[] };
-}) => {
+export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
+	const feedFetcher = useFetcher();
+	const location = useLocation();
+	// if we redirect to another monitor we need to reload drives
+	useEffect(() => {
+		if (feedFetcher.state === 'idle' && feedFetcher.data == null) {
+			feedFetcher.load(`/${monitor.type}/${monitor.id}/feed-latest`);
+		}
+	}, [location]);
+
+	useEffect(() => {
+		if (feedFetcher.state === 'idle' && feedFetcher.data == null) {
+			feedFetcher.load(`/${monitor.type}/${monitor.id}/feed-latest`);
+		}
+	}, [feedFetcher, monitor]);
 	return (
 		<div className="space-y-2 flex-grow">
 			<Table>
@@ -57,14 +68,16 @@ export const SshSystem = ({
 							</TableCell>
 						</TableRow>
 					)}
-					{monitor.feeds && (
-						<TableRow>
-							<TableCell className="py-1 font-medium">Memory</TableCell>
-							<TableCell className="py-1 text-slate-700">
-								{bytes(Number(monitor.feeds?.[0]?.memoryTotal || 0))}
-							</TableCell>
-						</TableRow>
-					)}
+					<TableRow>
+						<TableCell className="py-1 font-medium">Memory</TableCell>
+						<TableCell className="py-1 text-slate-700">
+							{feedFetcher.data ? (
+								bytes(Number(feedFetcher.data?.feed?.memoryTotal || 0))
+							) : (
+								<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+							)}
+						</TableCell>
+					</TableRow>
 					{monitor.cpuModel && (
 						<TableRow>
 							<TableCell className="py-1 font-medium">CPU</TableCell>
@@ -116,120 +129,9 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 				{drivesFetcher.data?.drives ? (
 					<>
 						<div className="grid gap-4 py-4 grid-cols-2">
-							{drivesFetcher.data.drives.map(
-								(drive: Drive & { usage: DriveUsage[] }) => (
-									<Link
-										to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
-										prefetch="intent"
-										key={drive.id}
-										className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200 ${
-											!drive.enabled || !drive.online
-												? 'opacity-50 hover:opacity-100'
-												: ''
-										}`}
-									>
-										<div>
-											{drive.enabled ? (
-												!drive.online ? (
-													<div className="flex space-x-2 text-muted-foreground center-content">
-														<AlertTriangle
-															size={16}
-															className="text-red-400 my-auto"
-														/>
-														<span>Offline</span>
-													</div>
-												) : (
-													<ToggleRight size={20} className="text-slate-400" />
-												)
-											) : (
-												<ToggleLeft
-													size={20}
-													className="fill-slate-200 text-slate-400"
-												/>
-											)}
-											<DoughnutChart
-												className="w-36 h-36"
-												data={{
-													labels: [
-														`Used ${bytes(Number(drive.usage?.[0]?.used))}`,
-														`Free ${bytes(Number(drive.usage?.[0]?.free))}`,
-													],
-													datasets: [
-														{
-															label: 'Drive Usage',
-															data: [
-																Number(drive.usage?.[0]?.used),
-																Number(drive.usage?.[0]?.used) +
-																	Number(drive.usage?.[0]?.free) ==
-																0
-																	? 100
-																	: Number(drive.usage?.[0]?.free),
-															],
-														},
-													],
-												}}
-											/>
-										</div>
-
-										<div className="space-y-2 flex-grow min-w-[1px]">
-											<H3 className="space-x-2 flex-shrink-0">
-												{drive.title ? (
-													<>
-														<span>{drive.title}</span>
-														<span>({drive.root})</span>
-													</>
-												) : (
-													<>
-														{drive.root}
-														{drive.location}
-													</>
-												)}
-											</H3>
-											<Table>
-												<TableBody>
-													<TableRow>
-														<TableCell className="py-1 font-medium">
-															Size
-														</TableCell>
-														<TableCell className="py-1 text-slate-700">
-															{' '}
-															{bytes(Number(drive.size))}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Used</TableCell>
-														<TableCell className="py-1">
-															{' '}
-															{bytes(Number(drive.usage?.[0]?.used)) || '-1'}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Free</TableCell>
-														<TableCell className="py-1">
-															{' '}
-															{bytes(Number(drive.usage?.[0]?.free)) || '-1'}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">
-															Days Till Full
-														</TableCell>
-														<TableCell className="py-1">
-															{drive.daysTillFull || '-1'}
-														</TableCell>
-													</TableRow>
-													<TableRow>
-														<TableCell className="py-1">Growth Rate</TableCell>
-														<TableCell className="py-1">
-															{bytes(Number(drive.growthRate))} / day
-														</TableCell>
-													</TableRow>
-												</TableBody>
-											</Table>
-										</div>
-									</Link>
-								),
-							)}
+							{drivesFetcher.data.drives.map((drive: Drive) => (
+								<MiniDrive monitor={monitor} drive={drive} />
+							))}
 						</div>
 					</>
 				) : (

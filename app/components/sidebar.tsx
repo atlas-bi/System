@@ -4,6 +4,7 @@ import { Fragment, forwardRef } from 'react';
 import { buttonVariants } from '~/components/ui/button';
 
 import { monitorTypes as typeDict } from '~/models/monitor';
+import { Badge } from './ui/badge';
 
 export const SidebarNav = forwardRef<
 	HTMLDivElement,
@@ -24,7 +25,10 @@ export const SidebarNav = forwardRef<
 			{...props}
 		>
 			{monitorTypes.map(
-				(item: { value: string; type: string }, index: number) => (
+				(
+					item: { value: string; type: string; _count: { type: string } },
+					index: number,
+				) => (
 					<Fragment key={index}>
 						{typeDict
 							.filter((x) => x.value === item.type)
@@ -37,11 +41,18 @@ export const SidebarNav = forwardRef<
 										pathname.startsWith('/' + x.value)
 											? 'bg-muted hover:bg-muted'
 											: 'hover:bg-transparent hover:underline',
-										'justify-start space-x-2',
+										'justify-between space-x-2',
 									)}
 								>
-									{x.icon}
-									<span>{x.name}</span>
+									<div className="justify-start flex space-x-2">
+										<div className="flex w-4 h-4 text-muted-foreground">
+											{x.icon}
+										</div>
+										<span>{x.name}</span>
+									</div>
+									<Badge className="bg-slate-200 text-slate-900">
+										{item._count.type}
+									</Badge>
 								</Link>
 							))}
 					</Fragment>

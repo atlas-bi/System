@@ -1,7 +1,7 @@
 import { H1 } from '~/components/ui/typography';
 import { LoaderArgs, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { getMonitorPublic } from '~/models/monitor.server';
+import { getMonitorMeta } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useLoaderData } from '@remix-run/react';
 import {
@@ -37,7 +37,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	if (monitorTypes.filter((x) => x.value === params.monitorType).length === 0) {
 		return redirect('/');
 	}
-	const monitor = await getMonitorPublic({ id: params.monitorId });
+	const monitor = await getMonitorMeta({ id: params.monitorId });
 	invariant(monitor, 'Monitor not found.');
 	return json({
 		monitor: {

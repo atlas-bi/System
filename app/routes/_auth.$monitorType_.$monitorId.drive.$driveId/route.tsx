@@ -1,13 +1,18 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { getDriveNotifications } from '~/models/monitor.server';
+import { getDriveMeta } from '~/models/drive.server';
 import { authenticator } from '~/services/auth.server';
 import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
 import { DriveChart } from '~/components/charts/driveChart';
 import { H1 } from '~/components/ui/typography';
-import { Activity, AlertTriangle, MoveLeft, Settings } from 'lucide-react';
-import { BellRing } from 'lucide-react';
-import { MoveRight } from 'lucide-react';
+import {
+	Activity,
+	AlertTriangle,
+	MoveLeft,
+	Settings,
+	BellRing,
+	MoveRight,
+} from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import bytes from 'bytes';
 import { useEffect, useState } from 'react';
@@ -17,6 +22,8 @@ import { Button } from '~/components/ui/button';
 import Drive from '~/components/driveForms/base';
 import { Badge } from '~/components/ui/badge';
 import { PingStat } from '../_auth.$monitorType_.$monitorId._index/responseTime';
+import invariant from 'tiny-invariant';
+import { Skeleton } from '~/components/ui/skeleton';
 
 export const loader = async ({ params, request }: LoaderArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -25,21 +32,23 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		)}`,
 	});
 
-	const driveLoad = await getDriveNotifications({ id: params.driveId });
+	invariant(params.driveId);
 
-	return json({ driveLoad });
+	const driveMeta = await getDriveMeta({ id: params.driveId });
+
+	return json({ driveMeta });
 };
 
 export default function Index() {
-	const { driveLoad } = useLoaderData<typeof loader>();
+	const { driveMeta } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType } = useParams();
 	const usageFetcher = useFetcher();
 	const dataFetcher = useFetcher();
 
-	const [drive, setDrive] = useState(driveLoad);
+	const [drive, setDrive] = useState(driveMeta);
 
 	// Get fresh header data every 30 seconds.
-	useEffect(() => setDrive(driveLoad), [driveLoad]);
+	useEffect(() => setDrive(driveMeta), [driveMeta]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -51,8 +60,8 @@ export default function Index() {
 	}, []);
 
 	useEffect(() => {
-		if (dataFetcher.data?.driveLoad) {
-			setDrive(dataFetcher.data.driveLoad);
+		if (dataFetcher.data?.driveMeta) {
+			setDrive(dataFetcher.data.driveMeta);
 		}
 	}, [dataFetcher.data]);
 
@@ -118,10 +127,10 @@ export default function Index() {
 							<span>({drive.root})</span>
 						</>
 					) : (
-						<>
+						<span>
 							{drive.root}
 							{drive.location}
-						</>
+						</span>
 					)}
 				</H1>
 				<PingStat
@@ -136,22 +145,31 @@ export default function Index() {
 							<TableRow>
 								<TableCell className="py-1 font-medium">Size</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{' '}
 									{bytes(Number(drive.size))}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="py-1">Used</TableCell>
 								<TableCell className="py-1">
-									{' '}
-									{bytes(Number(drive.usage?.[0]?.used)) || '-1'}
+									{usageFetcher.data ? (
+										bytes(
+											Number(usageFetcher?.data?.drive?.usage?.[0]?.used),
+										) || '-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="py-1">Free</TableCell>
 								<TableCell className="py-1">
-									{' '}
-									{bytes(Number(drive.usage?.[0]?.free)) || '-1'}
+									{usageFetcher.data ? (
+										bytes(
+											Number(usageFetcher?.data?.drive?.usage?.[0]?.free),
+										) || '-1'
+									) : (
+										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+									)}
 								</TableCell>
 							</TableRow>
 						</TableBody>

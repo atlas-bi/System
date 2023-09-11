@@ -159,6 +159,8 @@ model MonitorLogs {
 
   file   DatabaseFile? @relation(fields: [fileId], references: [id])
   fileId String?
+
+  @@index([monitorId, createdAt])
 }
 
 model Cpu {
@@ -184,6 +186,8 @@ model CpuUsage {
   // fields sent from monitor
   load  String?
   speed String?
+
+  @@index([cpuId, createdAt])
 }
 
 model Database {
@@ -291,6 +295,7 @@ model DatabaseUsage {
   memory String?
 
   @@index([databaseId, createdAt])
+  @@index([createdAt])
 }
 
 model Drive {
@@ -400,4 +405,5 @@ model DriveUsage {
 
   @@index([driveId, createdAt])
   @@index([driveId, id])
+  @@index([createdAt])
 }

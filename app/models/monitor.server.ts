@@ -2,11 +2,10 @@ import { encrypt } from '@/lib/utils';
 import type {
 	Database,
 	DatabaseFile,
-	Drive,
+	DatabaseFileUsage,
 	Monitor,
 	MonitorFeeds,
 	MonitorLogs,
-	User,
 } from '@prisma/client';
 import { prisma } from '~/db.server';
 import monitorRunner from '~/queues/monitor.server';
@@ -18,34 +17,10 @@ export type {
 	Cpu,
 	CpuUsage,
 	Monitor,
-	Drive,
-	DriveUsage,
 	MonitorLogs,
 	MonitorFeeds,
 	DatabaseFileUsage,
 } from '@prisma/client';
-
-export async function deleteDrive({ id }: Pick<Drive, 'id'>) {
-	// delete drive usage
-	await prisma.driveUsage.deleteMany({
-		where: {
-			drive: { id },
-		},
-	});
-
-	// delete drive logs
-	await prisma.monitorLogs.deleteMany({
-		where: {
-			drive: { id },
-		},
-	});
-
-	// delete drives
-	await prisma.drive.deleteMany({
-		where: { id },
-	});
-	searchLoader.enqueue(id);
-}
 
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
 	// delete database file usage
@@ -115,7 +90,7 @@ export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
 	searchLoader.enqueue(id);
 }
 
-export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorMeta({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findUnique({
 		where: { id },
 		select: {
@@ -157,21 +132,6 @@ export function getMonitorPublic({ id }: Pick<Monitor, 'id'>) {
 			httpDomain: true,
 			httpWorkstation: true,
 			sqlConnectionString: true,
-			feeds: {
-				select: {
-					id: true,
-					memoryFree: true,
-					memoryTotal: true,
-					cpuLoad: true,
-					cpuSpeed: true,
-					ping: true,
-					hasError: true,
-				},
-				orderBy: {
-					createdAt: 'desc',
-				},
-				take: 1,
-			},
 		},
 	});
 }
@@ -232,6 +192,7 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 		},
 	});
 }
+
 export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findFirst({
 		where: { id },
@@ -324,18 +285,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							fileName: true,
 							growth: true,
 							sqlFileSizePercentFreeNotifySentAt: true,
-							usage: {
-								select: {
-									id: true,
-									usedSize: true,
-									currentSize: true,
-									maxSize: true,
-								},
-								take: 1,
-								orderBy: {
-									createdAt: 'desc',
-								},
-							},
 						},
 					},
 				},
@@ -397,17 +346,6 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 							name: true,
 						},
 					},
-					usage: {
-						select: {
-							id: true,
-							free: true,
-							used: true,
-						},
-						take: 1,
-						orderBy: {
-							createdAt: 'desc',
-						},
-					},
 				},
 			},
 		},
@@ -465,18 +403,6 @@ export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
 					name: true,
 				},
 			},
-			usage: {
-				select: {
-					id: true,
-					currentSize: true,
-					usedSize: true,
-					maxSize: true,
-				},
-				take: 1,
-				orderBy: {
-					createdAt: 'desc',
-				},
-			},
 		},
 	});
 }
@@ -491,7 +417,7 @@ export function getFileNotifications({ id }: Pick<DatabaseFile, 'id'>) {
 	});
 }
 
-export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
+export function getDatabaseMeta({ id }: Pick<Database, 'id'>) {
 	return prisma.database.findUnique({
 		where: { id },
 		select: {
@@ -508,129 +434,51 @@ export function getDatabaseNotifications({ id }: Pick<Database, 'id'>) {
 			backupDataSize: true,
 			backupLogDate: true,
 			backupLogSize: true,
+			description: true,
 			monitor: {
 				select: {
 					title: true,
 					id: true,
 					type: true,
 					name: true,
-				},
-			},
-			files: {
-				select: {
-					id: true,
-					fileName: true,
-					type: true,
-					state: true,
-					growth: true,
-					isPercentGrowth: true,
-					fileId: true,
-					filePath: true,
-					usage: {
-						select: {
-							id: true,
-							currentSize: true,
-							usedSize: true,
-							maxSize: true,
-						},
-						take: 1,
-						orderBy: {
-							createdAt: 'desc',
-						},
-					},
-				},
-			},
-			usage: {
-				select: {
-					id: true,
-					memory: true,
-				},
-				take: 1,
-				orderBy: {
-					createdAt: 'desc',
 				},
 			},
 		},
 	});
 }
 
-export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
-	let lastMonth = new Date();
-	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
-	return prisma.drive.findUnique({
-		where: { id },
+export function getDatabaseFiles({
+	databaseId,
+}: Pick<DatabaseFiles, 'databaseId'>) {
+	return prisma.databaseFile.findMany({
+		where: { databaseId },
 		select: {
 			id: true,
-			title: true,
-			enabled: true,
-			hasError: true,
-			monitorId: true,
-			location: true,
-			name: true,
-			root: true,
-			systemDescription: true,
-			description: true,
-			size: true,
-			daysTillFull: true,
-			growthRate: true,
-			missingNotify: true,
-			missingNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			missingNotifyResendAfterMinutes: true,
-			percFreeNotify: true,
-			percFreeNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			percFreeNotifyResendAfterMinutes: true,
-			percFreeValue: true,
-			sizeFreeNotify: true,
-			sizeFreeNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			sizeFreeNotifyResendAfterMinutes: true,
-			sizeFreeValue: true,
-			growthRateNotify: true,
-			growthRateNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			growthRateNotifyResendAfterMinutes: true,
-			growthRateValue: true,
-			monitor: {
-				select: {
-					title: true,
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			usage: {
-				select: {
-					id: true,
-					used: true,
-					free: true,
-				},
-				take: 1,
-				orderBy: {
-					createdAt: 'desc',
-				},
-			},
+			fileName: true,
+			type: true,
+			state: true,
+			growth: true,
+			isPercentGrowth: true,
+			fileId: true,
+			filePath: true,
+		},
+	});
+}
+
+export function getFileUsageLatest({
+	databaseFileId,
+}: Pick<DatabaseFileUsage, 'databaseFileId'>) {
+	return prisma.databaseFileUsage.findFirst({
+		where: { databaseFileId },
+		select: {
+			id: true,
+			usedSize: true,
+			currentSize: true,
+			maxSize: true,
+		},
+
+		orderBy: {
+			createdAt: 'desc',
 		},
 	});
 }
@@ -668,53 +516,6 @@ export function getFileUsage({
 					currentSize: true,
 					usedSize: true,
 					maxSize: true,
-					createdAt: true,
-				},
-				where: {
-					createdAt: {
-						gte: startDate,
-						lt: endDate,
-					},
-				},
-				orderBy: { createdAt: 'desc' },
-			},
-		},
-	});
-}
-
-export function getDriveUsage({
-	id,
-	startDate,
-	endDate,
-}: Pick<Drive, 'id'> & { startDate: Date; endDate: Date }) {
-	let lastMonth = new Date();
-	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
-	return prisma.drive.findUnique({
-		where: { id },
-		select: {
-			id: true,
-			title: true,
-			monitorId: true,
-			location: true,
-			enabled: true,
-			name: true,
-			description: true,
-			systemDescription: true,
-			size: true,
-			daysTillFull: true,
-			growthRate: true,
-			monitor: {
-				select: {
-					title: true,
-					id: true,
-					type: true,
-				},
-			},
-			usage: {
-				select: {
-					id: true,
-					free: true,
-					used: true,
 					createdAt: true,
 				},
 				where: {
@@ -1084,16 +885,6 @@ export function getMonitorDatabases({
 					type: true,
 				},
 			},
-			usage: {
-				select: {
-					id: true,
-					memory: true,
-				},
-				take: 1,
-				orderBy: {
-					createdAt: 'desc',
-				},
-			},
 		},
 		orderBy: [{ enabled: 'desc' }, { name: 'asc' }],
 	});
@@ -1116,17 +907,6 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 			daysTillFull: true,
 			growthRate: true,
 			online: true,
-			usage: {
-				select: {
-					id: true,
-					free: true,
-					used: true,
-				},
-				take: 1,
-				orderBy: {
-					createdAt: 'desc',
-				},
-			},
 		},
 		orderBy: [
 			{ online: 'desc' },
@@ -1136,14 +916,7 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 		],
 	});
 }
-export function getDriveMonitor({ id }: { id: Drive['id'] }) {
-	return prisma.drive.findUnique({
-		where: { id },
-		select: {
-			monitor: { select: { id: true, type: true } },
-		},
-	});
-}
+
 export async function createMonitor({
 	title,
 	host,
@@ -1238,25 +1011,6 @@ export async function createMonitor({
 	searchLoader.enqueue(monitor.id);
 
 	return monitor;
-}
-
-export function editDrive({
-	id,
-	title,
-	description,
-	enabled,
-}: Pick<Drive, 'id' | 'title' | 'description' | 'enabled'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: {
-			title,
-			description,
-			enabled,
-		},
-		select: {
-			id: true,
-		},
-	});
 }
 
 export function editDatabase({
@@ -1417,21 +1171,6 @@ export function getDatabaseLatestFeeds({ id }: Pick<Database, 'id'>) {
 	});
 }
 
-export function getDriveLatestFeeds({ id }: Pick<Drive, 'id'>) {
-	return prisma.driveUsage.findMany({
-		where: { driveId: id },
-		select: {
-			id: true,
-			hasError: true,
-			createdAt: true,
-		},
-		take: 30,
-		orderBy: {
-			createdAt: 'desc',
-		},
-	});
-}
-
 export function getMonitorLatestFeeds({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitorFeeds.findMany({
 		where: { monitorId: id },
@@ -1443,6 +1182,27 @@ export function getMonitorLatestFeeds({ id }: Pick<Monitor, 'id'>) {
 			message: true,
 		},
 		take: 30,
+		orderBy: {
+			createdAt: 'desc',
+		},
+	});
+}
+
+export function getMonitorLatestFeed({ id }: Pick<Monitor, 'id'>) {
+	return prisma.monitorFeeds.findMany({
+		where: { monitorId: id },
+		select: {
+			id: true,
+			ping: true,
+			hasError: true,
+			createdAt: true,
+			message: true,
+			memoryFree: true,
+			memoryTotal: true,
+			cpuLoad: true,
+			cpuSpeed: true,
+		},
+		take: 1,
 		orderBy: {
 			createdAt: 'desc',
 		},
@@ -1478,76 +1238,6 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 				title: 'asc',
 			},
 		],
-	});
-}
-
-export function updateDriveNotifications({
-	id,
-	missingNotify,
-	missingNotifyTypes,
-	missingNotifyResendAfterMinutes,
-	percFreeNotify,
-	percFreeNotifyTypes,
-	percFreeNotifyResendAfterMinutes,
-	percFreeValue,
-	sizeFreeNotify,
-	sizeFreeNotifyTypes,
-	sizeFreeNotifyResendAfterMinutes,
-	sizeFreeValue,
-	growthRateNotify,
-	growthRateNotifyTypes,
-	growthRateNotifyResendAfterMinutes,
-	growthRateValue,
-}: Pick<
-	Drive,
-	| 'id'
-	| 'percFreeValue'
-	| 'sizeFreeValue'
-	| 'growthRateValue'
-	| 'missingNotify'
-	| 'missingNotifyResendAfterMinutes'
-	| 'percFreeNotify'
-	| 'percFreeNotifyResendAfterMinutes'
-	| 'sizeFreeNotify'
-	| 'sizeFreeNotifyResendAfterMinutes'
-	| 'growthRateNotify'
-	| 'growthRateNotifyResendAfterMinutes'
-> & {
-	percFreeNotifyTypes: string[];
-	growthRateNotifyTypes: string[];
-	missingNotifyTypes: string[];
-	sizeFreeNotifyTypes: string[];
-}) {
-	return prisma.drive.update({
-		where: { id },
-		data: {
-			missingNotify,
-			missingNotifyTypes: missingNotifyTypes
-				? { set: missingNotifyTypes.map((x) => ({ id: x })) }
-				: undefined,
-			missingNotifyResendAfterMinutes,
-
-			percFreeNotify,
-			percFreeNotifyTypes: percFreeNotifyTypes
-				? { set: percFreeNotifyTypes.map((x: string) => ({ id: x })) }
-				: undefined,
-			percFreeNotifyResendAfterMinutes,
-			percFreeValue,
-
-			sizeFreeNotify,
-			sizeFreeNotifyTypes: sizeFreeNotifyTypes
-				? { set: sizeFreeNotifyTypes.map((x: string) => ({ id: x })) }
-				: undefined,
-			sizeFreeNotifyResendAfterMinutes,
-			sizeFreeValue,
-
-			growthRateNotify,
-			growthRateNotifyTypes: growthRateNotifyTypes
-				? { set: growthRateNotifyTypes.map((x: string) => ({ id: x })) }
-				: undefined,
-			growthRateNotifyResendAfterMinutes,
-			growthRateValue,
-		},
 	});
 }
 
@@ -1864,31 +1554,8 @@ export function updateMonitor({
 			drives: {
 				select: {
 					id: true,
-					size: true,
 					name: true,
-					usage: {
-						where: {
-							createdAt: {
-								gte: lastWeek,
-							},
-						},
-						select: {
-							id: true,
-							used: true,
-							createdAt: true,
-						},
-						orderBy: {
-							createdAt: 'desc',
-						},
-					},
 				},
-			},
-			feeds: {
-				select: { id: true },
-				orderBy: {
-					createdAt: 'desc',
-				},
-				take: 1,
 			},
 			databases: {
 				select: {
@@ -1896,23 +1563,6 @@ export function updateMonitor({
 					files: {
 						select: {
 							id: true,
-							usage: {
-								where: {
-									createdAt: {
-										gte: lastWeek,
-									},
-								},
-								select: {
-									id: true,
-									maxSize: true,
-									currentSize: true,
-									usedSize: true,
-									createdAt: true,
-								},
-								orderBy: {
-									createdAt: 'desc',
-								},
-							},
 						},
 					},
 				},
@@ -1931,38 +1581,11 @@ export function setFileDays({
 	});
 }
 
-export function setDriveDays({
-	id,
-	daysTillFull,
-}: Pick<Drive, 'id' | 'daysTillFull'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: { daysTillFull },
-	});
-}
-
-export function setDriveOnline({ id, online }: Pick<Drive, 'id' | 'online'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: { online },
-	});
-}
-
 export function setFileGrowth({
 	id,
 	growthRate,
 }: Pick<DatabaseFile, 'id' | 'growthRate'>) {
 	return prisma.databaseFile.update({
-		where: { id },
-		data: { growthRate },
-	});
-}
-
-export function setDriveGrowth({
-	id,
-	growthRate,
-}: Pick<Drive, 'id' | 'growthRate'>) {
-	return prisma.drive.update({
 		where: { id },
 		data: { growthRate },
 	});
@@ -1975,15 +1598,6 @@ export function setFilePercFreeSentAt({
 	return prisma.databaseFile.update({
 		where: { id },
 		data: { sqlFileSizePercentFreeNotifySentAt },
-	});
-}
-export function setDrivePercFreeSentAt({
-	id,
-	percFreeNotifySentAt,
-}: Pick<Drive, 'id' | 'percFreeNotifySentAt'>) {
-	return prisma.drive.update({
-		where: { id },
-		data: { percFreeNotifySentAt },
 	});
 }
 

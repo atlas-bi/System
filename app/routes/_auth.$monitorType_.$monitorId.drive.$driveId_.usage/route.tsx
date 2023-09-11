@@ -1,8 +1,9 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
-import { getDriveUsage } from '~/models/monitor.server';
+import { getDriveUsage } from '~/models/drive.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
 
@@ -53,7 +54,9 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		url.searchParams.get('range') || 'last_24_hours',
 	);
 
+	invariant(params.driveId);
 	const drive = await getDriveUsage({ id: params.driveId, startDate, endDate });
+
 	if (!drive) {
 		throw new Response('Not Found', { status: 404 });
 	}

@@ -1,8 +1,11 @@
+import { useFetcher, useParams } from '@remix-run/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import bytes from 'bytes';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
+import { Skeleton } from '~/components/ui/skeleton';
 
 export const columns: ColumnDef<any>[] = [
 	{
@@ -65,15 +68,26 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Size" />
 		),
 		cell: ({ row }) => {
+			const sizeFetcher = useFetcher();
+			const { monitorType, monitorId, databaseId } = useParams();
+			useEffect(() => {
+				if (sizeFetcher.state === 'idle' && sizeFetcher.data == null) {
+					sizeFetcher.load(
+						`/${monitorType}/${monitorId}/database/${databaseId}/file/${row.original.id}/usage-latest`,
+					);
+				}
+			}, []);
 			return (
 				<div
 					className={`${
 						row.original.state !== 'ONLINE' ? 'text-orange-700' : ''
 					}`}
 				>
-					{row.original.usage?.[0].currentSize
-						? bytes(Number(row.original.usage?.[0].currentSize))
-						: 'n/a'}
+					{sizeFetcher.data ? (
+						bytes(Number(sizeFetcher?.data?.usage?.currentSize)) || '-1'
+					) : (
+						<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+					)}
 				</div>
 			);
 		},

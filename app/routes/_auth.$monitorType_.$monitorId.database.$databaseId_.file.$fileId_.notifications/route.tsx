@@ -1,24 +1,15 @@
 import type { ActionArgs, LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import {
-	getDatabaseNotifications,
-	getDriveNotifications,
-	getFileNotifications,
-	updateDriveNotifications,
-} from '~/models/monitor.server';
+import { getFileNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
-import { Form, Link, useLoaderData, useParams } from '@remix-run/react';
+import { Link, useLoaderData, useParams } from '@remix-run/react';
 import { H1, H3 } from '~/components/ui/typography';
 import { Loader2, MoveLeft } from 'lucide-react';
-import { Switch } from '~/components/ui/switch';
-import { useSubmit, useNavigation } from '@remix-run/react';
-import { Collapsible, CollapsibleContent } from '~/components/ui/collapsible';
 
-import { Label } from '~/components/ui/label';
-import { Separator } from '~/components/ui/separator';
-import { useRef, useState } from 'react';
-import { Input } from '~/components/ui/input';
-import { MultiSelect } from '~/components/ui/multiselect';
+import { useSubmit, useNavigation } from '@remix-run/react';
+
+import { useRef } from 'react';
+
 import { getNotifications } from '~/models/notification.server';
 
 export const loader = async ({ params, request }: LoaderArgs) => {

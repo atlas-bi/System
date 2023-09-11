@@ -1,8 +1,7 @@
 import {
 	Database,
 	DatabaseFile,
-	DatabaseFileUsage,
-	DriveUsage,
+	getFileUsageLatest,
 	setFilePercFreeSentAt,
 } from '~/models/monitor.server';
 import type { Drive, Monitor } from '~/models/monitor.server';
@@ -92,9 +91,7 @@ export default async function sqlFilePercentFreeNotifier({
 }: {
 	monitor: Monitor & {
 		sqlFileSizePercentFreeNotifyTypes: Notification[];
-		databases: Array<
-			Database & { files: Array<DatabaseFile & { usage: DatabaseFileUsage[] }> }
-		>;
+		databases: Array<Database & { files: DatabaseFile[] }>;
 	};
 }) {
 	// only for sql
@@ -109,30 +106,27 @@ export default async function sqlFilePercentFreeNotifier({
 		database.files.map(async (file) => {
 			// if the database or the file is disabled, reset and leave.
 			// or if auto growth is enabled
+
+			const usage = await getFileUsageLatest({ databaseFileId: file.id });
+
 			if (
 				!database.enabled ||
 				!file.enabled ||
-				(Number(file.growth) > 0 && Number(file.usage?.[0]?.maxSize) == 0)
+				(Number(file.growth) > 0 && Number(usage?.maxSize) == 0)
 			) {
 				return resetFile({ file });
 			}
 
 			// if there is no usage, return
-			if (file.usage.length < 1) return;
+			if (!usage) return;
 
 			// calculate % free in file
 			const percFree =
-				(1 -
-					Number(file.usage[0].usedSize) /
-						Number(file.usage?.[0]?.currentSize)) *
-				100;
+				(1 - Number(usage.usedSize) / Number(usage.currentSize)) * 100;
 
 			// calculate % free to file with max size
 			const percFreeMax =
-				(1 -
-					Number(file.usage[0].currentSize) /
-						Number(file.usage?.[0]?.maxSize)) *
-				100;
+				(1 - Number(usage.currentSize) / Number(usage.maxSize)) * 100;
 
 			let message, subject: string;
 
