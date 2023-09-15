@@ -169,23 +169,35 @@ from sys.dm_os_windows_info`)
 			// create mem temp table
 			await pool.request().query(``);
 			// database info
+
+			let memQuery = '',
+				memJoin = '',
+				memCol = '';
+			if (monitor.sqlDisableDbMemory !== true) {
+				memQuery = `
+				    drop table if exists #mem;
+					SELECT database_id
+								-- 8kb files
+				        , cast(COUNT_BIG(*) as bigint) * 8 * 1024 AS db_buffer_pages
+						into #mem
+				    FROM sys.dm_os_buffer_descriptors
+				    GROUP BY database_id`;
+
+				memJoin = `LEFT OUTER JOIN #mem ON #mem.database_id = d.database_id`;
+				memCol = `, db_buffer_pages AS pagesInMemory`;
+			}
+
 			databaseInfo = (
 				await pool.request().batch(
 					`
-    drop table if exists #mem;
-	SELECT database_id
-				-- 8kb files
-        , cast(COUNT_BIG(*) as bigint) * 8 * 1024 AS db_buffer_pages
-		into #mem
-    FROM sys.dm_os_buffer_descriptors
-    GROUP BY database_id
+					${memQuery}
 
 SELECT d.database_id databaseId
     , d.name
     , d.state_desc stateDesc
     , d.recovery_model_desc recoveryModel
     , d.compatibility_level compatLevel
-    , db_buffer_pages AS pagesInMemory
+    ${memCol}
     , bu.full_last_date backupDataDate
     , bu.full_size backupDataSize
     , bu.log_last_date backupLogDate
@@ -231,8 +243,7 @@ LEFT JOIN (
     GROUP BY f.database_name
     ) bu
     ON d.name = bu.database_name
-LEFT OUTER JOIN #mem
-    ON #mem.database_id = d.database_id
+    ${memJoin}
 ORDER BY d.database_id DESC
 `,
 				)

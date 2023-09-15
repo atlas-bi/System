@@ -132,6 +132,7 @@ export function getMonitorMeta({ id }: Pick<Monitor, 'id'>) {
 			httpDomain: true,
 			httpWorkstation: true,
 			sqlConnectionString: true,
+			sqlDisableDbMemory: true,
 		},
 	});
 }
@@ -271,6 +272,7 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 			httpDomain: true,
 			httpWorkstation: true,
 			sqlConnectionString: true,
+			sqlDisableDbMemory: true,
 			lastBootTime: true,
 			databases: {
 				select: {
@@ -938,6 +940,7 @@ export async function createMonitor({
 	httpDomain,
 	httpWorkstation,
 	sqlConnectionString,
+	sqlDisableDbMemory,
 }: Pick<
 	Monitor,
 	| 'title'
@@ -964,6 +967,7 @@ export async function createMonitor({
 	| 'httpDomain'
 	| 'httpWorkstation'
 	| 'sqlConnectionString'
+	| 'sqlDisableDbMemory'
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
@@ -993,6 +997,7 @@ export async function createMonitor({
 			sqlConnectionString: sqlConnectionString
 				? encrypt(sqlConnectionString)
 				: null,
+			sqlDisableDbMemory,
 		},
 		select: {
 			id: true,
@@ -1070,6 +1075,7 @@ export async function editMonitor({
 	httpDomain,
 	httpWorkstation,
 	sqlConnectionString,
+	sqlDisableDbMemory,
 }: Pick<
 	Monitor,
 	| 'id'
@@ -1097,6 +1103,7 @@ export async function editMonitor({
 	| 'httpDomain'
 	| 'httpWorkstation'
 	| 'sqlConnectionString'
+	| 'sqlDisableDbMemory'
 >) {
 	const monitor = await prisma.monitor.update({
 		where: { id },
@@ -1127,6 +1134,7 @@ export async function editMonitor({
 			sqlConnectionString: sqlConnectionString
 				? encrypt(sqlConnectionString)
 				: null,
+			sqlDisableDbMemory,
 		},
 		select: {
 			id: true,

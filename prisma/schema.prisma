@@ -89,6 +89,7 @@ model Monitor {
 
   // sql details
   sqlConnectionString String?
+  sqlDisableDbMemory  Boolean?
 
   drives        Drive[]
   databases     Database[]
