@@ -1,3 +1,8 @@
+## <small>1.43.1 (2023-09-15)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([431cdc5](https://github.com/atlas-bi/System/commit/431cdc5))
+* fix(notification): fixed drive latest values, fixed notification for sql files with growth disabled ([a29757a](https://github.com/atlas-bi/System/commit/a29757a))
+
 ## 1.43.0 (2023-09-15)
 
 * Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([726178d](https://github.com/atlas-bi/System/commit/726178d))
