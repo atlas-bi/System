@@ -1,3 +1,8 @@
+## 1.43.0 (2023-09-15)
+
+* Merge branch 'master' of github.com:atlas-bi/System # Please enter a commit message ([726178d](https://github.com/atlas-bi/System/commit/726178d))
+* feat(sql): added option to disable database memory check ([64ab55e](https://github.com/atlas-bi/System/commit/64ab55e))
+
 ## 1.42.0 (2023-09-15)
 
 * Merge branch 'master' of github.com:atlas-bi/System ([936e549](https://github.com/atlas-bi/System/commit/936e549))
