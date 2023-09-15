@@ -129,7 +129,6 @@ export default async function sqlFilePercentFreeNotifier({
 				(1 - Number(usage.currentSize) / Number(usage.maxSize)) * 100;
 
 			let message, subject: string;
-
 			if (
 				Number(file.growth) == 0 &&
 				percFree < (monitor.sqlFileSizePercentFreeValue || 0)
@@ -141,7 +140,7 @@ export default async function sqlFilePercentFreeNotifier({
 					monitor.sqlFileSizePercentFreeValue
 				}%.`;
 				subject = `💔 [${monitor.name}.${database.name} file ${file.fileName}] Alert: free space limit exceeded.`;
-			} else if (percFreeMax < (monitor.sqlFileSizePercentFreeValue || 0)) {
+			} else if (Number(usage?.maxSize) > 0 && percFreeMax < (monitor.sqlFileSizePercentFreeValue || 0)) {
 				// alert for max file size
 				message = `(Max file size) Percentage of free space (${Math.round(
 					percFreeMax,

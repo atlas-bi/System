@@ -222,7 +222,7 @@ export default function Index() {
 								<TableCell className="py-1 text-slate-700">
 									{usageFetcher.data ? (
 										bytes(
-											Number(usageFetcher?.data?.database?.usage?.[0]?.memory),
+											Number([...usageFetcher.data?.database?.usage]?.pop()?.memory),
 										) || '-1'
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />

@@ -63,22 +63,22 @@ export const MiniDrive = ({
 						data={{
 							labels: [
 								`Used ${bytes(
-									Number(usageFetcher.data?.drive?.usage?.[0]?.used),
+									Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
 								)}`,
 								`Free ${bytes(
-									Number(usageFetcher.data?.drive?.usage?.[0]?.free),
+									Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
 								)}`,
 							],
 							datasets: [
 								{
 									label: 'Drive Usage',
 									data: [
-										Number(usageFetcher.data?.drive?.usage?.[0]?.used),
-										Number(usageFetcher.data?.drive?.usage?.[0]?.used) +
-											Number(usageFetcher.data?.drive?.usage?.[0]?.free) ==
+										Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
+										Number([...usageFetcher.data?.drive?.usage]?.pop()?.used) +
+											Number([...usageFetcher.data?.drive?.usage]?.pop()?.free) ==
 										0
 											? 100
-											: Number(usageFetcher.data?.drive?.usage?.[0]?.free),
+											: Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
 									],
 								},
 							],
@@ -119,7 +119,7 @@ export const MiniDrive = ({
 							<TableCell className="py-1">Used</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher?.data?.drive?.usage?.[0]?.used)) ||
+									bytes(Number([...usageFetcher.data?.drive?.usage]?.pop()?.used)) ||
 									'-1'
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
@@ -130,7 +130,7 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Free</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher?.data?.drive?.usage?.[0]?.free)) ||
+									bytes(Number([...usageFetcher.data?.drive?.usage]?.pop()?.free)) ||
 									'-1'
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />

@@ -153,7 +153,7 @@ export default function Index() {
 								<TableCell className="py-1">
 									{usageFetcher.data ? (
 										bytes(
-											Number(usageFetcher?.data?.drive?.usage?.[0]?.used),
+											Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
 										) || '-1'
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
@@ -165,7 +165,7 @@ export default function Index() {
 								<TableCell className="py-1">
 									{usageFetcher.data ? (
 										bytes(
-											Number(usageFetcher?.data?.drive?.usage?.[0]?.free),
+											Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
 										) || '-1'
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />

@@ -206,7 +206,7 @@ export async function action({ request }: ActionArgs) {
 					sqlConnectionString: values.sqlConnectionString
 						? values.sqlConnectionString.toString()
 						: null,
-					sqlDisableDbMemory: values.sqlDisableDbMemory.toString() == 'true',
+					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == 'true',
 				});
 
 				return json({ monitor });
@@ -262,7 +262,7 @@ export async function action({ request }: ActionArgs) {
 					sqlConnectionString: values.sqlConnectionString
 						? values.sqlConnectionString.toString()
 						: null,
-					sqlDisableDbMemory: values.sqlDisableDbMemory.toString() == 'true',
+					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == 'true',
 				});
 			}
 			return json({ monitor });
