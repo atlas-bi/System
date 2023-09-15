@@ -1,3 +1,8 @@
+## <small>1.41.4 (2023-09-11)</small>
+
+* Merge branch 'master' of github.com:atlas-bi/System ([b2d15a8](https://github.com/atlas-bi/System/commit/b2d15a8))
+* fix(ubuntu): fixed offline drive ([b9b9392](https://github.com/atlas-bi/System/commit/b9b9392))
+
 ## <small>1.41.3 (2023-09-11)</small>
 
 * Merge branch 'master' of github.com:atlas-bi/System ([ae850c0](https://github.com/atlas-bi/System/commit/ae850c0))
