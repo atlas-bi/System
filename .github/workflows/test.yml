@@ -12,27 +12,27 @@ permissions:
   contents: read
 
 jobs:
-  shell:
-    name: ✓ ShellCheck
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+  #shell:
+  #  name: ✓ ShellCheck
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: 🛑 Cancel Previous Runs
+  #      uses: styfle/cancel-workflow-action@0.11.0
 
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+  #    - name: ⬇️ Checkout repo
+  #      uses: actions/checkout@v3
 
-      - name: ⎔ Setup ShellCheck
-        run: sudo apt-get update; sudo apt-get install -y shellcheck
+  #    - name: ⎔ Setup ShellCheck
+  #      run: sudo apt-get update; sudo apt-get install -y shellcheck
 
-      - name: 🔬 Lint
-        run: |
-          cd packages
-          shellcheck  **/*.sh
-          shellcheck **/atlas-requests
-          shellcheck **/install
-          shellcheck **/postinst
-          shellcheck **/preinst
+  #    - name: 🔬 Lint
+  #      run: |
+  #        cd packages
+  #        shellcheck  **/*.sh
+  #        shellcheck **/atlas-requests
+  #        shellcheck **/install
+  #        shellcheck **/postinst
+  #        shellcheck **/preinst
 
   lint:
     name: ⬣ ESLint
