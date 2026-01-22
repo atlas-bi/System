@@ -9,7 +9,7 @@
 		"build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
 		"dev": "npm run build; npm run saml:cert; run-p dev:*  quirrel ",
 		"prod": "npm run build; npm run saml:cert; run-p dev:ldap dev:saml prod:server",
-		"dev:ldap": "docker run  -p 389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnami/openldap:latest",
+		"dev:ldap": "docker run  -p 389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
 		"dev:saml": "node ./test/saml-idp/bin/run.js --acsUrl http://localhost:3000/auth/asc --audience http://localhost:3000/login",
 		"dev:build": "cross-env NODE_ENV=development npm run build:server -- --watch",
 		"dev:remix": "cross-env NODE_ENV=development remix watch",
