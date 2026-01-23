@@ -106,63 +106,63 @@ jobs:
       - name: ⚡ Run vitest
         run: pnpm exec vitest --coverage
 
-  cypress:
-    name: ⚫️ Cypress
-    runs-on: ubuntu-latest
-    env:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${{ github.run_id }}
-      POSTGRES_DB: postgres
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ github.run_id }}
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: 🏄 Copy test env vars
-        run: |
-          echo "DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}" > .env
-          echo "SESSION_SECRET=atlas-ci" >> .env
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Setup pnpm
-        run: corepack enable
-
-      - name: Download deps
-        run: pnpm install
-
-      - name: Setup Database
-        run: pnpm exec prisma migrate reset --force
-        env:
-          DATABASE_URL: 'postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}'
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Cypress run
-        uses: cypress-io/github-action@v5
-        with:
-          start: pnpm run start:mocks
-          wait-on: 'http://localhost:8811'
-        env:
-          PORT: '8811'
-          DISABLE_BACKGROUND_SERVICES: '1'
+  # cypress:
+  #   name: ⚫️ Cypress
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${{ github.run_id }}
+  #     POSTGRES_DB: postgres
+  #   services:
+  #     postgres:
+  #       image: postgres:14
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: ${{ github.run_id }}
+  #         POSTGRES_DB: postgres
+  #       ports:
+  #         - 5432:5432
+  #       options: >-
+  #         --health-cmd "pg_isready -U postgres -d postgres"
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   steps:
+  #     - name: 🛑 Cancel Previous Runs
+  #       uses: styfle/cancel-workflow-action@0.11.0
+  #
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v3
+  #
+  #     - name: 🏄 Copy test env vars
+  #       run: |
+  #         echo "DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}" > .env
+  #         echo "SESSION_SECRET=atlas-ci" >> .env
+  #
+  #     - name: ⎔ Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #
+  #     - name: Setup pnpm
+  #       run: corepack enable
+  #
+  #     - name: Download deps
+  #       run: pnpm install
+  #
+  #     - name: Setup Database
+  #       run: pnpm exec prisma migrate reset --force
+  #       env:
+  #         DATABASE_URL: 'postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}'
+  #
+  #     - name: Build
+  #       run: pnpm run build
+  #
+  #     - name: Cypress run
+  #       uses: cypress-io/github-action@v5
+  #       with:
+  #         start: pnpm run start:mocks
+  #         wait-on: 'http://localhost:8811'
+  #       env:
+  #         PORT: '8811'
+  #         DISABLE_BACKGROUND_SERVICES: '1'

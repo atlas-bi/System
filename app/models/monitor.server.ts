@@ -20,6 +20,8 @@ export type {
 	MonitorLogs,
 	MonitorFeeds,
 	DatabaseFileUsage,
+	Drive,
+	Notification,
 } from '@prisma/client';
 
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
@@ -449,7 +451,7 @@ export function getDatabaseMeta({ id }: Pick<Database, 'id'>) {
 
 export function getDatabaseFiles({
 	databaseId,
-}: Pick<DatabaseFiles, 'databaseId'>) {
+}: Pick<DatabaseFile, 'databaseId'>) {
 	return prisma.databaseFile.findMany({
 		where: { databaseId },
 		select: {

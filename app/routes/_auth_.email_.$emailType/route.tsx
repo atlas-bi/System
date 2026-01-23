@@ -1,3 +1,4 @@
+import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useLoaderData, useParams } from '@remix-run/react';
 import { prisma } from '~/db.server';
@@ -22,22 +23,26 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 	const monitor = await prisma.monitor.findFirst({});
 
-	return json({ monitor, hostname: process.env.HOSTNAME });
+	return json({ monitor: monitor!, hostname: process.env.HOSTNAME });
 };
 
 export default function Index() {
 	const { monitor, hostname } = useLoaderData<typeof loader>();
 	let { emailType } = useParams();
+	// Type assertion needed because email components expect Prisma Monitor type
+	// but Remix serializes Date objects to strings
+	const monitorForEmail = monitor as any;
 
 	const successSubject =
 		'💚 [bing (https://bing.com)] Data collection restored.';
 	const errorSubject = '💔 [bing (https://bing.com)] Data collection failed.';
 	const errorMessage = 'ECCONBLAH';
+	const mockDrive = { name: 'C:', percentFree: 25 } as any;
 	if (emailType == 'collectionError') {
 		return (
 			<ErrorEmail
 				hostname={hostname}
-				monitor={monitor}
+				monitor={monitorForEmail}
 				message={errorMessage}
 			/>
 		);
@@ -48,13 +53,13 @@ export default function Index() {
 			<SuccessEmail
 				hostname={hostname}
 				subject={successSubject}
-				monitor={monitor}
+				monitor={monitorForEmail}
 			/>
 		);
 	}
 
 	if (emailType == 'reboot') {
-		return <RebootEmail hostname={hostname} monitor={monitor} />;
+		return <RebootEmail hostname={hostname} monitor={monitorForEmail} />;
 	}
 
 	if (emailType == 'percentFreeSuccess') {
@@ -62,7 +67,8 @@ export default function Index() {
 			<PercentFreeSuccessEmail
 				hostname={hostname}
 				subject={successSubject}
-				monitor={monitor}
+				monitor={monitorForEmail}
+				drive={mockDrive}
 			/>
 		);
 	}
@@ -72,7 +78,8 @@ export default function Index() {
 			<PercentFreeErrorEmail
 				hostname={hostname}
 				message={errorMessage}
-				monitor={monitor}
+				monitor={monitorForEmail}
+				drive={mockDrive}
 			/>
 		);
 	}
