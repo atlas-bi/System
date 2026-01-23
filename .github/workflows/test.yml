@@ -159,3 +159,4 @@ jobs:
           wait-on: 'http://localhost:8811'
         env:
           PORT: '8811'
+          DISABLE_BACKGROUND_SERVICES: '1'
