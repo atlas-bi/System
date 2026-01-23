@@ -22,17 +22,16 @@ async function createAndLogin(email: string) {
 	const session = await sessionStorage.getSession();
 	// remix-auth stores the user in the session (default key is 'user')
 	session.set('user', user);
-	const cookieValue = await sessionStorage.commitSession(session);
-	if (!cookieValue) {
-		throw new Error('Cookie missing from createUserSession response');
+	const setCookieHeader = await sessionStorage.commitSession(session);
+	if (!setCookieHeader) {
+		throw new Error('Cookie missing from sessionStorage.commitSession');
 	}
-	const parsedCookie = parse(cookieValue);
-	// we log it like this so our cypress command can parse it out and set it as
-	// the cookie value.
+	// Output the full Set-Cookie header value (not just the cookie value)
+	// Cypress will use this with cy.request({ headers: { Cookie: ... } })
 	console.log(
 		`
 <cookie>
-  ${parsedCookie.__session}
+  ${setCookieHeader}
 </cookie>
   `.trim(),
 	);

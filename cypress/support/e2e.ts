@@ -11,13 +11,16 @@ function login({
 	cy.exec(
 		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require dotenv/config --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`,
 	).then(({ stdout }) => {
-		const cookieValue = stdout
+		const setCookieHeader = stdout
 			.replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, '$<cookieValue>')
 			.trim();
-		// Remix signed cookies are "value.signature" - we need the full string
-		cy.setCookie('__session', cookieValue, {
-			httpOnly: true,
-			sameSite: 'lax',
+		// Use cy.request to set the httpOnly cookie (cy.setCookie can't set httpOnly)
+		cy.request({
+			url: '/',
+			headers: {
+				Cookie: setCookieHeader,
+			},
+			followRedirect: false,
 		});
 	});
 	return cy.get('@user');
