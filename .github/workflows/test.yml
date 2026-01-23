@@ -109,12 +109,16 @@ jobs:
   cypress:
     name: ⚫️ Cypress
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${{ github.run_id }}
+      POSTGRES_DB: postgres
     services:
       postgres:
         image: postgres:14
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ${{ github.run_id }}
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
@@ -138,21 +142,21 @@ jobs:
         with:
           node-version: 18
 
-      - name: ⎔ Setup pnpm
+      - name: Setup pnpm
         run: corepack enable
 
-      - name: 📥 Download deps
+      - name: Download deps
         run: pnpm install
 
-      - name: � Setup Database
+      - name: Setup Database
         run: pnpm exec prisma migrate reset --force
         env:
-          DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/postgres'
+          DATABASE_URL: 'postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}'
 
-      - name: ⚙️ Build
+      - name: Build
         run: pnpm run build
 
-      - name: 🌳 Cypress run
+      - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
           start: pnpm run start:mocks
