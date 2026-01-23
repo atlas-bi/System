@@ -104,7 +104,7 @@ jobs:
         run: pnpm install
 
       - name: ⚡ Run vitest
-        run: pnpm run test -- --coverage
+        run: pnpm exec vitest --coverage
 
   cypress:
     name: ⚫️ Cypress
