@@ -9,19 +9,23 @@ function login({
 } = {}) {
 	cy.then(() => ({ email })).as('user');
 	cy.exec(
-		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`,
+		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require dotenv/config --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`,
 	).then(({ stdout }) => {
 		const cookieValue = stdout
 			.replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, '$<cookieValue>')
 			.trim();
-		cy.setCookie('__session', cookieValue);
+		// Remix signed cookies are "value.signature" - we need the full string
+		cy.setCookie('__session', cookieValue, {
+			httpOnly: true,
+			sameSite: 'lax',
+		});
 	});
 	return cy.get('@user');
 }
 
 function deleteUserByEmail(email: string) {
 	cy.exec(
-		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require tsconfig-paths/register ./cypress/support/delete-user.ts "${email}"`,
+		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require dotenv/config --require tsconfig-paths/register ./cypress/support/delete-user.ts "${email}"`,
 		{ failOnNonZeroExit: false },
 	);
 	cy.clearCookie('__session');

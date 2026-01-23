@@ -88,7 +88,7 @@ async function getOrCreateGroup(name: Group['name']) {
 	return createGroup(name);
 }
 
-async function getOrCreateUser(email: User['email']) {
+export async function getOrCreateUser(email: User['email']) {
 	const user = await getUserByEmail(email);
 	if (user) return user;
 
