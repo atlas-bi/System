@@ -35,7 +35,7 @@ jobs:
   #        shellcheck **/preinst
 
   lint:
-    name: ⬣ ESLint
+    name: ⬣ Biome
     runs-on: ubuntu-latest
     steps:
       - name: 🛑 Cancel Previous Runs
@@ -49,13 +49,14 @@ jobs:
         with:
           node-version: 16
 
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: 🔬 Lint
-        run: npm run lint
+        run: pnpm run lint
 
   typecheck:
     name: ʦ TypeScript
@@ -72,13 +73,14 @@ jobs:
         with:
           node-version: 16
 
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: 🔎 Type check
-        run: npm run typecheck --if-present
+        run: pnpm run typecheck --if-present
 
   vitest:
     name: ⚡ Vitest
@@ -95,13 +97,14 @@ jobs:
         with:
           node-version: 16
 
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: pnpm run test -- --coverage
 
   cypress:
     name: ⚫️ Cypress
@@ -121,10 +124,11 @@ jobs:
         with:
           node-version: 16
 
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: 🐳 Docker compose
         # the sleep is just there to give time for postgres to get started
@@ -133,15 +137,15 @@ jobs:
           DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/postgres'
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate reset --force
+        run: pnpm exec prisma migrate reset --force
 
       - name: ⚙️ Build
-        run: npm run build
+        run: pnpm run build
 
       - name: 🌳 Cypress run
         uses: cypress-io/github-action@v5
         with:
-          start: npm run start:mocks
+          start: pnpm run start:mocks
           wait-on: 'http://localhost:8811'
         env:
           PORT: '8811'

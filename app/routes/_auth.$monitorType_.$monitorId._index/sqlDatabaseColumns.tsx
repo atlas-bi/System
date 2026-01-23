@@ -1,8 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Activity, AlertTriangle, Minus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
-import { Minus } from 'lucide-react';
-import { formatInTimeZone, formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Badge } from '~/components/ui/badge';
 import { useFetcher } from '@remix-run/react';

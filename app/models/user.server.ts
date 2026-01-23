@@ -12,7 +12,7 @@ export interface UserSerialized
 }
 
 export type SlimUserFields = {
-	id: number;
+	id: string;
 	email: string;
 	lastName: string | null;
 	firstName: string | null;

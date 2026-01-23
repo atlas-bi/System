@@ -1,0 +1,25 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"files": {
+		"ignore": [
+			"node_modules",
+			"build",
+			"public/build",
+			"test/saml-idp",
+			"data.ms",
+			"postgres-data"
+		]
+	},
+	"formatter": {
+		"enabled": false
+	},
+	"organizeImports": {
+		"enabled": false
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false
+		}
+	}
+}
