@@ -51,7 +51,7 @@ async function getUserByEmail(email: User['email']) {
 	return prisma.user.findUnique({ where: { email }, select: slimUserFields });
 }
 
-function createUser(email: User['email']) {
+export function createUser(email: User['email']) {
 	return prisma.user.create({
 		data: {
 			email,
