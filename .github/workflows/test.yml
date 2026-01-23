@@ -109,6 +109,20 @@ jobs:
   cypress:
     name: ⚫️ Cypress
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: 🛑 Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
@@ -130,14 +144,10 @@ jobs:
       - name: 📥 Download deps
         run: pnpm install
 
-      - name: 🐳 Docker compose
-        # the sleep is just there to give time for postgres to get started
-        run: docker compose up -d && sleep 3
+      - name: � Setup Database
+        run: pnpm exec prisma migrate reset --force
         env:
           DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/postgres'
-
-      - name: 🛠 Setup Database
-        run: pnpm exec prisma migrate reset --force
 
       - name: ⚙️ Build
         run: pnpm run build
