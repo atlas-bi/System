@@ -14,14 +14,13 @@ function login({
 		const setCookieHeader = stdout
 			.replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, '$<cookieValue>')
 			.trim();
-		// Use cy.request to set the httpOnly cookie (cy.setCookie can't set httpOnly)
-		cy.request({
-			url: '/',
-			headers: {
-				Cookie: setCookieHeader,
-			},
-			followRedirect: false,
-		});
+		// Parse the Set-Cookie header to extract just the cookie value
+		// Format: "__session=value; Path=/; HttpOnly; SameSite=Lax"
+		const match = setCookieHeader.match(/__session=([^;]+)/);
+		if (match) {
+			const cookieValue = match[1];
+			cy.setCookie('__session', cookieValue);
+		}
 	});
 	return cy.get('@user');
 }
