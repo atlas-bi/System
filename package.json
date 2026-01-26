@@ -1,20 +1,21 @@
 {
 	"name": "atlas-system",
+	"packageManager": "pnpm@9.15.4",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
-		"db": "npx prisma migrate deploy && npx prisma generate",
+		"db": "pnpm exec prisma migrate deploy && pnpm exec prisma generate",
 		"build": "run-s build:*",
 		"build:remix": "remix build",
 		"build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
-		"dev": "npm run build; npm run saml:cert; run-p dev:*  quirrel ",
-		"prod": "npm run build; npm run saml:cert; run-p dev:ldap dev:saml prod:server",
-		"dev:ldap": "docker run  -p 389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
+		"dev": "pnpm run build; pnpm run saml:cert; run-p dev:*  quirrel ",
+		"prod": "pnpm run build; pnpm run saml:cert; run-p dev:ldap dev:saml prod:server",
+		"dev:ldap": "docker run  -p 1389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
 		"dev:saml": "node ./test/saml-idp/bin/run.js --acsUrl http://localhost:3000/auth/asc --audience http://localhost:3000/login",
-		"dev:build": "cross-env NODE_ENV=development npm run build:server -- --watch",
+		"dev:build": "cross-env NODE_ENV=development esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --watch",
 		"dev:remix": "cross-env NODE_ENV=development remix watch",
 		"asdfdev:remix:browser": "open-cli http://localhost:3000 --background",
-		"dev:smtp": "docker run -p 3030:80 -p 25:25 -p 143:143 rnwood/smtp4dev",
+		"dev:smtp": "docker run -p 3080:80 -p 3025:25 -p 3143:143 rnwood/smtp4dev",
 		"dev:search": "./node_modules/.bin/dotenv meilisearch",
 		"dev:server": "cross-env NODE_ENV=development node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
 		"prod:server": "cross-env NODE_ENV=production node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
@@ -24,19 +25,18 @@
 		"quirrel:ci": "./node_modules/.bin/dotenv quirrel ci",
 		"saml:cert": "openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout test/saml-idp/idp-private-key.pem -out test/saml-idp/idp-public-cert.pem -days 7300",
 		"saml:setup": "git submodule update --init --rebase --remote; cd test/saml-idp/; npm install",
-		"format:repo": "npm run format && npm run lint:repo -- --fix",
-		"lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-		"lint:repo": "npm run lint -- --config ./.eslintrc.repo.js",
+		"format:repo": "pnpm run format && pnpm run lint -- --write",
+		"lint": "biome check .",
 		"setup": "prisma generate && prisma migrate deploy && prisma db seed",
 		"start": "cross-env NODE_ENV=production node ./build/server.js",
-		"start:mocks": "cross-env NODE_ENV=production node --require ./mocks --require dotenv/config ./build/server.js",
+		"start:mocks": "cross-env NODE_ENV=test DISABLE_BACKGROUND_SERVICES=1 node --require ./mocks --require dotenv/config ./build/server.js",
 		"test": "vitest",
 		"test:e2e:dev": "start-server-and-test dev http://localhost:3000 \"npx cypress open\"",
-		"pretest:e2e:run": "npm run build",
+		"pretest:e2e:run": "pnpm run build",
 		"test:e2e:run": "cross-env PORT=8811 start-server-and-test start:mocks http://localhost:8811 \"npx cypress run\"",
 		"typecheck": "tsc && tsc -p cypress",
 		"validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
-		"commit": "git add . && npm run pre-commit && git add . && cz --no-verify",
+		"commit": "git add . && pnpm run pre-commit && git add . && cz --no-verify",
 		"pre-commit": "lint-staged"
 	},
 	"prettier": {
@@ -46,12 +46,6 @@
 		"singleQuote": true,
 		"semi": true
 	},
-	"eslintIgnore": [
-		"/node_modules",
-		"/build",
-		"/public/build",
-		"/postgres-data"
-	],
 	"dependencies": {
 		"@authenio/samlify-node-xmllint": "^2.0.0",
 		"@hookform/resolvers": "^3.3.0",
@@ -75,6 +69,7 @@
 		"@radix-ui/react-switch": "^1.0.3",
 		"@radix-ui/react-tabs": "^1.0.4",
 		"@radix-ui/react-tooltip": "^1.0.6",
+		"@tediousjs/connection-string": "^0.5.0",
 		"@react-email/body": "0.0.3",
 		"@react-email/button": "0.0.10",
 		"@react-email/container": "0.0.8",
@@ -143,8 +138,8 @@
 		"zod": "^3.22.2"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^1.8.3",
 		"@faker-js/faker": "^8.0.2",
-		"@remix-run/eslint-config": "^1.19.3",
 		"@semantic-release/changelog": "6.0.3",
 		"@semantic-release/commit-analyzer": "^10.0.3",
 		"@semantic-release/exec": "6.0.3",
@@ -157,7 +152,6 @@
 		"@types/bcryptjs": "^2.4.2",
 		"@types/bytes": "^3.1.1",
 		"@types/compression": "^1.7.2",
-		"@types/eslint": "^8.44.2",
 		"@types/express": "^4.17.17",
 		"@types/morgan": "^1.9.5",
 		"@types/mssql": "^8.1.2",
@@ -171,11 +165,6 @@
 		"cookie": "^0.5.0",
 		"cypress": "^12.17.4",
 		"cz-conventional-changelog": "3.3.0",
-		"eslint": "^8.48.0",
-		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-cypress": "^2.14.0",
-		"eslint-plugin-markdown": "^3.0.1",
-		"eslint-plugin-prefer-let": "^3.0.1",
 		"faker": "^6.6.6",
 		"happy-dom": "^10.11.0",
 		"lint-staged": "^14.0.1",
@@ -202,14 +191,9 @@
 	"prisma": {
 		"seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
 	},
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-conventional-changelog"
-		}
-	},
 	"lint-staged": {
 		"**/*.{ts,css,less,scss,js,json,md,yaml,html}": [
-			"npm run format"
+			"pnpm run format"
 		]
 	},
 	"version": "1.43.1"

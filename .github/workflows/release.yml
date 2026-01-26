@@ -25,12 +25,13 @@ jobs:
         with:
           node-version: 18
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+      - name: ⎔ Setup pnpm
+        run: corepack enable
 
-      - run: npm run build
+      - name: 📥 Download deps
+        run: pnpm install
+
+      - run: pnpm run build
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3

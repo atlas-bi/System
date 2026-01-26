@@ -12,7 +12,7 @@ export interface UserSerialized
 }
 
 export type SlimUserFields = {
-	id: number;
+	id: string;
 	email: string;
 	lastName: string | null;
 	firstName: string | null;
@@ -51,7 +51,7 @@ async function getUserByEmail(email: User['email']) {
 	return prisma.user.findUnique({ where: { email }, select: slimUserFields });
 }
 
-function createUser(email: User['email']) {
+export function createUser(email: User['email']) {
 	return prisma.user.create({
 		data: {
 			email,
@@ -88,7 +88,7 @@ async function getOrCreateGroup(name: Group['name']) {
 	return createGroup(name);
 }
 
-async function getOrCreateUser(email: User['email']) {
+export async function getOrCreateUser(email: User['email']) {
 	const user = await getUserByEmail(email);
 	if (user) return user;
 

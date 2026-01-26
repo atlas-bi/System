@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress';
 
 export default defineConfig({
 	e2e: {
+		supportFile: 'cypress/support/e2e.ts',
 		setupNodeEvents: (on, config) => {
 			const isDev = config.watchForFileChanges;
 			const port = process.env.PORT ?? (isDev ? '3000' : '8811');
