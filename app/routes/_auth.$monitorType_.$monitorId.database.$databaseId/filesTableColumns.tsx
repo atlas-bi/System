@@ -68,7 +68,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Size" />
 		),
 		cell: ({ row }) => {
-			const sizeFetcher = useFetcher();
+			const sizeFetcher = useFetcher<{ usage?: { currentSize?: string | null } }>();
 			const { monitorType, monitorId, databaseId } = useParams();
 			useEffect(() => {
 				if (sizeFetcher.state === 'idle' && sizeFetcher.data == null) {

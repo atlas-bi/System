@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getDatabaseMeta } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -26,7 +26,7 @@ import invariant from 'tiny-invariant';
 import { FilesMeta } from './files';
 import { Skeleton } from '~/components/ui/skeleton';
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -47,8 +47,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function Index() {
 	const { databaseMeta } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType } = useParams();
-	const usageFetcher = useFetcher();
-	const dataFetcher = useFetcher();
+	const usageFetcher = useFetcher<any>();
+	const dataFetcher = useFetcher<typeof loader>();
 
 	const [database, setDatabase] = useState(databaseMeta);
 
@@ -66,7 +66,7 @@ export default function Index() {
 
 	useEffect(() => {
 		if (dataFetcher.data?.databaseMeta) {
-			setDatabase(dataFetcher.data.databaseMeta);
+			setDatabase(dataFetcher.data.databaseMeta as any);
 		}
 	}, [dataFetcher.data]);
 
@@ -97,7 +97,7 @@ export default function Index() {
 					Database
 				</Badge>
 				<div className="flex divide-x">
-					<Database database={database} setter={setDatabase}>
+					<Database database={database as any} setter={setDatabase as any}>
 						<Button variant="link" className="text-slate-700 h-6 ">
 							<Settings size={16} />
 						</Button>
@@ -251,7 +251,7 @@ export default function Index() {
 						/>
 					</TabsContent>
 					<TabsContent value="files">
-						<FilesMeta database={databaseMeta} />
+						<FilesMeta database={databaseMeta as any} />
 					</TabsContent>
 				</Tabs>
 

@@ -5,7 +5,6 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import { ChildProcess, spawnSync } from 'child_process';
-import { execa } from 'execa';
 import { symmetric } from 'secure-webhooks';
 /*
 
@@ -100,8 +99,8 @@ const fetchWithRetries: FetchWithRetries = async (
 		process.env.QUIRREL_BASE_URL = `http://127.0.0.1:${port}`;
 
 		if (!DISABLE_BACKGROUND_SERVICES) {
-			child = startQuirrel();
-			search = startMeili();
+			child = await startQuirrel();
+			search = await startMeili();
 			await getQuirrelToken();
 		}
 	}
@@ -199,7 +198,8 @@ const fetchWithRetries: FetchWithRetries = async (
 	}
 })();
 
-function startQuirrel() {
+async function startQuirrel() {
+	const { execa } = await import('execa');
 	const child: ChildProcess = execa(
 		'node',
 		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
@@ -223,7 +223,8 @@ function startQuirrel() {
 	return child;
 }
 
-function startMeili() {
+async function startMeili() {
+	const { execa } = await import('execa');
 	const child: ChildProcess = execa('./etc/meilisearch', {
 		env: {
 			...process.env,

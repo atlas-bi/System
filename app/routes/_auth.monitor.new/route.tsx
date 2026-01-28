@@ -1,7 +1,7 @@
-import { ActionArgs, redirect } from '@remix-run/node';
+import { redirect, type ActionFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { NodeSSH } from 'node-ssh';
-import { namedAction } from 'remix-utils';
+import { namedAction } from '~/utils';
 import {
 	createMonitor,
 	deleteMonitor,
@@ -113,7 +113,7 @@ const checkTcp = function ({
 	}
 };
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,

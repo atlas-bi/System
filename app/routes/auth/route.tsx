@@ -1,7 +1,7 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
-import { safeRedirect } from 'remix-utils';
 import { authenticator } from '~/services/auth.server';
+import { safeRedirect } from '~/utils';
 
 export const action: ActionFunction = ({ request }) => login(request);
 export const loader: LoaderFunction = ({ request }) => login(request);

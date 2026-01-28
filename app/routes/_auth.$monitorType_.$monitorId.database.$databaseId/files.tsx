@@ -5,10 +5,10 @@ import { columns } from './filesTableColumns';
 import { FilesTable } from './filesTable';
 import { Skeleton } from '~/components/ui/skeleton';
 
-export const FilesMeta = ({ database }: { database: Database }) => {
+export const FilesMeta = ({ database }: { database: Database | any }) => {
 	let { monitorId, monitorType } = useParams();
 
-	const fileFetcher = useFetcher();
+	const fileFetcher = useFetcher<{ files?: any[] }>();
 	const location = useLocation();
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
@@ -17,7 +17,7 @@ export const FilesMeta = ({ database }: { database: Database }) => {
 				`/${monitorType}/${monitorId}/database/${database.id}/files`,
 			);
 		}
-	}, []);
+	}, [fileFetcher.state, fileFetcher.data, monitorType, monitorId, database.id]);
 
 	useEffect(() => {
 		if (fileFetcher.state === 'idle' && fileFetcher.data == null) {
@@ -33,7 +33,7 @@ export const FilesMeta = ({ database }: { database: Database }) => {
 				`/${monitorType}/${monitorId}/database/${database.id}/files`,
 			);
 		}
-	}, [fileFetcher, database]);
+	}, [fileFetcher.state, fileFetcher.data, monitorType, monitorId, database.id]);
 
 	return (
 		<>
