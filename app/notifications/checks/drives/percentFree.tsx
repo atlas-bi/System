@@ -54,7 +54,7 @@ async function allClear({
 	}
 }
 
-async function reset({ drive }: { drive: Drive }) {
+async function reset({ drive }: { drive: any }) {
 	return setDrivePercFreeSentAt({
 		id: drive.id,
 		percFreeNotifySentAt: null,

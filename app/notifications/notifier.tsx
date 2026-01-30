@@ -1,9 +1,10 @@
+import type { MonitorWithRelations } from '~/models/monitor.server';
 import { getMonitor } from '~/models/monitor.server';
 import { getDriveLatestFeed } from '~/models/drive.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
 import {
-	Notification,
+	NotificationMeta,
 	getNotificationConnection,
 } from '~/models/notification.server';
 import percentFreeNotifier from './checks/drives/percentFree';
@@ -23,7 +24,7 @@ export default async function Notifier({
 }: {
 	job: string;
 	message?: string;
-	oldMonitor?: any;
+	oldMonitor?: MonitorWithRelations;
 }) {
 	const monitor = await getMonitor({ id: job });
 
@@ -35,10 +36,10 @@ export default async function Notifier({
 
 	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier
-		if (oldMonitor) await rebootNotifier({ monitor: monitor as any, oldMonitor: oldMonitor as any });
+		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
 
 		// drive notifications
-		monitor?.drives?.map(async (drive: any) => {
+		monitor?.drives?.map(async (drive) => {
 			// don't report inactive drives.
 			if (drive.enabled == false) return;
 
@@ -50,7 +51,7 @@ export default async function Notifier({
 				// notify if drive was missing
 			}
 
-			await percentFreeNotifier({ drive: drive as any, monitor: monitor as any, usage: usage as any });
+			await percentFreeNotifier({ drive, monitor, usage });
 
 			if (drive.sizeFreeNotify) {
 			}
@@ -66,7 +67,7 @@ export const sendNotification = async ({
 	subject,
 	message,
 }: {
-	notification: Notification;
+	notification: NotificationMeta;
 	subject: string;
 	message: string;
 }) => {

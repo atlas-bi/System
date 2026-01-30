@@ -6,6 +6,7 @@ import {
 	getMonitorDisabledDrives,
 	monitorError,
 	updateMonitor,
+	UpdateMonitorResult,
 } from '~/models/monitor.server';
 
 import { setDriveOnline } from '~/models/drive.server';
@@ -13,7 +14,7 @@ import Notifier from '~/notifications/notifier';
 import { disposeSsh } from './helpers.server';
 import { differenceInDays } from 'date-fns';
 
-function cpuBuilder(data) {
+function cpuBuilder(data: any) {
 	// list of cpu for each socket
 
 	if (data.length === undefined) return data;
@@ -206,7 +207,7 @@ export default async function WindowsMonitor({
 		});
 
 		// only update drives that are enabled.
-		const updateableDrives = s.filter((drive) => {
+		const updateableDrives = s.filter((drive: any) => {
 			const l =
 				disabledDrives.filter(
 					(d) =>
@@ -216,8 +217,8 @@ export default async function WindowsMonitor({
 				).length == 0;
 			return l;
 		});
-		const oldMonitor = await getMonitor({ id: monitor.id });
-		const data = await updateMonitor({
+		const oldMonitor = (await getMonitor({ id: monitor.id })) ?? undefined;
+		const data: UpdateMonitorResult = await updateMonitor({
 			id: monitor.id,
 			data: {
 				name: cs.Name,
@@ -271,11 +272,12 @@ export default async function WindowsMonitor({
 
 		// online/offline
 		data.drives?.map(
-			async (drive: { size: string; usage: string | any[]; id: any }) => {
+			async (drive) => {
 				await setDriveOnline({
 					id: drive.id,
 					online:
-						updateableDrives.filter((x) => x.Name == drive.name).length > 0,
+						updateableDrives.filter((x: any) => x.Name == drive.name)
+							.length > 0,
 				});
 			},
 		);
