@@ -209,7 +209,7 @@ export const columnsPing: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Ping" />
 		),
 		cell: ({ row }) => {
-			const pingFetcher = useFetcher();
+			const pingFetcher = useFetcher<{ feeds?: any[] }>();
 			const url = `/${row.original.type}/${row.original.id}/ping-latest`;
 
 			useEffect(() => {
@@ -225,7 +225,7 @@ export const columnsPing: ColumnDef<any>[] = [
 				if (pingFetcher.state === 'idle' && pingFetcher.data == null) {
 					pingFetcher.load(url);
 				}
-			}, [pingFetcher]);
+			}, [pingFetcher.state, pingFetcher.data, url]);
 
 			return (
 				<div
@@ -233,7 +233,7 @@ export const columnsPing: ColumnDef<any>[] = [
 						row.original.enabled ? '' : 'opacity-50 group-hover:opacity-100'
 					}`}
 				>
-					{pingFetcher.data?.feeds?.map((x: MonitorFeeds) => (
+					{pingFetcher.data?.feeds?.map((x: any) => (
 						<TooltipProvider
 							key={x.id}
 							delayDuration={20}

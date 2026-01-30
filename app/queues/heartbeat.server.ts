@@ -3,7 +3,7 @@ import { getEnabledMonitors } from '~/models/monitor.server';
 
 import monitorServer from './monitor.server';
 
-export default CronJob('/queues/heartbeat', '* * * * *', async (meta) => {
+export default CronJob('/queues/heartbeat', '* * * * *', async () => {
 	try {
 		const jobs = await getEnabledMonitors();
 		jobs.map((job: { id: string }) => monitorServer.enqueue(job.id));

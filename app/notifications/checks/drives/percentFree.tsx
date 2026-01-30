@@ -1,6 +1,4 @@
-import { DriveUsage, setDrivePercFreeSentAt } from '~/models/drive.server';
-import type { Monitor } from '~/models/monitor.server';
-import type { Drive } from '~/models/drive.server';
+import { setDrivePercFreeSentAt } from '~/models/drive.server';
 import type { Notification } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
@@ -15,8 +13,8 @@ async function allClear({
 	monitor,
 	drive,
 }: {
-	monitor: Monitor;
-	drive: Drive & { percFreeNotifyTypes: Notification[] };
+	monitor: any;
+	drive: any;
 }) {
 	if (drive.percFreeNotifySentAt) {
 		// send an all clear alert
@@ -34,7 +32,7 @@ async function allClear({
 			},
 		);
 
-		drive.percFreeNotifyTypes.map(async (notification: Notification) => {
+		(drive.percFreeNotifyTypes ?? []).map(async (notification: Notification) => {
 			try {
 				return await sendNotification({ notification, subject, message: html });
 			} catch (e) {
@@ -68,9 +66,9 @@ export default async function percentFreeNotifier({
 	monitor,
 	usage,
 }: {
-	drive: Drive & { percFreeNotifyTypes: Notification[] };
-	monitor: Monitor;
-	usage: DriveUsage;
+	drive: any;
+	monitor: any;
+	usage: any;
 }) {
 	// don't notify if disabled.
 	if (!drive.percFreeNotify) return reset({ drive });

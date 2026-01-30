@@ -22,7 +22,11 @@ export default async function Telegram({
 
 		await axios.get(
 			`https://api.telegram.org/bot${
-				test ? notification.tgBotToken : decrypt(notification.tgBotToken)
+				test
+					? notification.tgBotToken
+					: notification.tgBotToken
+						? decrypt(notification.tgBotToken)
+						: ''
 			}/sendMessage`,
 			{
 				params: params,

@@ -14,19 +14,28 @@ export default async function SMTP({
 	message: string;
 	test?: Boolean;
 }) {
+	if (!notification.smtpHost || !notification.smtpPort) {
+		throw new Error('SMTP host and port are required');
+	}
+	if (!notification.smtpToEmail || !notification.smtpFromEmail) {
+		throw new Error('SMTP to/from email are required');
+	}
+
 	const config = {
 		host: notification.smtpHost,
-		port: notification.smtpPort,
-		secure: notification.smtpSecure || false,
+		port: Number(notification.smtpPort),
+		secure: Boolean(notification.smtpSecurity) || false,
 		tls: {
-			rejectUnauthorized: notification.smtpIgnoreTLSError || false,
+			rejectUnauthorized: Boolean(notification.ignoreSSLErrors) || false,
 		},
 		auth: notification.smtpUsername
 			? {
 					user: notification.smtpUsername,
 					pass: test
 						? notification.smtpPassword
-						: decrypt(notification.smtpPassword),
+						: notification.smtpPassword
+							? decrypt(notification.smtpPassword)
+							: null,
 			  }
 			: undefined,
 	};

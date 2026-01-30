@@ -1,6 +1,5 @@
-import { Monitor, getMonitor } from '~/models/monitor.server';
+import { getMonitor } from '~/models/monitor.server';
 import { getDriveLatestFeed } from '~/models/drive.server';
-import type { Drive } from '~/models/drive.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
 import {
@@ -24,7 +23,7 @@ export default async function Notifier({
 }: {
 	job: string;
 	message?: string;
-	oldMonitor?: Monitor;
+	oldMonitor?: any;
 }) {
 	const monitor = await getMonitor({ id: job });
 
@@ -36,10 +35,10 @@ export default async function Notifier({
 
 	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier
-		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
+		if (oldMonitor) await rebootNotifier({ monitor: monitor as any, oldMonitor: oldMonitor as any });
 
 		// drive notifications
-		monitor?.drives?.map(async (drive: Drive) => {
+		monitor?.drives?.map(async (drive: any) => {
 			// don't report inactive drives.
 			if (drive.enabled == false) return;
 
@@ -51,7 +50,7 @@ export default async function Notifier({
 				// notify if drive was missing
 			}
 
-			await percentFreeNotifier({ drive, monitor, usage });
+			await percentFreeNotifier({ drive: drive as any, monitor: monitor as any, usage: usage as any });
 
 			if (drive.sizeFreeNotify) {
 			}

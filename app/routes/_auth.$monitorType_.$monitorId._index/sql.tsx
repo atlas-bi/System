@@ -11,7 +11,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { SqlDatabaseTable } from './sqlDatabaseTable';
 import { columns } from './sqlDatabaseColumns';
 
-export const SqlSystem = ({ monitor }: { monitor: Monitor }) => {
+type MonitorLike = {
+	type: string;
+	id: string;
+	name?: string | null;
+	model?: string | null;
+	manufacturer?: string | null;
+	version?: string | null;
+	os?: string | null;
+	osVersion?: string | null;
+	lastBootTime?: string | Date | null;
+};
+
+export const SqlSystem = ({ monitor }: { monitor: MonitorLike }) => {
 	return (
 		<div className="space-y-2 flex-grow">
 			<Table>
@@ -66,8 +78,8 @@ export const SqlSystem = ({ monitor }: { monitor: Monitor }) => {
 	);
 };
 
-export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
-	const databasesFetcher = useFetcher();
+export const SqlStats = ({ monitor }: { monitor: MonitorLike }) => {
+	const databasesFetcher = useFetcher<{ databases?: any[] }>();
 	const location = useLocation();
 
 	// if we redirect to another monitor we need to reload databases
@@ -83,7 +95,7 @@ export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
 		if (databasesFetcher.state === 'idle' && databasesFetcher.data == null) {
 			databasesFetcher.load(`/${monitor.type}/${monitor.id}/databases`);
 		}
-	}, [databasesFetcher, monitor]);
+	}, [databasesFetcher.state, databasesFetcher.data, monitor.type, monitor.id]);
 
 	return (
 		<Tabs

@@ -6,16 +6,37 @@ import { DoughnutChart } from '~/components/charts/driveDoughnut';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { H3 } from '~/components/ui/typography';
-import { Drive, Monitor } from '~/models/monitor.server';
+ 
+type MonitorLike = {
+	type: string;
+	id: string;
+};
+
+type DriveLike = {
+	id: string;
+	enabled: boolean;
+	online: boolean;
+	title?: string | null;
+	root?: string | null;
+	name?: string | null;
+	location?: string | null;
+	size?: string | null;
+};
 
 export const MiniDrive = ({
 	monitor,
 	drive,
 }: {
-	monitor: Monitor;
-	drive: Drive;
+	monitor: MonitorLike;
+	drive: DriveLike;
 }) => {
-	const usageFetcher = useFetcher();
+	const usageFetcher = useFetcher<{
+		drive?: {
+			usage?: any[];
+			daysTillFull?: number | null;
+			growthRate?: string | number | null;
+		};
+	}>();
 	const location = useLocation();
 
 	// if we redirect to another monitor we need to reload drives
@@ -33,7 +54,7 @@ export const MiniDrive = ({
 				`/${monitor.type}/${monitor.id}/drive/${drive.id}/usage`,
 			);
 		}
-	}, [usageFetcher]);
+	}, [usageFetcher.state, usageFetcher.data, monitor.type, monitor.id, drive.id]);
 
 	return (
 		<Link
@@ -58,32 +79,37 @@ export const MiniDrive = ({
 					<ToggleLeft size={20} className="fill-slate-200 text-slate-400" />
 				)}
 				{usageFetcher.data ? (
-					<DoughnutChart
-						className="w-36 h-36"
-						data={{
-							labels: [
-								`Used ${bytes(
-									Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
-								)}`,
-								`Free ${bytes(
-									Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
-								)}`,
-							],
-							datasets: [
-								{
-									label: 'Drive Usage',
-									data: [
-										Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
-										Number([...usageFetcher.data?.drive?.usage]?.pop()?.used) +
-											Number([...usageFetcher.data?.drive?.usage]?.pop()?.free) ==
-										0
-											? 100
-											: Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
+					(() => {
+						const usage = usageFetcher.data?.drive?.usage ?? [];
+						return (
+							<DoughnutChart
+								className="w-36 h-36"
+								data={{
+									labels: [
+										`Used ${bytes(
+											Number([...usage]?.pop()?.used),
+										)}`,
+										`Free ${bytes(
+											Number([...usage]?.pop()?.free),
+										)}`,
 									],
-								},
-							],
-						}}
-					/>
+									datasets: [
+										{
+											label: 'Drive Usage',
+											data: [
+												Number([...usage]?.pop()?.used),
+												Number([...usage]?.pop()?.used) +
+													Number([...usage]?.pop()?.free) ==
+												0
+													? 100
+													: Number([...usage]?.pop()?.free),
+											],
+										},
+									],
+								}}
+							/>
+						);
+					})()
 				) : (
 					<Skeleton className="w-36 h-36 rounded-full" />
 				)}
@@ -119,7 +145,11 @@ export const MiniDrive = ({
 							<TableCell className="py-1">Used</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number([...usageFetcher.data?.drive?.usage]?.pop()?.used)) ||
+									bytes(
+										Number([
+											...(usageFetcher.data?.drive?.usage ?? []),
+										].pop()?.used),
+									) ||
 									'-1'
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
@@ -130,7 +160,11 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Free</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number([...usageFetcher.data?.drive?.usage]?.pop()?.free)) ||
+									bytes(
+										Number([
+											...(usageFetcher.data?.drive?.usage ?? []),
+										].pop()?.free),
+									) ||
 									'-1'
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
