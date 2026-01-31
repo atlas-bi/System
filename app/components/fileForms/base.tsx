@@ -1,5 +1,5 @@
 import { Form, useFetcher } from '@remix-run/react';
-import { Dispatch, ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
 	Dialog,
@@ -21,11 +21,16 @@ export default function File({
 	children,
 }: {
 	file: DatabaseFile;
-	setter: Dispatch<DatabaseFile>;
+	setter: (next: DatabaseFile) => void;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	const fetcher = useFetcher<{
+		file?: DatabaseFile;
+		form?: {
+			error?: string;
+		};
+	}>();
 
 	const [data, setData] = useState<DatabaseFile>(file);
 
@@ -35,7 +40,7 @@ export default function File({
 		if (fetcher.state === 'idle' && fetcher.data?.file != null) {
 			setOpen(false);
 		}
-	}, [fetcher]);
+	}, [fetcher.state, fetcher.data]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>

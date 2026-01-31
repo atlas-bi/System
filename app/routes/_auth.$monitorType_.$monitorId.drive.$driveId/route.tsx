@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getDriveMeta } from '~/models/drive.server';
 import { authenticator } from '~/services/auth.server';
@@ -25,7 +25,7 @@ import { PingStat } from '../_auth.$monitorType_.$monitorId._index/responseTime'
 import invariant from 'tiny-invariant';
 import { Skeleton } from '~/components/ui/skeleton';
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -42,8 +42,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function Index() {
 	const { driveMeta } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType } = useParams();
-	const usageFetcher = useFetcher();
-	const dataFetcher = useFetcher();
+	const usageFetcher = useFetcher<any>();
+	const dataFetcher = useFetcher<typeof loader>();
 
 	const [drive, setDrive] = useState(driveMeta);
 
@@ -61,7 +61,7 @@ export default function Index() {
 
 	useEffect(() => {
 		if (dataFetcher.data?.driveMeta) {
-			setDrive(dataFetcher.data.driveMeta);
+			setDrive(dataFetcher.data.driveMeta as any);
 		}
 	}, [dataFetcher.data]);
 
@@ -94,7 +94,7 @@ export default function Index() {
 					Drive
 				</Badge>
 				<div className="flex divide-x">
-					<Drive drive={drive}>
+					<Drive drive={drive as any}>
 						<Button variant="link" className="text-slate-700 h-6 ">
 							<Settings size={16} />
 						</Button>

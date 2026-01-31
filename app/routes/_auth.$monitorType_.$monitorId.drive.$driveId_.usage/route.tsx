@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
 import invariant from 'tiny-invariant';
@@ -39,7 +39,7 @@ function calcGrowth({
 	return { daysTillFull, growthRate };
 }
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,

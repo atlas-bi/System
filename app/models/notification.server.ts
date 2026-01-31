@@ -4,6 +4,8 @@ import { prisma } from '~/db.server';
 import type { Notification } from '@prisma/client';
 export type { Notification } from '@prisma/client';
 
+export type NotificationMeta = Pick<Notification, 'id' | 'type' | 'name'>;
+
 export function getNotifications() {
 	return prisma.notification.findMany({
 		select: {

@@ -5,7 +5,7 @@ import { Preview } from '@react-email/preview';
 import { Link } from '@react-email/link';
 import { Tailwind } from '@react-email/tailwind';
 import { Text } from '@react-email/text';
-import { Monitor } from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
 import { Body } from '@react-email/body';
 import { Container } from '@react-email/container';
 import { Section } from '@react-email/section';
@@ -20,7 +20,7 @@ export const SuccessEmail = ({
 }: {
 	hostname?: string;
 	subject: string;
-	monitor: Monitor;
+	monitor: MonitorWithRelations;
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
@@ -41,8 +41,6 @@ export const SuccessEmail = ({
 
 						<Section className="text-center mt-[32px] mb-[32px]">
 							<Button
-								pX={20}
-								pY={12}
 								className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
 								href={`${hostname}/${monitor.type}/${monitor.id}`}
 							>
@@ -73,7 +71,7 @@ export const ErrorEmail = ({
 	message,
 }: {
 	hostname?: string;
-	monitor: Monitor;
+	monitor: MonitorWithRelations;
 	message: string;
 }) => {
 	return (
@@ -106,8 +104,6 @@ export const ErrorEmail = ({
 
 						<Section className="text-center mt-[32px] mb-[32px]">
 							<Button
-								pX={20}
-								pY={12}
 								className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
 								href={`${hostname}/${monitor.type}/${monitor.id}`}
 							>

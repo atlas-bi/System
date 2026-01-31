@@ -1,11 +1,9 @@
 import {
-	Database,
-	DatabaseFile,
 	getFileUsageLatest,
 	setFilePercFreeSentAt,
 } from '~/models/monitor.server';
-import type { Drive, Monitor } from '~/models/monitor.server';
-import type { Notification } from '~/models/notification.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import type { NotificationMeta } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 import { render } from '@react-email/render';
@@ -20,9 +18,9 @@ async function allClear({
 	database,
 	file,
 }: {
-	monitor: Monitor & { sqlFileSizePercentFreeNotifyTypes: Notification[] };
-	database: Database;
-	file: DatabaseFile;
+	monitor: MonitorWithRelations;
+	database: MonitorWithRelations['databases'][number];
+	file: MonitorWithRelations['databases'][number]['files'][number];
 }) {
 	if (file.sqlFileSizePercentFreeNotifySentAt) {
 		// send an all clear alert
@@ -42,7 +40,7 @@ async function allClear({
 		);
 
 		monitor.sqlFileSizePercentFreeNotifyTypes.map(
-			async (notification: Notification) => {
+			async (notification: NotificationMeta) => {
 				try {
 					return await sendNotification({
 						notification,
@@ -73,13 +71,13 @@ async function allClear({
 async function reset({
 	monitor,
 }: {
-	monitor: Monitor & { databases: Array<Database & { files: DatabaseFile[] }> };
+	monitor: MonitorWithRelations;
 }) {
 	return monitor.databases?.map(
 		(x) => x.files?.map(async (file) => resetFile({ file })),
 	);
 }
-async function resetFile({ file }: { file: DatabaseFile }) {
+async function resetFile({ file }: { file: MonitorWithRelations['databases'][number]['files'][number] }) {
 	return setFilePercFreeSentAt({
 		id: file.id,
 		sqlFileSizePercentFreeNotifySentAt: null,
@@ -89,10 +87,7 @@ async function resetFile({ file }: { file: DatabaseFile }) {
 export default async function sqlFilePercentFreeNotifier({
 	monitor,
 }: {
-	monitor: Monitor & {
-		sqlFileSizePercentFreeNotifyTypes: Notification[];
-		databases: Array<Database & { files: DatabaseFile[] }>;
-	};
+	monitor: MonitorWithRelations;
 }) {
 	// only for sql
 	if (monitor.type !== 'sqlServer') return;
@@ -190,7 +185,7 @@ export default async function sqlFilePercentFreeNotifier({
 					);
 
 					monitor.sqlFileSizePercentFreeNotifyTypes.map(
-						async (notification: Notification) => {
+						async (notification: NotificationMeta) => {
 							try {
 								// await to prevent error from bubbling
 								return await sendNotification({

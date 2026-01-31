@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { startOfDay, startOfHour } from 'date-fns';
 import invariant from 'tiny-invariant';
@@ -82,7 +82,7 @@ function grouper(group: {
 		.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
 }
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,

@@ -1,11 +1,15 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
-import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import { defineConfig } from 'vitest/config';
+const path = require('path');
 
-export default defineConfig({
-	plugins: [react(), tsconfigPaths()],
+/** @type {import('vitest/config').UserConfig} */
+module.exports = {
+	resolve: {
+		alias: {
+			'~': path.resolve(__dirname, 'app'),
+			'@': path.resolve(__dirname),
+		},
+	},
 	test: {
 		globals: true,
 		environment: 'happy-dom',
@@ -17,4 +21,4 @@ export default defineConfig({
 			'.*\\/postgres-data\\/.*',
 		],
 	},
-});
+};
