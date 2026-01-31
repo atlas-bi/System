@@ -32,10 +32,10 @@ export default function SshForm({
 			<Input
 				type="number"
 				id="port"
-				value={data.port || 22}
+				value={data.port ?? '22'}
 				placeholder="22"
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, port: Number(e.target.value) })}
+				onChange={(e) => setData({ ...data, port: e.target.value })}
 			/>
 			<Label htmlFor="username" className="text-right">
 				Username*

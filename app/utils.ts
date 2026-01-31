@@ -44,14 +44,14 @@ export function safeRedirect(
 
 export async function namedAction(
 	request: Request,
-	actions: Record<string, () => Promise<Response> | Response>,
+	actions: Record<string, (formData: FormData) => Promise<Response> | Response>,
 ) {
 	const formData = await request.formData();
 	const action = formData.get('_action');
 	if (typeof action !== 'string' || !(action in actions)) {
 		throw new Response('Invalid action', { status: 400 });
 	}
-	return await actions[action]!();
+	return await actions[action]!(formData);
 }
 
 export function redirectBack(request: Request, { fallback }: { fallback: string }) {

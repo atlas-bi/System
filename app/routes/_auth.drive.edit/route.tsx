@@ -12,8 +12,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	});
 
 	return namedAction(request, {
-		async edit() {
-			const formData = await request.formData();
+		async edit(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const drive = await editDrive({
@@ -30,8 +29,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			});
 			return json({ drive });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const drive = await getDriveMonitor({
