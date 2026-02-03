@@ -165,7 +165,7 @@
 		"cookie": "^0.7.0",
 		"cypress": "^12.17.4",
 		"cz-conventional-changelog": "3.3.0",
-		"happy-dom": "^10.11.0",
+		"happy-dom": "^15.10.2",
 		"lint-staged": "^14.0.1",
 		"msw": "^1.2.5",
 		"npm-run-all2": "^5.0.0",
@@ -195,5 +195,5 @@
 			"pnpm run format"
 		]
 	},
-	"version": "1.43.6"
+	"version": "1.43.7"
 }
