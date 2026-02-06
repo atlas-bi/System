@@ -9,8 +9,8 @@ export function TelegramForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Partial<Notification>;
+	setData: Dispatch<Partial<Notification>>;
 }) {
 	return (
 		<>

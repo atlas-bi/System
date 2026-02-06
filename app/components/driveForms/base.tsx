@@ -26,7 +26,11 @@ export default function Drive({
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	type DriveFetcherData = {
+		drive?: Drive;
+		form?: { error?: string };
+	};
+	const fetcher = useFetcher<DriveFetcherData>();
 
 	const [data, setData] = useState<Drive>(drive);
 
@@ -89,10 +93,13 @@ export default function Drive({
 							<Button
 								type="button"
 								onClick={(e) => {
-									fetcher.submit(
-										{ _action: 'edit', ...data },
-										{ method: 'post', action: '/drive/edit' },
-									);
+									const formData = new FormData();
+									formData.set('_action', 'edit');
+									formData.set('id', data.id);
+									formData.set('enabled', data.enabled ? 'true' : 'false');
+									formData.set('title', data.title ?? '');
+									formData.set('description', data.description ?? '');
+									fetcher.submit(formData, { method: 'post', action: '/drive/edit' });
 								}}
 							>
 								Save
@@ -104,10 +111,10 @@ export default function Drive({
 								variant="outline"
 								className="border-red-300"
 								onClick={(e) => {
-									fetcher.submit(
-										{ _action: 'delete', id: data.id },
-										{ method: 'post', action: '/drive/edit' },
-									);
+									const formData = new FormData();
+									formData.set('_action', 'delete');
+									formData.set('id', data.id);
+									fetcher.submit(formData, { method: 'post', action: '/drive/edit' });
 								}}
 							>
 								Delete

@@ -121,8 +121,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	});
 
 	return namedAction(request, {
-		async new() {
-			const formData = await request.formData();
+		async new(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const baseErrors = checkBase({ values });

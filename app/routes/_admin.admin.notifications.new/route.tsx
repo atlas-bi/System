@@ -71,8 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	});
 
 	return namedAction(request, {
-		async new() {
-			const formData = await request.formData();
+		async new(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const errors = validateForm({ values });
@@ -159,15 +158,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return json({ notification });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			await deleteNotification({ id: values.id.toString() });
 			return redirectBack(request, { fallback: '/admin/notifications' });
 		},
-		async test() {
-			const formData = await request.formData();
+		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const errors = validateForm({ values });
