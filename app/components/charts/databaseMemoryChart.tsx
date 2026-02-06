@@ -6,13 +6,14 @@ import {
 	CategoryScale,
 	ChartData,
 	Chart as ChartJS,
+	ChartOptions,
 	LinearScale,
 	PointElement,
 	Tooltip,
 	Filler,
 	TimeScale,
 } from 'chart.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -35,31 +36,62 @@ import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
 export const MemoryChart = ({ url }: { url: string }) => {
-	const usageFetcher = useFetcher();
+	type DatabaseMemoryFetcherData = {
+		monitor?: { startDate?: string | number | Date; endDate?: string | number | Date };
+		database?: { usage?: Array<{ createdAt: string | Date; memory?: number | null }> };
+	};
+	const usageFetcher = useFetcher<DatabaseMemoryFetcherData>();
 	const [unit, setUnit] = useState('last_24_hours');
-	const chartRef = useRef<ChartJS>(null);
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit: string) => {
+		(sizeUnit: string): ChartOptions<'line'> => {
+			const startDate = usageFetcher.data?.monitor?.startDate;
+			const endDate = usageFetcher.data?.monitor?.endDate;
+			const min = startDate ? new Date(startDate).getTime() : undefined;
+			const max = endDate ? new Date(endDate).getTime() : undefined;
+
+			type AllowedTimeUnit =
+				| 'millisecond'
+				| 'second'
+				| 'minute'
+				| 'hour'
+				| 'day'
+				| 'week'
+				| 'month'
+				| 'quarter'
+				| 'year';
+			const allowedTimeUnits: AllowedTimeUnit[] = [
+				'millisecond',
+				'second',
+				'minute',
+				'hour',
+				'day',
+				'week',
+				'month',
+				'quarter',
+				'year',
+			];
+			const candidateTimeUnit =
+				dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit;
+			const timeUnit =
+				candidateTimeUnit &&
+				allowedTimeUnits.includes(candidateTimeUnit as AllowedTimeUnit)
+					? (candidateTimeUnit as AllowedTimeUnit)
+					: undefined;
+
 			return {
 				responsive: true,
 				maintainAspectRatio: false,
 				interaction: {
 					intersect: false,
-					mode: 'index',
+					mode: 'index' as const,
 				},
 				animation: {
 					duration: 300,
-					resize: {
-						duration: 0,
-					},
-					active: {
-						duration: 0,
-					},
 				},
 				plugins: {
 					title: {
@@ -90,8 +122,8 @@ export const MemoryChart = ({ url }: { url: string }) => {
 						position: 'left' as const,
 						beginAtZero: true,
 						ticks: {
-							callback: function (value: string) {
-								return value + sizeUnit;
+							callback: function (tickValue: number | string) {
+								return `${tickValue}${sizeUnit}`;
 							},
 						},
 						stacked: true,
@@ -99,12 +131,10 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					x: {
 						stacked: true,
 						type: 'time',
-						min: () => usageFetcher.data?.monitor?.startDate,
-						max: () => usageFetcher.data?.monitor?.endDate,
+						min,
+						max,
 						time: {
-							unit: () =>
-								dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
-								undefined,
+							unit: timeUnit,
 						},
 						grid: {
 							display: false,
@@ -116,7 +146,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		[unit, usageFetcher.data],
 	);
 
-	const [options, setOptions] = useState(getOptions('GB'));
+	const [options, setOptions] = useState<ChartOptions<'line'>>(getOptions('GB'));
 
 	useEffect(() => {
 		usageFetcher.load(url + `?range=${unit}`);
@@ -128,24 +158,21 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		}
 	}, [usageFetcher]);
 
-	const emptyDataset = {
+	const emptyDataset: ChartData<'line', { x: Date; y: number }[]> = {
 		datasets: [],
 	};
-	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
+	const [chartData, setChartData] = useState<
+		ChartData<'line', { x: Date; y: number }[]>
+	>(emptyDataset);
 
 	useEffect(() => {
-		const chart = chartRef.current;
-
-		if (!chart) {
-			return;
-		}
-
 		let sizeUnit = 'GB';
-		const max = usageFetcher.data?.database?.usage?.reduce(
+		const max =
+			usageFetcher.data?.database?.usage?.reduce(
 			(a: number, e: { memory?: number | null }) =>
 				Math.max(Number(a), Number(e.memory) || 0),
 			0,
-		);
+		) ?? 0;
 		if (max < 10000) {
 			sizeUnit = 'KB';
 		} else if (max < 100000) {
@@ -155,69 +182,37 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		const xUnit =
 			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
 
-		const chartData = {
+		const chartData: ChartData<'line', { x: Date; y: number }[]> = {
 			datasets: [
 				{
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
 					label: 'Used',
-					cubicInterpolationMode: 'monotone',
+					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
-					data: usageFetcher.data?.database?.usage?.map((x: DatabaseUsage) => {
-						return {
-							x: x.createdAt,
+					data:
+						usageFetcher.data?.database?.usage?.map((x) => {
+							return {
+								x: new Date(x.createdAt),
 							y: Number(
 								bytes(Number(x?.memory) || 0, {
 									unit: sizeUnit as Unit,
 									decimalPlaces: 4,
-								}).replace(sizeUnit, ''),
+								})?.replace(sizeUnit, '') ?? '0',
 							),
 						};
-					}),
+						}) ?? [],
 					segment: {
-						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
+						borderColor: (ctx) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							return darkGradient[0];
 						},
-						backgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								lightGradient,
-							);
-						},
-						hoverBackgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
-						},
-						hoverBorderColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
+						backgroundColor: (ctx) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							return lightGradient[0];
 						},
 					},
-					pointStyle: false,
+					pointStyle: false as const,
 				},
 			],
 		};
@@ -242,7 +237,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					</div>
 				</div>
 				<div className="h-[450px] relative">
-					<Line ref={chartRef} options={options} data={chartData} />
+					<Line options={options} data={chartData} />
 					{usageFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />
