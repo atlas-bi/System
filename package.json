@@ -139,7 +139,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
-		"@faker-js/faker": "^7.0.0",
+		"@faker-js/faker": "^8.0.0",
 		"@semantic-release/changelog": "6.0.3",
 		"@semantic-release/commit-analyzer": "^10.0.3",
 		"@semantic-release/exec": "6.0.3",
@@ -195,5 +195,5 @@
 			"pnpm run format"
 		]
 	},
-	"version": "2.0.3"
+	"version": "2.0.4"
 }
