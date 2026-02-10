@@ -6,7 +6,7 @@ describe('smoke tests', () => {
 	});
 
 	it('should allow you to register and login', () => {
-		cy.login({ email: `${faker.internet.userName()}@example.com` });
+		cy.login({ email: `${faker.internet.username()}@example.com` });
 		cy.visitAndCheck('/');
 		cy.findByRole('link', { name: /notes/i }).click();
 		cy.findByRole('link', { name: /log out/i }).click();
