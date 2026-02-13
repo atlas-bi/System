@@ -42,7 +42,7 @@ jobs:
         uses: styfle/cancel-workflow-action@0.13.0
 
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v6
@@ -90,7 +90,7 @@ jobs:
         uses: styfle/cancel-workflow-action@0.13.0
 
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v6
