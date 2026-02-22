@@ -147,7 +147,7 @@
 		"@semantic-release/github": "^10.0.0",
 		"@semantic-release/npm": "^10.0.5",
 		"@semantic-release/release-notes-generator": "^14.0.0",
-		"@testing-library/cypress": "^9.0.0",
+		"@testing-library/cypress": "^10.0.0",
 		"@testing-library/jest-dom": "^6.1.2",
 		"@types/bcryptjs": "^2.4.2",
 		"@types/bytes": "^3.1.1",
@@ -195,5 +195,5 @@
 			"pnpm run format"
 		]
 	},
-	"version": "2.0.10"
+	"version": "2.0.11"
 }
