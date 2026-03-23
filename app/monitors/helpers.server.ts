@@ -14,7 +14,7 @@ export function disposeSsh(ssh: NodeSSH) {
 }
 
 //https://github.com/louislam/uptime-kuma/blob/master/server/util-server.js#L640
-const parseCertificateInfo = function (info) {
+const parseCertificateInfo = function (info: any) {
 	let link = info;
 	let i = 0;
 

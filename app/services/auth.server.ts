@@ -2,6 +2,7 @@ import * as validator from '@authenio/samlify-node-xmllint';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 import { SamlStrategy } from 'remix-auth-saml';
+import fs from 'node:fs';
 import invariant from 'tiny-invariant';
 import { SlimUserFields, updateUserProps } from '~/models/user.server';
 import { sessionStorage } from '~/services/session.server';
@@ -14,7 +15,16 @@ export const authenticator = new Authenticator<SlimUserFields>(sessionStorage);
 
 const host = process.env.HOSTNAME;
 
-let metadata;
+let metadata: string | undefined;
+
+function maybeReadPemFromEnv(value: string | undefined) {
+	if (!value) return undefined;
+	if (value.includes('BEGIN')) return value;
+	if (fs.existsSync(value)) {
+		return fs.readFileSync(value, 'utf8');
+	}
+	return undefined;
+}
 
 if (process.env.SAML_IDP_METADATA) {
 	try {
@@ -45,13 +55,13 @@ if (process.env.SAML_IDP_METADATA) {
 					(process.env.SAML_SP_ISASSERTIONENCRYPTED || '').toLowerCase() ===
 					'true',
 				// optional
-				privateKey: process.env.SAML_PRIVATE_KEY,
+				privateKey: maybeReadPemFromEnv(process.env.SAML_PRIVATE_KEY),
 				// optional
 				privateKeyPass: process.env.SAML_PRIVATE_KEY_PASS,
 				// optional
-				encPrivateKey: process.env.SAML_ENC_PRIVATE_KEY,
-				signingCert: process.env.SAML_SIGNING_CERT,
-				encryptCert: process.env.SAML_ENC_CERT,
+				encPrivateKey: maybeReadPemFromEnv(process.env.SAML_ENC_PRIVATE_KEY),
+				signingCert: maybeReadPemFromEnv(process.env.SAML_SIGNING_CERT),
+				encryptCert: maybeReadPemFromEnv(process.env.SAML_ENC_CERT),
 			},
 			async ({ extract, data }) => {
 				if (!extract.nameID) {

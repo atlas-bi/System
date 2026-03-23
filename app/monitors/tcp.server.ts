@@ -19,13 +19,15 @@ export default async function TcpMonitor({ monitor }: { monitor: Monitor }) {
 	// most thanks to https://github.com/louislam/uptime-kuma/blob/de8386362710973d00b8bbc41374753d3500219c/server/model/monitor.js#L1015
 
 	const { host, port } = monitor;
-
+	if (!host || !port) {
+		throw new Error('Host and port are required');
+	}
 	let startTime = Date.now();
 
 	try {
 		await TcpCheck({
-			address: host,
-			port,
+			address: host!,
+			port: Number(port!),
 		});
 
 		const ping = Date.now() - startTime;

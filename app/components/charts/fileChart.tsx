@@ -4,13 +4,15 @@ import {
 	CategoryScale,
 	ChartData,
 	Chart as ChartJS,
+	ChartOptions,
 	LinearScale,
 	PointElement,
+	type ScriptableLineSegmentContext,
 	Tooltip,
 	Filler,
 	TimeScale,
 } from 'chart.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -35,31 +37,74 @@ import { TrendingUp } from 'lucide-react';
 import { DatabaseFileUsage } from '~/models/monitor.server';
 
 export const FileChart = ({ url }: { url: string }) => {
-	const usageFetcher = useFetcher();
+	type FileFetcherData = {
+		file?: {
+			startDate?: string | number | Date;
+			endDate?: string | number | Date;
+			daysTillFull?: number;
+			growthRate?: number;
+			usage?: Array<{
+				createdAt: string | Date;
+				maxSize?: number | null;
+				currentSize?: number | null;
+				usedSize?: number | null;
+				free?: number | null;
+				used?: number | null;
+			}>;
+		};
+	};
+	const usageFetcher = useFetcher<FileFetcherData>();
 	const [unit, setUnit] = useState('last_24_hours');
-	const chartRef = useRef<ChartJS>(null);
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit: string) => {
+		(sizeUnit: string): ChartOptions<'line'> => {
+			const startDate = usageFetcher.data?.file?.startDate;
+			const endDate = usageFetcher.data?.file?.endDate;
+			const min = startDate ? new Date(startDate).getTime() : undefined;
+			const max = endDate ? new Date(endDate).getTime() : undefined;
+
+			type AllowedTimeUnit =
+				| 'millisecond'
+				| 'second'
+				| 'minute'
+				| 'hour'
+				| 'day'
+				| 'week'
+				| 'month'
+				| 'quarter'
+				| 'year';
+			const allowedTimeUnits: AllowedTimeUnit[] = [
+				'millisecond',
+				'second',
+				'minute',
+				'hour',
+				'day',
+				'week',
+				'month',
+				'quarter',
+				'year',
+			];
+			const candidateTimeUnit =
+				dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit;
+			const timeUnit =
+				candidateTimeUnit &&
+				allowedTimeUnits.includes(candidateTimeUnit as AllowedTimeUnit)
+					? (candidateTimeUnit as AllowedTimeUnit)
+					: undefined;
+
 			return {
 				responsive: true,
 				maintainAspectRatio: false,
 				interaction: {
 					intersect: false,
-					mode: 'index',
+					mode: 'index' as const,
 				},
 				animation: {
 					duration: 300,
-					resize: {
-						duration: 0,
-					},
-					active: {
-						duration: 0,
-					},
 				},
 				plugins: {
 					title: {
@@ -84,20 +129,18 @@ export const FileChart = ({ url }: { url: string }) => {
 						position: 'left' as const,
 						beginAtZero: true,
 						ticks: {
-							callback: function (value: string) {
-								return value + sizeUnit;
+							callback: function (tickValue: number | string) {
+								return `${tickValue}${sizeUnit}`;
 							},
 						},
 						stacked: true,
 					},
 					x: {
 						type: 'time',
-						min: () => usageFetcher.data?.file?.startDate,
-						max: () => usageFetcher.data?.file?.endDate,
+						min,
+						max,
 						time: {
-							unit: () =>
-								dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
-								undefined,
+							unit: timeUnit,
 						},
 						grid: {
 							display: false,
@@ -109,7 +152,7 @@ export const FileChart = ({ url }: { url: string }) => {
 		[unit, usageFetcher.data],
 	);
 
-	const [options, setOptions] = useState(getOptions('GB'));
+	const [options, setOptions] = useState<ChartOptions<'line'>>(getOptions('GB'));
 
 	useEffect(() => {
 		usageFetcher.load(url + `?range=${unit}`);
@@ -121,20 +164,17 @@ export const FileChart = ({ url }: { url: string }) => {
 		}
 	}, [usageFetcher]);
 
-	const emptyDataset = {
+	const emptyDataset: ChartData<'line', { x: Date; y: number }[]> = {
 		datasets: [],
 	};
-	const [chartData, setChartData] = useState<ChartData<'bar'>>(emptyDataset);
+	const [chartData, setChartData] = useState<
+		ChartData<'line', { x: Date; y: number | null }[]>
+	>(emptyDataset);
 
 	useEffect(() => {
-		const chart = chartRef.current;
-
-		if (!chart) {
-			return;
-		}
-
 		let sizeUnit = 'GB';
-		const max = usageFetcher.data?.file?.usage?.reduce(
+		const max =
+			usageFetcher.data?.file?.usage?.reduce(
 			(
 				a: number,
 				e: {
@@ -152,7 +192,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					),
 				),
 			0,
-		);
+		) ?? 0;
 
 		if (max < 10000) {
 			sizeUnit = 'KB';
@@ -163,94 +203,74 @@ export const FileChart = ({ url }: { url: string }) => {
 		const xUnit =
 			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
 
-		type usageType = {
-			createdAt: string;
-			maxSize: number;
-			free: number;
-			used: number;
-		};
-		const chartData = {
+		const chartData: ChartData<'line', { x: Date; y: number | null }[]> = {
 			datasets: [
 				{
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
 					label: 'Used',
-					cubicInterpolationMode: 'monotone',
+					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
-					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
-						x: x.createdAt,
+					data:
+						usageFetcher.data?.file?.usage?.map((x) => ({
+							x: new Date(x.createdAt),
 						y: Number(
-							bytes(Number(x.used), { unit: sizeUnit as Unit }).replace(
+							bytes(Number(x.used), { unit: sizeUnit as Unit })?.replace(
 								sizeUnit,
 								'',
 							),
 						),
-					})),
+					})) ?? [],
 					segment: {
-						borderColor: (ctx: { p0: { stop: any }; p1: { stop: any } }) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
+						borderColor: (ctx: ScriptableLineSegmentContext) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							const { chart } = ctx as unknown as {
+								chart: { ctx: CanvasRenderingContext2D; chartArea: unknown };
+							};
+							return (
+								createLinearGradient(
+									chart.ctx,
+									chart.chartArea as any,
+									darkGradient,
+								) ?? 'transparent'
 							);
 						},
-						backgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								lightGradient,
-							);
-						},
-						hoverBackgroundColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
-						},
-						hoverBorderColor: (ctx: {
-							p0: { stop: any };
-							p1: { stop: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
+						backgroundColor: (ctx: ScriptableLineSegmentContext) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							const { chart } = ctx as unknown as {
+								chart: { ctx: CanvasRenderingContext2D; chartArea: unknown };
+							};
+							return (
+								createLinearGradient(
+									chart.ctx,
+									chart.chartArea as any,
+									lightGradient,
+								) ?? 'transparent'
 							);
 						},
 					},
-					pointStyle: false,
+					pointStyle: false as const,
 					stack: 'line-stack',
 				},
 				{
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Free',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
-						x: x.createdAt,
-						y: x.free
-							? Number(
-									bytes(Number(x.free), {
-										unit: sizeUnit as Unit,
-									}).replace(sizeUnit, ''),
-							  )
-							: null,
-					})),
+					data:
+						usageFetcher.data?.file?.usage?.map((x) => ({
+							x: new Date(x.createdAt),
+							y: x.free
+								? Number(
+										bytes(Number(x.free), {
+											unit: sizeUnit as Unit,
+										})?.replace(sizeUnit, ''),
+								  )
+								: null,
+						})) ?? [],
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
-					borderRadius: { topLeft: 2, topRight: 2 },
-					cubicInterpolationMode: 'monotone',
-					pointStyle: false,
+					cubicInterpolationMode: 'monotone' as const,
+					pointStyle: false as const,
 					tension: 0.4,
 					stack: 'line-stack',
 				},
@@ -258,21 +278,21 @@ export const FileChart = ({ url }: { url: string }) => {
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					label: 'Limit',
 					fill: true,
-					data: usageFetcher.data?.file?.usage?.map((x: usageType) => ({
-						x: x.createdAt,
-						y: x.maxSize
-							? Number(
-									bytes(Number(x.maxSize), {
-										unit: sizeUnit as Unit,
-									}).replace(sizeUnit, ''),
-							  )
-							: undefined,
-					})),
+					data:
+						usageFetcher.data?.file?.usage?.map((x) => ({
+							x: new Date(x.createdAt),
+							y: x.maxSize
+								? Number(
+										bytes(Number(x.maxSize), {
+											unit: sizeUnit as Unit,
+										})?.replace(sizeUnit, ''),
+								  )
+								: null,
+						})) ?? [],
 					borderColor: '#a7f3d0',
 					backgroundColor: '#d1fae5',
-					borderRadius: { topLeft: 2, topRight: 2 },
-					cubicInterpolationMode: 'monotone',
-					pointStyle: false,
+					cubicInterpolationMode: 'monotone' as const,
+					pointStyle: false as const,
 					tension: 0.4,
 				},
 			],
@@ -314,7 +334,7 @@ export const FileChart = ({ url }: { url: string }) => {
 					)}
 				</div>
 				<div className="h-[450px] relative">
-					<Line ref={chartRef} options={options} data={chartData} />
+					<Line options={options} data={chartData} />
 					{usageFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />

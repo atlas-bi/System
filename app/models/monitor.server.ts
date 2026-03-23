@@ -7,6 +7,7 @@ import type {
 	MonitorFeeds,
 	MonitorLogs,
 } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '~/db.server';
 import monitorRunner from '~/queues/monitor.server';
 import searchLoader from '~/queues/searchService.server';
@@ -20,6 +21,9 @@ export type {
 	MonitorLogs,
 	MonitorFeeds,
 	DatabaseFileUsage,
+	Drive,
+	DriveUsage,
+	Notification,
 } from '@prisma/client';
 
 export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
@@ -137,6 +141,174 @@ export function getMonitorMeta({ id }: Pick<Monitor, 'id'>) {
 	});
 }
 
+const monitorWithRelationsSelect = Prisma.validator<Prisma.MonitorSelect>()({
+	id: true,
+	name: true,
+	type: true,
+	title: true,
+	description: true,
+	enabled: true,
+	hasError: true,
+	createdAt: true,
+	updatedAt: true,
+	username: true,
+	host: true,
+	password: true,
+	port: true,
+	privateKey: true,
+	caption: true,
+	manufacturer: true,
+	model: true,
+	version: true,
+	os: true,
+	osVersion: true,
+	dnsHostName: true,
+	domain: true,
+
+	connectionNotify: true,
+	connectionNotifyTypes: {
+		select: {
+			id: true,
+			type: true,
+			name: true,
+		},
+	},
+	connectionNotifyResendAfterMinutes: true,
+	connectionNotifySentAt: true,
+	connectionNotifyRetried: true,
+	connectionNotifyRetries: true,
+
+	sqlFileSizePercentFreeNotify: true,
+	sqlFileSizePercentFreeNotifyTypes: {
+		select: {
+			id: true,
+			type: true,
+			name: true,
+		},
+	},
+	sqlFileSizePercentFreeValue: true,
+	sqlFileSizePercentFreeNotifyResendAfterMinutes: true,
+
+	httpCertNotify: true,
+	httpCertNotifyTypes: {
+		select: {
+			id: true,
+			type: true,
+			name: true,
+		},
+	},
+	httpCertNotifyResendAfterMinutes: true,
+	httpCertNotifySentAt: true,
+	certDays: true,
+	certValid: true,
+
+	cpuManufacturer: true,
+	cpuModel: true,
+	cpuCores: true,
+	cpuProcessors: true,
+	cpuMaxSpeed: true,
+
+	rebootNotify: true,
+	rebootNotifyTypes: true,
+	rebootNotifySentAt: true,
+
+	httpUrl: true,
+	httpIgnoreSsl: true,
+	httpCheckCert: true,
+	httpAcceptedStatusCodes: true,
+	httpMaxRedirects: true,
+	httpRequestMethod: true,
+	httpBodyEncoding: true,
+	httpBody: true,
+	httpHeaders: true,
+	httpAuthentication: true,
+	httpUsername: true,
+	httpPassword: true,
+	httpDomain: true,
+	httpWorkstation: true,
+	sqlConnectionString: true,
+	sqlDisableDbMemory: true,
+	lastBootTime: true,
+	databases: {
+		select: {
+			id: true,
+			title: true,
+			name: true,
+			enabled: true,
+			files: {
+				select: {
+					id: true,
+					enabled: true,
+					fileName: true,
+					growth: true,
+					sqlFileSizePercentFreeNotifySentAt: true,
+				},
+			},
+		},
+	},
+	drives: {
+		select: {
+			id: true,
+			title: true,
+			hasError: true,
+			enabled: true,
+			location: true,
+			name: true,
+			root: true,
+			description: true,
+			systemDescription: true,
+			size: true,
+			missingNotify: true,
+			missingNotifyResendAfterMinutes: true,
+			missingNotifySentAt: true,
+			missingNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			percFreeNotify: true,
+			percFreeValue: true,
+			percFreeNotifyResendAfterMinutes: true,
+			percFreeNotifySentAt: true,
+			percFreeNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			sizeFreeNotify: true,
+			sizeFreeValue: true,
+			sizeFreeNotifyResendAfterMinutes: true,
+			sizeFreeNotifySentAt: true,
+			sizeFreeNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+			growthRateNotify: true,
+			growthRateValue: true,
+			growthRateNotifyResendAfterMinutes: true,
+			growthRateNotifySentAt: true,
+			growthRateNotifyTypes: {
+				select: {
+					id: true,
+					type: true,
+					name: true,
+				},
+			},
+		},
+	},
+});
+
+export type MonitorWithRelations = Prisma.MonitorGetPayload<{
+	select: typeof monitorWithRelationsSelect;
+}>;
+
 export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findUnique({
 		where: { id },
@@ -197,158 +369,7 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 	return prisma.monitor.findFirst({
 		where: { id },
-		select: {
-			id: true,
-			name: true,
-			type: true,
-			title: true,
-			description: true,
-			enabled: true,
-			hasError: true,
-			username: true,
-			host: true,
-			password: true,
-			port: true,
-			privateKey: true,
-			manufacturer: true,
-			model: true,
-			version: true,
-			os: true,
-			osVersion: true,
-
-			connectionNotify: true,
-			connectionNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			connectionNotifyResendAfterMinutes: true,
-			connectionNotifySentAt: true,
-			connectionNotifyRetried: true,
-			connectionNotifyRetries: true,
-
-			sqlFileSizePercentFreeNotify: true,
-			sqlFileSizePercentFreeNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			sqlFileSizePercentFreeValue: true,
-			sqlFileSizePercentFreeNotifyResendAfterMinutes: true,
-
-			httpCertNotify: true,
-			httpCertNotifyTypes: {
-				select: {
-					id: true,
-					type: true,
-					name: true,
-				},
-			},
-			httpCertNotifyResendAfterMinutes: true,
-			httpCertNotifySentAt: true,
-			certDays: true,
-			certValid: true,
-
-			rebootNotify: true,
-			rebootNotifyTypes: true,
-			rebootNotifySentAt: true,
-
-			httpUrl: true,
-			httpIgnoreSsl: true,
-			httpCheckCert: true,
-			httpAcceptedStatusCodes: true,
-			httpMaxRedirects: true,
-			httpRequestMethod: true,
-			httpBodyEncoding: true,
-			httpBody: true,
-			httpHeaders: true,
-			httpAuthentication: true,
-			httpUsername: true,
-			httpPassword: true,
-			httpDomain: true,
-			httpWorkstation: true,
-			sqlConnectionString: true,
-			sqlDisableDbMemory: true,
-			lastBootTime: true,
-			databases: {
-				select: {
-					id: true,
-					title: true,
-					name: true,
-					enabled: true,
-					files: {
-						select: {
-							id: true,
-							enabled: true,
-							fileName: true,
-							growth: true,
-							sqlFileSizePercentFreeNotifySentAt: true,
-						},
-					},
-				},
-			},
-			drives: {
-				select: {
-					id: true,
-					title: true,
-					hasError: true,
-					enabled: true,
-					location: true,
-					name: true,
-					root: true,
-					description: true,
-					systemDescription: true,
-					size: true,
-					missingNotify: true,
-					missingNotifyResendAfterMinutes: true,
-					missingNotifySentAt: true,
-					missingNotifyTypes: {
-						select: {
-							id: true,
-							type: true,
-							name: true,
-						},
-					},
-					percFreeNotify: true,
-					percFreeValue: true,
-					percFreeNotifyResendAfterMinutes: true,
-					percFreeNotifySentAt: true,
-					percFreeNotifyTypes: {
-						select: {
-							id: true,
-							type: true,
-							name: true,
-						},
-					},
-					sizeFreeNotify: true,
-					sizeFreeValue: true,
-					sizeFreeNotifyResendAfterMinutes: true,
-					sizeFreeNotifySentAt: true,
-					sizeFreeNotifyTypes: {
-						select: {
-							id: true,
-							type: true,
-							name: true,
-						},
-					},
-					growthRateNotify: true,
-					growthRateValue: true,
-					growthRateNotifyResendAfterMinutes: true,
-					growthRateNotifySentAt: true,
-					growthRateNotifyTypes: {
-						select: {
-							id: true,
-							type: true,
-							name: true,
-						},
-					},
-				},
-			},
-		},
+		select: monitorWithRelationsSelect,
 	});
 }
 
@@ -449,7 +470,7 @@ export function getDatabaseMeta({ id }: Pick<Database, 'id'>) {
 
 export function getDatabaseFiles({
 	databaseId,
-}: Pick<DatabaseFiles, 'databaseId'>) {
+}: Pick<DatabaseFile, 'databaseId'>) {
 	return prisma.databaseFile.findMany({
 		where: { databaseId },
 		select: {
@@ -1393,6 +1414,10 @@ export function updateMonitor({
 		where: { id },
 		data: {
 			...data,
+			lastBootTime:
+				data?.lastBootTime instanceof Date
+					? data.lastBootTime.toISOString()
+					: data?.lastBootTime,
 			hasError: false,
 			feeds: feed
 				? {
@@ -1555,10 +1580,12 @@ export function updateMonitor({
 				: undefined,
 		},
 		select: {
+			id: true,
 			drives: {
 				select: {
 					id: true,
 					name: true,
+					root: true,
 				},
 			},
 			databases: {
@@ -1574,6 +1601,32 @@ export function updateMonitor({
 		},
 	});
 }
+
+// Export the return type for updateMonitor
+const updateMonitorResultValidator = Prisma.validator<Prisma.MonitorDefaultArgs>()({
+	select: {
+		id: true,
+		drives: {
+			select: {
+				id: true,
+				name: true,
+				root: true,
+			},
+		},
+		databases: {
+			select: {
+				id: true,
+				files: {
+					select: {
+						id: true,
+					},
+				},
+			},
+		},
+	},
+});
+
+export type UpdateMonitorResult = Prisma.MonitorGetPayload<typeof updateMonitorResultValidator>;
 
 export function setFileDays({
 	id,

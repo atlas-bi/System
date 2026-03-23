@@ -1,10 +1,10 @@
-import { ActionArgs } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { namedAction } from 'remix-utils';
+import { namedAction } from '~/utils';
 import { editDatabase } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -12,8 +12,7 @@ export async function action({ request }: ActionArgs) {
 	});
 
 	return namedAction(request, {
-		async edit() {
-			const formData = await request.formData();
+		async edit(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const database = await editDatabase({

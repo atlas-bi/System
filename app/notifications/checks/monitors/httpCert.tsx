@@ -1,5 +1,6 @@
-import { Monitor, setMonitorHttpCertSentAt } from '~/models/monitor.server';
-import type { Notification } from '~/models/notification.server';
+import { setMonitorHttpCertSentAt } from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import type { NotificationMeta } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 import { render } from '@react-email/render';
@@ -12,12 +13,13 @@ import {
 export default async function httpCertNotifier({
 	monitor,
 }: {
-	monitor: Monitor & { httpCertNotifyTypes: Notification[] };
+	monitor: MonitorWithRelations;
 }) {
 	// don't notify if disabled.
 	if (
 		!monitor.httpCertNotify ||
 		monitor.type !== 'http' ||
+		!monitor.httpUrl ||
 		!monitor.httpUrl.startsWith('https')
 	) {
 		return setMonitorHttpCertSentAt({
@@ -50,7 +52,7 @@ export default async function httpCertNotifier({
 			},
 		);
 		message = `${snippet}.`;
-	} else if (monitor.certDays <= 21) {
+	} else if (Number(monitor.certDays) <= 21) {
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] Certificate expires in ${monitor.certDays}.`;
@@ -80,8 +82,9 @@ export default async function httpCertNotifier({
 		);
 		message = subject;
 
-		monitor.httpCertNotifyTypes.map(async (notification: Notification) => {
+		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
+				if (!subject || !html) return;
 				return await sendNotification({
 					notification,
 					subject,
@@ -117,12 +120,14 @@ export default async function httpCertNotifier({
 	}
 
 	if (resend && subject && html) {
-		monitor.httpCertNotifyTypes.map(async (notification: Notification) => {
+		const subjectToSend = subject;
+		const htmlToSend = html;
+		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
 				return await sendNotification({
 					notification,
-					subject,
-					message: html,
+					subject: subjectToSend,
+					message: htmlToSend,
 				});
 			} catch (e) {
 				return Logger({

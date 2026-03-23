@@ -7,10 +7,9 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { MonitorFeeds } from '~/models/monitor.server';
 
 export function PingStat({ url }: { url: string }) {
-	const pingFetcher = useFetcher();
+	const pingFetcher = useFetcher<{ feeds?: any[] }>();
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -25,13 +24,13 @@ export function PingStat({ url }: { url: string }) {
 		if (pingFetcher.state === 'idle' && pingFetcher.data == null) {
 			pingFetcher.load(url);
 		}
-	}, [pingFetcher]);
+	}, [pingFetcher.state, pingFetcher.data, url]);
 
 	return (
 		<div
 			className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse my-auto min-w-[1px]`}
 		>
-			{pingFetcher.data?.feeds?.map((x: MonitorFeeds) => (
+			{pingFetcher.data?.feeds?.map((x: any) => (
 				<TooltipProvider key={x.id} delayDuration={20} skipDelayDuration={20}>
 					<Tooltip>
 						<TooltipTrigger asChild>

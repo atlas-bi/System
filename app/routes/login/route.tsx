@@ -1,18 +1,17 @@
 import {
-	type ActionArgs,
-	type LoaderArgs,
-	type V2_MetaFunction,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+	type MetaFunction,
 	json,
 } from '@remix-run/node';
 import { useSearchParams } from '@remix-run/react';
-import { safeRedirect } from 'remix-utils';
 import { authenticator } from '~/services/auth.server';
 import { commitSession, getSession } from '~/services/session.server';
-import { validateEmail } from '~/utils';
+import { safeRedirect, validateEmail } from '~/utils';
 
 import { UserAuthForm } from './LoginForm';
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	// If the user is already authenticated redirect to /dashboard directly
 	await authenticator.isAuthenticated(request, {
 		successRedirect: '/',
@@ -31,13 +30,13 @@ export async function loader({ request }: LoaderArgs) {
 	);
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	// remove session error messages
 	const session = await getSession(request);
 	session.unset(authenticator.sessionErrorKey);
 
 	// validate the form before trying to login
-	const formData = await request.formData();
+	const formData = await request.clone().formData();
 	const email = formData.get('email') as string;
 	const password = formData.get('password');
 
@@ -73,7 +72,7 @@ export async function action({ request }: ActionArgs) {
 	});
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
 	return [
 		{
 			title: 'Login',

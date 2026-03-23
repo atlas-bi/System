@@ -1,8 +1,9 @@
 import {
-	Monitor,
 	setMonitorConnectionRetried,
 	setMonitorConnectionSentAt,
 } from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import type { NotificationMeta } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 import { render } from '@react-email/render';
@@ -16,10 +17,10 @@ export default async function collectionNotifier({
 	monitor,
 	message,
 }: {
-	monitor: Monitor & { connectionNotifyTypes: Notification[] };
+	monitor: MonitorWithRelations;
 	message?: string;
 }) {
-	async function reset({ monitor }: { monitor: Monitor }) {
+	async function reset({ monitor }: { monitor: MonitorWithRelations }) {
 		await setMonitorConnectionSentAt({
 			id: monitor.id,
 			connectionNotifySentAt: null,
@@ -63,7 +64,7 @@ export default async function collectionNotifier({
 				},
 			);
 
-			monitor.connectionNotifyTypes.map(async (notification: Notification) => {
+			monitor.connectionNotifyTypes.map(async (notification: NotificationMeta) => {
 				try {
 					return await sendNotification({
 						notification,
@@ -130,7 +131,7 @@ export default async function collectionNotifier({
 			},
 		);
 
-		monitor.connectionNotifyTypes.map(async (notification: Notification) => {
+		monitor.connectionNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
 				return await sendNotification({
 					notification,
@@ -138,7 +139,6 @@ export default async function collectionNotifier({
 					message: html,
 				});
 			} catch (e) {
-				console.log('failed to send!');
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
 					type: 'error',
@@ -154,7 +154,7 @@ export default async function collectionNotifier({
 	}
 
 	// increment try value only if we are still checking it.
-	if (monitor.connectionNotifyRetried <= monitor.connectionNotifyRetries) {
+	if ((monitor.connectionNotifyRetried || 0) <= (monitor.connectionNotifyRetries || 0)) {
 		return setMonitorConnectionRetried({
 			id: monitor.id,
 			connectionNotifyRetried: (monitor.connectionNotifyRetried || 0) + 1,

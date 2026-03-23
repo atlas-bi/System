@@ -2,10 +2,10 @@ import {
 	Monitor,
 	monitorError,
 	updateMonitor,
-	getMonitorDisabledDatabases,
 	setFileDays,
 	setFileGrowth,
-	DatabaseFile,
+	UpdateMonitorResult,
+	getMonitorDisabledDatabases,
 } from '~/models/monitor.server';
 import mssql from 'mssql';
 import Notifier from '~/notifications/notifier';
@@ -332,7 +332,7 @@ OPTION (
 			return l;
 		});
 
-		const data = await updateMonitor({
+		const data: UpdateMonitorResult = await updateMonitor({
 			id: monitor.id,
 			data: {
 				name,
@@ -387,9 +387,8 @@ OPTION (
 		});
 
 		// calculate days till full
-		data.databases?.map(
-			(d: { files?: DatabaseFile[] }) =>
-				d.files?.map(async (file: DatabaseFile) => {
+		data.databases?.map((d) =>
+			d.files?.map(async (file) => {
 					// if (!file.usage || file.usage.length <= 1) {
 					await setFileDays({ id: file.id, daysTillFull: null });
 					await setFileGrowth({ id: file.id, growthRate: null });

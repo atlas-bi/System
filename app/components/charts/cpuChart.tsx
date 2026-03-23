@@ -14,7 +14,7 @@ import {
 	Scale,
 	ChartOptions,
 } from 'chart.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { createLinearGradient, darkGradient, lightGradient } from './functions';
 import { useFetcher } from '@remix-run/react';
@@ -35,7 +35,6 @@ import 'chartjs-adapter-date-fns';
 import { H2, H3 } from '../ui/typography';
 import { Circle, Loader, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
-import { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 
 const SubChart = ({
 	speed,
@@ -48,12 +47,10 @@ const SubChart = ({
 	speed?: boolean;
 	unit: string;
 	fetcherState: string;
-	data: Array<{ createdAt: Date; cpuLoad: string; cpuSpeed: string }>;
-	startDate: Date;
-	endDate: Date;
+	data: Array<{ createdAt: string | Date; cpuLoad: string; cpuSpeed: string }>;
+	startDate?: string | number | Date;
+	endDate?: string | number | Date;
 }) => {
-	const chartRef = useRef<ChartJSOrUndefined>(null);
-
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
@@ -62,7 +59,38 @@ const SubChart = ({
 		datasets: [],
 	};
 
-	const getOptions = useCallback(() => {
+	const getOptions = useCallback((): ChartOptions<'line'> => {
+		const min = startDate ? new Date(startDate).getTime() : undefined;
+		const max = endDate ? new Date(endDate).getTime() : undefined;
+		type AllowedTimeUnit =
+			| 'millisecond'
+			| 'second'
+			| 'minute'
+			| 'hour'
+			| 'day'
+			| 'week'
+			| 'month'
+			| 'quarter'
+			| 'year';
+		const allowedTimeUnits: AllowedTimeUnit[] = [
+			'millisecond',
+			'second',
+			'minute',
+			'hour',
+			'day',
+			'week',
+			'month',
+			'quarter',
+			'year',
+		];
+		const candidateTimeUnit =
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit;
+		const timeUnit =
+			candidateTimeUnit &&
+			allowedTimeUnits.includes(candidateTimeUnit as AllowedTimeUnit)
+				? (candidateTimeUnit as AllowedTimeUnit)
+				: undefined;
+
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -136,12 +164,10 @@ const SubChart = ({
 				x: {
 					stacked: true,
 					type: 'time' as const,
-					min: () => startDate,
-					max: () => endDate,
+					min,
+					max,
 					time: {
-						unit: () =>
-							dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit ||
-							undefined,
+						unit: timeUnit,
 					},
 					grid: {
 						display: false,
@@ -162,16 +188,10 @@ const SubChart = ({
 	}, [fetcherState]);
 
 	useEffect(() => {
-		const chart = chartRef.current;
-
-		if (!chart) {
-			return;
-		}
-
 		const xUnit =
 			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
 
-		const chartData = {
+		const chartData: ChartData<'line', { x: Date; y: number }[]> = {
 			datasets: [
 				{
 					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
@@ -180,50 +200,17 @@ const SubChart = ({
 					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
 					data: data?.map((x) => ({
-						x: x.createdAt,
+						x: new Date(x.createdAt),
 						y: Number(x.cpuLoad),
 					})),
 					segment: {
-						borderColor: (ctx: { p0: { stop?: any }; p1: { stop?: any } }) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
+						borderColor: (ctx) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							return darkGradient[0];
 						},
-						backgroundColor: (ctx: {
-							p0: { stop?: any };
-							p1: { stop?: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								lightGradient,
-							);
-						},
-						hoverBackgroundColor: (ctx: {
-							p0: { stop?: any };
-							p1: { stop?: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
-						},
-						hoverBorderColor: (ctx: {
-							p0: { stop?: any };
-							p1: { stop?: any };
-						}) => {
-							if (ctx.p0.stop || ctx.p1.stop) return 'transparent';
-							return createLinearGradient(
-								chart.ctx,
-								chart.chartArea,
-								darkGradient,
-							);
+						backgroundColor: (ctx) => {
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							return lightGradient[0];
 						},
 					},
 					pointStyle: false as const,
@@ -233,12 +220,11 @@ const SubChart = ({
 					label: 'Speed',
 					fill: false,
 					data: data?.map((x) => ({
-						x: x.createdAt,
+						x: new Date(x.createdAt),
 						y: Number(x.cpuSpeed),
 					})),
 					borderColor: '#cbd5e1',
 					backgroundColor: '#e2e8f0',
-					borderRadius: { topLeft: 2, topRight: 2 },
 					cubicInterpolationMode: 'monotone' as const,
 					pointStyle: false as const,
 					tension: 0.4,
@@ -250,7 +236,7 @@ const SubChart = ({
 		setChartData(chartData);
 	}, [data]);
 
-	return <Line ref={chartRef} options={options} data={chartData} />;
+	return <Line options={options} data={chartData} />;
 };
 
 export const CpuChart = ({
@@ -260,7 +246,19 @@ export const CpuChart = ({
 	url: string;
 	speed?: boolean;
 }) => {
-	const usageFetcher = useFetcher();
+	type CpuFetcherData = {
+		monitor?: {
+			startDate?: string | number | Date;
+			endDate?: string | number | Date;
+			feeds?: Array<{ createdAt: string | Date; cpuLoad: string; cpuSpeed: string }>;
+			cpus: Array<
+				Cpu & {
+					usage: Array<{ createdAt: string | Date; cpuLoad: string; cpuSpeed: string }>;
+				}
+			>;
+		};
+	};
+	const usageFetcher = useFetcher<CpuFetcherData>();
 	const [unit, setUnit] = useState('last_24_hours');
 
 	useEffect(() => {
@@ -295,7 +293,7 @@ export const CpuChart = ({
 						speed={speed}
 						unit={unit}
 						fetcherState={usageFetcher.state}
-						data={usageFetcher.data?.monitor?.feeds}
+						data={usageFetcher.data?.monitor?.feeds ?? []}
 						startDate={usageFetcher.data?.monitor?.startDate}
 						endDate={usageFetcher.data?.monitor?.endDate}
 					/>
@@ -308,16 +306,7 @@ export const CpuChart = ({
 				</div>
 
 				<div className="grid sm:grid-cols-1 md:grid-cols-3 ls:grid-cols-4">
-					{usageFetcher.data?.monitor?.cpus.map(
-						(
-							x: Cpu & {
-								usage: Array<{
-									createdAt: Date;
-									cpuLoad: string;
-									cpuSpeed: string;
-								}>;
-							},
-						) => (
+					{usageFetcher.data?.monitor?.cpus.map((x) => (
 							<div key={x.id}>
 								<H3 className="text-base">CPU {x.title}</H3>
 								<div className="h-[150px] relative" key={x.id}>
@@ -336,8 +325,7 @@ export const CpuChart = ({
 									)}
 								</div>
 							</div>
-						),
-					)}
+					))}
 				</div>
 
 				<div className="flex space-x-4 text-muted-foreground">

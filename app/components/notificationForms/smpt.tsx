@@ -18,8 +18,8 @@ export function SmtpForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Partial<Notification>;
+	setData: Dispatch<Partial<Notification>>;
 }) {
 	return (
 		<>
@@ -39,18 +39,18 @@ export function SmtpForm({
 			</Label>
 			<Input
 				type="number"
-				value={data.smtpPort}
+				value={data.smtpPort ?? ''}
 				id="port"
 				placeholder="22"
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, smtpPort: Number(e.target.value) })}
+				onChange={(e) => setData({ ...data, smtpPort: e.target.value })}
 			/>
 
 			<Select
 				onValueChange={(smtpSecurity: string) =>
 					setData({ ...data, smtpSecurity })
 				}
-				defaultValue={data.smtpSecurity}
+				defaultValue={data.smtpSecurity ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Security*
@@ -73,7 +73,7 @@ export function SmtpForm({
 					id="ssl_errors"
 					defaultChecked={data.ignoreSSLErrors || false}
 					onCheckedChange={(checked) =>
-						setData({ ...data, ignoreSSLErrors: checked })
+						setData({ ...data, ignoreSSLErrors: checked === true })
 					}
 				/>
 				<label

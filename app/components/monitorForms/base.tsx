@@ -36,16 +36,16 @@ export default function Monitor({
 	monitor,
 	children,
 }: {
-	monitor: Monitor;
+	monitor: any;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	const fetcher = useFetcher<{ monitor?: any; form?: { error?: string } }>();
 	const deleteSubmit = useSubmit();
-	const testFetcher = useFetcher();
+	const testFetcher = useFetcher<{ error?: any; form?: { error?: string }; success?: string }>();
 	const navigate = useNavigate();
 
-	const [data, setData] = useState<Monitor>(monitor);
+	const [data, setData] = useState<any>(monitor);
 
 	useEffect(() => {
 		if (!monitor.id || monitor.id !== data.id) {
@@ -62,7 +62,7 @@ export default function Monitor({
 				setOpen(false);
 			}
 		}
-	}, [fetcher]);
+	}, [fetcher.state, fetcher.data, monitor.id, navigate]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>

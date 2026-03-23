@@ -1,5 +1,6 @@
-import { Monitor, setMonitorRebootSentAt } from '~/models/monitor.server';
-import type { Notification } from '~/models/notification.server';
+import { setMonitorRebootSentAt } from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import type { NotificationMeta } from '~/models/notification.server';
 import { Logger } from '~/notifications/logger';
 import { sendNotification } from '~/notifications/notifier';
 import { SuccessEmail } from '~/notifications/email/monitors/reboot';
@@ -9,8 +10,8 @@ export default async function rebootNotifier({
 	monitor,
 	oldMonitor,
 }: {
-	monitor: Monitor & { rebootNotifyTypes: Notification[] };
-	oldMonitor: Monitor;
+	monitor: MonitorWithRelations;
+	oldMonitor: MonitorWithRelations;
 }) {
 	// don't notify if disabled.
 	if (!monitor.rebootNotify) return;
@@ -26,7 +27,7 @@ export default async function rebootNotifier({
 			},
 		);
 
-		monitor.rebootNotifyTypes.map(async (notification: Notification) => {
+		monitor.rebootNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
 				return await sendNotification({ notification, subject, message: html });
 			} catch (e) {

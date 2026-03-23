@@ -4,6 +4,7 @@ import {
 	getMonitorDisabledDrives,
 	monitorError,
 	updateMonitor,
+	UpdateMonitorResult,
 } from '~/models/monitor.server';
 
 import { setDriveOnline } from '~/models/drive.server';
@@ -12,7 +13,7 @@ import { disposeSsh } from './helpers.server';
 import { NodeSSH } from 'node-ssh';
 import { decrypt } from '@/lib/utils';
 
-async function getStdout(ssh, command) {
+async function getStdout(ssh: any, command: string) {
 	const out = await ssh.execCommand(command);
 	if (out.code !== 0) {
 		throw { out };
@@ -67,7 +68,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		const drives = JSON.parse(
 			await getStdout(
 				ssh,
-				'df -P | awk \'BEGIN {printf"{\\"discarray\\":["}{if($1=="Filesystem")next;if(a)printf",";printf"{\\"filesystem\\":\\""$1"\\",\\"mount\\":\\""$6"\\",\\"size\\":\\""$2"\\",\\"used\\":\\""$3"\\",\\"avail\\":\\""$4"\\",\\"use%\\":\\""$5"\\"}";a++;}END{print"]}";}\'',
+				'df -P | awk \'BEGIN {printf"{\\"discarray\\":["}{if($1=="Filesystem")next;if(a)printf",";printf"{\\"filesystem\\":\\""$1"\\",\\"mount\\":\\""$6"\\",\\"size\\":\\""$2"\\",\\"used\\":\\""$3"\\",\\"avail\\":\\""$4"\\",\\"use%\\":\\""$5"\\"}";a++;}END{print"]});}\'',
 			),
 		);
 
@@ -124,8 +125,8 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 
 			return l;
 		});
-		const oldMonitor = await getMonitor({ id: monitor.id });
-		const data = await updateMonitor({
+		const oldMonitor = (await getMonitor({ id: monitor.id })) ?? undefined;
+		const data: UpdateMonitorResult = await updateMonitor({
 			id: monitor.id,
 			data: {
 				name,
@@ -182,18 +183,12 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 
 		// online/offline
 		data.drives?.map(
-			async (drive: {
-				size: string;
-				usage: string | any[];
-				id: any;
-				name: string;
-			}) => {
+			async (drive) => {
 				await setDriveOnline({
 					id: drive.id,
 					online:
-						updateableDrives.filter(
-							(x: { mount: string }) => x.mount == drive.name,
-						).length > 0,
+						updateableDrives.filter((x: Drive) => x.mount == drive.root)
+							.length > 0,
 				});
 			},
 		);

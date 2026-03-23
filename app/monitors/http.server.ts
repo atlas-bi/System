@@ -211,7 +211,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		httpCheckCert,
 		httpBodyEncoding,
 		httpUrl,
-		httpMethod,
+		httpRequestMethod,
 		httpHeaders,
 		httpMaxRedirects,
 		httpAcceptedStatusCodes,
@@ -221,28 +221,28 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 
 	let startTime = Date.now();
 	try {
-		let error, certValid, certDays;
+		let error: string | undefined, certValid, certDays;
 		try {
 			const data = await HttpCheck({
-				httpBody,
-				httpAuthentication,
-				httpUsername,
-				httpPassword,
-				httpIgnoreSsl,
-				httpCheckCert,
-				httpBodyEncoding,
-				httpUrl,
-				httpMethod,
-				httpHeaders,
-				httpMaxRedirects,
-				httpAcceptedStatusCodes,
-				httpDomain,
-				httpWorkstation,
+				httpBody: httpBody ?? undefined,
+				httpAuthentication: httpAuthentication ?? undefined,
+				httpUsername: httpUsername ?? undefined,
+				httpPassword: httpPassword ?? undefined,
+				httpIgnoreSsl: httpIgnoreSsl ?? undefined,
+				httpCheckCert: httpCheckCert ?? undefined,
+				httpBodyEncoding: httpBodyEncoding ?? undefined,
+				httpUrl: httpUrl ?? undefined,
+				httpMethod: httpRequestMethod ?? undefined,
+				httpHeaders: httpHeaders ?? undefined,
+				httpMaxRedirects: httpMaxRedirects ?? undefined,
+				httpAcceptedStatusCodes: httpAcceptedStatusCodes ?? undefined,
+				httpDomain: httpDomain ?? undefined,
+				httpWorkstation: httpWorkstation ?? undefined,
 			});
 			certValid = data.certValid;
 			certDays = data.certDays;
 		} catch (e) {
-			error = e.message;
+			error = (e as any)?.message ?? String(e);
 		}
 
 		const ping = Date.now() - startTime;
@@ -259,15 +259,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		});
 
 		if (error) {
-			// update feed to be an error
-			if (data?.feeds) {
-				await setFeedError({
-					id: data?.feeds?.[0]?.id,
-					hasError: true,
-					message: error.message || error,
-				});
-			}
-			throw Error(error.message || error);
+			throw new Error(error);
 		}
 
 		await Notifier({ job: monitor.id });

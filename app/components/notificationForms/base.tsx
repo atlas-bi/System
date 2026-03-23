@@ -31,15 +31,21 @@ export default function Notification({
 	notification,
 	children,
 }: {
-	notification: Notification;
+	notification: Partial<Notification>;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	type NotificationFetcherData = {
+		notification?: Notification;
+		form?: { error?: string };
+		error?: { code?: string };
+		success?: string;
+	};
+	const fetcher = useFetcher<NotificationFetcherData>();
 	const deleteSubmit = useSubmit();
-	const testFetcher = useFetcher();
+	const testFetcher = useFetcher<NotificationFetcherData>();
 
-	const [data, setData] = useState<Notification>(notification);
+	const [data, setData] = useState<Partial<Notification>>(notification);
 
 	useEffect(() => {
 		if (!notification.id || notification.id !== data.id) {
@@ -142,8 +148,10 @@ export default function Notification({
 								variant="outline"
 								onClick={(e) => {
 									e.preventDefault();
+									const id = data.id;
+									if (!id) return;
 									deleteSubmit(
-										{ _action: 'delete', id: data.id },
+										{ _action: 'delete', id },
 										{ method: 'post', action: '/admin/notifications/new' },
 									);
 									setOpen(false);

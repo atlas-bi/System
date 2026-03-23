@@ -29,6 +29,17 @@ export default function HttpForm({
 	data: Monitor;
 	setData: Dispatch<Monitor>;
 }) {
+	const httpAcceptedStatusCodes = (() => {
+		const parsed = jsonParser(data.httpAcceptedStatusCodes);
+		if (Array.isArray(parsed)) {
+			return parsed.map((v) => v.toString());
+		}
+		if (typeof parsed === 'string' || typeof parsed === 'number') {
+			return [parsed.toString()];
+		}
+		return [];
+	})();
+
 	return (
 		<>
 			<Label htmlFor="httpUrl" className="text-right">
@@ -73,22 +84,12 @@ export default function HttpForm({
 				placeholder="choose"
 				parentClassName="col-span-3"
 				data={statusCodes}
-				active={statusCodes.filter((x: { value: string }) => {
-					const codes = jsonParser(data.httpAcceptedStatusCodes);
-					if (!codes) return false;
-					if (typeof codes === 'string' || typeof codes === 'number') {
-						return codes.toString() === x.value;
-					}
-					return (
-						codes.filter((t: string | number) => t.toString() == x.value)
-							.length > 0
-					);
-				})}
+				active={statusCodes.filter((x) => httpAcceptedStatusCodes.includes(x.value))}
 				name="httpAcceptedStatusCodes"
-				onChange={(x) => {
+				onChange={(x: Array<{ value: string }>) => {
 					setData({
 						...data,
-						httpAcceptedStatusCodes: JSON.stringify(x.map((x) => x.value)),
+						httpAcceptedStatusCodes: x.map((i) => i.value),
 					});
 				}}
 			/>
@@ -99,11 +100,11 @@ export default function HttpForm({
 			<Input
 				type="number"
 				id="httpMaxRedirects"
-				value={data.httpMaxRedirects}
+				value={data.httpMaxRedirects ?? ''}
 				placeholder="10"
 				className="col-span-3"
 				onChange={(e) =>
-					setData({ ...data, httpMaxRedirects: Number(e.target.value) })
+					setData({ ...data, httpMaxRedirects: e.target.value })
 				}
 			/>
 
@@ -111,7 +112,7 @@ export default function HttpForm({
 				onValueChange={(httpRequestMethod: string) =>
 					setData({ ...data, httpRequestMethod })
 				}
-				value={data.httpRequestMethod}
+				value={data.httpRequestMethod ?? undefined}
 				defaultValue="GET"
 			>
 				<Label htmlFor="name" className="text-right">
@@ -135,7 +136,7 @@ export default function HttpForm({
 				onValueChange={(httpBodyEncoding: string) =>
 					setData({ ...data, httpBodyEncoding })
 				}
-				value={data.httpBodyEncoding}
+				value={data.httpBodyEncoding ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Body Encoding
@@ -158,31 +159,30 @@ export default function HttpForm({
 			</Label>
 			<Textarea
 				id="httpBodyText"
-				value={data.httpBodyText || ''}
+				value={data.httpBody || ''}
 				placeholder=""
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, httpBodyText: e.target.value })}
+				onChange={(e) => setData({ ...data, httpBody: e.target.value })}
 			/>
 			<Label htmlFor="httpHeaderText" className="text-right">
 				Header Text
 			</Label>
 			<Textarea
 				id="httpHeaderText"
-				value={data.httpHeaderText || ''}
+				value={data.httpHeaders || ''}
 				placeholder=""
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, httpHeaderText: e.target.value })}
+				onChange={(e) => setData({ ...data, httpHeaders: e.target.value })}
 			/>
 
 			<Select
 				onValueChange={(httpAuthentication: string) =>
 					setData({
 						...data,
-						httpAuthentication:
-							httpAuthentication == '' ? undefined : httpAuthentication,
+						httpAuthentication: httpAuthentication === '' ? null : httpAuthentication,
 					})
 				}
-				value={data.httpAuthentication}
+				value={data.httpAuthentication ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Authentication Method

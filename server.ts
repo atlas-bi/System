@@ -5,7 +5,6 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import { ChildProcess, spawnSync } from 'child_process';
-import { execa } from 'execa';
 import { symmetric } from 'secure-webhooks';
 /*
 
@@ -20,7 +19,7 @@ kill -9 <<PID>>
 
 */
 
-const port = process.env.WEB_PORT || 3000;
+const port = process.env.PORT || process.env.WEB_PORT || 3000;
 
 if (!process.env.QUIRREL_PORT) {
 	process.env.QUIRREL_PORT = '9891';
@@ -33,6 +32,11 @@ process.env.SESSION_SECRET = `atlas-${port}`;
 
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), 'build');
+
+const DISABLE_BACKGROUND_SERVICES =
+	process.env.DISABLE_BACKGROUND_SERVICES === 'true' ||
+	process.env.DISABLE_BACKGROUND_SERVICES === '1' ||
+	process.env.CI === 'true';
 
 let child: ChildProcess | undefined;
 let search: ChildProcess | undefined;
@@ -94,9 +98,11 @@ const fetchWithRetries: FetchWithRetries = async (
 		process.env.QUIRREL_API_URL = `http://127.0.0.1:${process.env.QUIRREL_PORT}`;
 		process.env.QUIRREL_BASE_URL = `http://127.0.0.1:${port}`;
 
-		child = startQuirrel();
-		search = startMeili();
-		await getQuirrelToken();
+		if (!DISABLE_BACKGROUND_SERVICES) {
+			child = await startQuirrel();
+			search = await startMeili();
+			await getQuirrelToken();
+		}
 	}
 
 	const app = express();
@@ -179,24 +185,21 @@ const fetchWithRetries: FetchWithRetries = async (
 	);
 
 	// call search loader for an initial load
-	const response = await fetchWithRetries(
-		`http://127.0.0.1:${port}/queues/searchService`,
-		{
+	if (!DISABLE_BACKGROUND_SERVICES) {
+		await fetchWithRetries(`http://127.0.0.1:${port}/queues/searchService`, {
 			body: '',
 			method: 'POST',
 			headers: {
-				'x-quirrel-signature': symmetric.sign(
-					'',
-					process.env.QUIRREL_TOKEN || '',
-				),
+				'x-quirrel-signature': symmetric.sign('', process.env.QUIRREL_TOKEN || ''),
 			},
 			maxRetries: 5,
-		},
-	);
-	console.log('🔍 Triggered search load');
+		});
+		console.log('🔍 Triggered search load');
+	}
 })();
 
-function startQuirrel() {
+async function startQuirrel() {
+	const { execa } = await import('execa');
 	const child: ChildProcess = execa(
 		'node',
 		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
@@ -220,7 +223,8 @@ function startQuirrel() {
 	return child;
 }
 
-function startMeili() {
+async function startMeili() {
+	const { execa } = await import('execa');
 	const child: ChildProcess = execa('./etc/meilisearch', {
 		env: {
 			...process.env,

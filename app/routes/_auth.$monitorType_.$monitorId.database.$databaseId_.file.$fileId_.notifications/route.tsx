@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getFileNotifications } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -11,13 +11,16 @@ import { useSubmit, useNavigation } from '@remix-run/react';
 import { useRef } from 'react';
 
 import { getNotifications } from '~/models/notification.server';
+import invariant from 'tiny-invariant';
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
 	});
+
+	invariant(params.fileId);
 
 	const file = await getFileNotifications({ id: params.fileId });
 	if (!file) {
@@ -29,7 +32,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	return json({ file, notifications });
 };
 
-export async function action({ request, params }: ActionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,

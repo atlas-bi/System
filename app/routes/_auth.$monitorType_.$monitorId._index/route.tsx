@@ -1,5 +1,5 @@
 import { H1 } from '~/components/ui/typography';
-import { LoaderArgs, redirect } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { getMonitorMeta } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
@@ -24,7 +24,9 @@ import { PingChart } from '~/components/charts/pingChart';
 import { parseSqlConnectionString } from '@tediousjs/connection-string';
 import { Badge } from '~/components/ui/badge';
 import { PingStat } from './responseTime';
-export const loader = async ({ params, request }: LoaderArgs) => {
+import type { LoaderFunctionArgs } from '@remix-run/node';
+
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,

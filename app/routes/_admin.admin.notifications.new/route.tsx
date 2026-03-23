@@ -1,6 +1,6 @@
-import type { ActionArgs } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { namedAction, redirectBack } from 'remix-utils';
+import { namedAction, redirectBack } from '~/utils';
 
 import { authenticator } from '~/services/auth.server';
 
@@ -19,7 +19,7 @@ const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	return false;
 };
 
-const validateForm = ({ values }) => {
+const validateForm = ({ values }: { values: any }) => {
 	if (isNullOrEmpty(values.name)) {
 		return json({ form: { error: 'Name is required.' } });
 	}
@@ -63,7 +63,7 @@ const validateForm = ({ values }) => {
 	}
 };
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -71,8 +71,7 @@ export async function action({ request }: ActionArgs) {
 	});
 
 	return namedAction(request, {
-		async new() {
-			const formData = await request.formData();
+		async new(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const errors = validateForm({ values });
@@ -159,15 +158,13 @@ export async function action({ request }: ActionArgs) {
 
 			return json({ notification });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
-			await deleteNotification({ id: values.id });
+			await deleteNotification({ id: values.id.toString() });
 			return redirectBack(request, { fallback: '/admin/notifications' });
 		},
-		async test() {
-			const formData = await request.formData();
+		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const errors = validateForm({ values });
@@ -179,7 +176,7 @@ export async function action({ request }: ActionArgs) {
 					await SMTP({
 						subject: 'connection test',
 						message: 'connection test',
-						notification: { ...values },
+						notification: values as any,
 						test: true,
 					});
 				} catch (e) {
@@ -190,7 +187,7 @@ export async function action({ request }: ActionArgs) {
 				try {
 					await Telegram({
 						message: 'connection test',
-						notification: { ...values },
+						notification: values as any,
 						test: true,
 					});
 				} catch (e) {
