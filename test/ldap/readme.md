@@ -9,7 +9,7 @@ copy the `config.ldif` file to `config/config.ldif`
 
 # Browsing LDAP
 
-1. start up the ldap server `npm run dev:ldap`
+1. start up the ldap server `pnpm run dev:ldap`
 
 **Listing all users**
 
