@@ -1,9 +1,11 @@
 import { cn } from '@/lib/utils';
 import * as React from 'react';
 
-export interface HProps extends React.HTMLAttributes<HTMLElement> {}
+export interface H1Props extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface H2Props extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface H3Props extends React.HTMLAttributes<HTMLHeadingElement> {}
 
-const H1 = React.forwardRef<HTMLElement, HProps>(
+const H1 = React.forwardRef<HTMLHeadingElement, H1Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h1
@@ -20,7 +22,7 @@ const H1 = React.forwardRef<HTMLElement, HProps>(
 
 H1.displayName = 'H1';
 
-const H2 = React.forwardRef<HTMLElement, HProps>(
+const H2 = React.forwardRef<HTMLHeadingElement, H2Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h2
@@ -37,7 +39,7 @@ const H2 = React.forwardRef<HTMLElement, HProps>(
 
 H2.displayName = 'H2';
 
-const H3 = React.forwardRef<HTMLElement, HProps>(
+const H3 = React.forwardRef<HTMLHeadingElement, H3Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h3

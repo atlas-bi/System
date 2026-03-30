@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction } from '@remix-run/node';
+import type { LoaderFunction } from '@remix-run/node';
 import { sharpTransformer } from 'remix-image-sharp';
 import { MemoryCache, imageLoader } from 'remix-image/server';
 
@@ -7,8 +7,12 @@ const configBase = {
   transformer: sharpTransformer,
 };
 
-export const loader: LoaderFunction = ({ request }: ActionArgs) => {
+export const loader: LoaderFunction = ({ request }) => {
   const url = new URL(request.url);
-  const selfUrl = process.env.HOSTNAME ?? `${url.protocol}//${url.host}`;
+  const requestOrigin = `${url.protocol}//${url.host}`;
+  const selfUrl =
+    process.env.NODE_ENV === 'production' && process.env.HOSTNAME
+      ? process.env.HOSTNAME
+      : requestOrigin;
   return imageLoader({ ...configBase, selfUrl }, request);
 };

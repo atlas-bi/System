@@ -1,19 +1,24 @@
-import type { LoaderArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
 import invariant from 'tiny-invariant';
 import { dateOptions } from '~/models/dates';
 import {
 	DatabaseFile,
-	DatabaseFileUsage,
 	getFileUsage,
 } from '~/models/monitor.server';
 import { authenticator } from '~/services/auth.server';
 import { dateRange } from '~/utils';
 
-function calcGrowth({ usage }: { usage: DatabaseFileUsage[] }) {
+type UsagePoint = {
+	createdAt: Date;
+	usedSize: string | null;
+	currentSize: string | null;
+};
+
+function calcGrowth({ usage }: { usage: UsagePoint[] }) {
 	if (!usage) {
-		return { daysTillFull: -1, growthRage: -1 };
+		return { daysTillFull: -1, growthRate: -1 };
 	}
 
 	if (usage.length == 0) {
@@ -45,7 +50,7 @@ function calcGrowth({ usage }: { usage: DatabaseFileUsage[] }) {
 	return { daysTillFull, growthRate };
 }
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -76,8 +81,15 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		endDate = undefined;
 	}
 
-	let grouped = {};
-	const { daysTillFull, growthRate } = calcGrowth({ usage: file.usage });
+	type GroupedPoint = {
+		maxSize: string | null;
+		currentSize: string | null;
+		usedSize: string | null;
+	};
+	const grouped: Record<string, GroupedPoint[]> = {};
+	const { daysTillFull, growthRate } = calcGrowth({
+		usage: file.usage as unknown as UsagePoint[],
+	});
 
 	switch (groupSize) {
 		case 'minute':
@@ -98,31 +110,33 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				},
 			});
 		case 'hour':
-			grouped = file.usage.reduce((a, e) => {
-				if (!a[startOfHour(e.createdAt).toISOString()]) {
-					a[startOfHour(e.createdAt).toISOString()] = [];
+			file.usage.reduce((a, e) => {
+				const key = startOfHour(e.createdAt).toISOString();
+				if (!a[key]) {
+					a[key] = [];
 				}
-				a[startOfHour(e.createdAt).toISOString()].push({
+				a[key].push({
 					maxSize: e.maxSize,
 					currentSize: e.currentSize,
 					usedSize: e.usedSize,
 				});
 				return a;
-			}, {});
+			}, grouped);
 			break;
 		case 'day':
 		default:
-			grouped = file.usage.reduce((a, e) => {
-				if (!a[startOfDay(e.createdAt).toISOString()]) {
-					a[startOfDay(e.createdAt).toISOString()] = [];
+			file.usage.reduce((a, e) => {
+				const key = startOfDay(e.createdAt).toISOString();
+				if (!a[key]) {
+					a[key] = [];
 				}
-				a[startOfDay(e.createdAt).toISOString()].push({
+				a[key].push({
 					maxSize: e.maxSize,
 					currentSize: e.currentSize,
 					usedSize: e.usedSize,
 				});
 				return a;
-			}, {});
+			}, grouped);
 			break;
 	}
 

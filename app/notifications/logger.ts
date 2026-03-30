@@ -1,11 +1,4 @@
-import {
-	Database,
-	DatabaseFile,
-	Drive,
-	Monitor,
-	getLatestMonitorLog,
-	monitorLog,
-} from '~/models/monitor.server';
+import { getLatestMonitorLog, monitorLog } from '~/models/monitor.server';
 
 export async function Logger({
 	message,
@@ -17,10 +10,10 @@ export async function Logger({
 }: {
 	message: string;
 	type: string;
-	monitor: Monitor;
-	drive?: Drive;
-	database?: Database;
-	file?: DatabaseFile;
+	monitor: { id: string };
+	drive?: { id: string };
+	database?: { id: string };
+	file?: { id: string };
 }) {
 	const lastLog = await getLatestMonitorLog({
 		monitorId: monitor.id,

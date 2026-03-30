@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DialogProps } from '@radix-ui/react-alert-dialog';
+import type { DialogProps } from '@radix-ui/react-dialog';
 import { cn } from '@/lib/utils';
 import { Button } from '~/components/ui/button';
 import {
@@ -16,7 +16,21 @@ import { Badge } from '../ui/badge';
 
 export function Search({ ...props }: DialogProps) {
 	const [open, setOpen] = React.useState(false);
-	const fetcher = useFetcher();
+	type SearchHit = {
+		url: string;
+		enabled?: boolean;
+		hasError?: boolean;
+		name?: string | null;
+		title?: string | null;
+		httpUrl?: string | null;
+		tags?: string[] | null;
+	};
+	type SearchFetcherData = {
+		results?: {
+			hits?: SearchHit[];
+		};
+	};
+	const fetcher = useFetcher<SearchFetcherData>();
 
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {

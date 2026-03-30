@@ -8,12 +8,23 @@ import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { Monitor } from '~/models/monitor.server';
-import type { Drive } from '~/models/drive.server';
 import { MiniDrive } from './drive';
 
-export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
-	const feedFetcher = useFetcher();
+type MonitorLike = {
+	type: string;
+	id: string;
+	host?: string | null;
+	os?: string | null;
+	osVersion?: string | null;
+	lastBootTime?: string | Date | null;
+	cpuModel?: string | null;
+	cpuCores?: number | string | null;
+	cpuProcessors?: number | string | null;
+	cpuMaxSpeed?: number | string | null;
+};
+
+export const SshSystem = ({ monitor }: { monitor: MonitorLike }) => {
+	const feedFetcher = useFetcher<{ feed?: { memoryTotal?: string | null } }>();
 	const location = useLocation();
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
@@ -26,7 +37,7 @@ export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
 		if (feedFetcher.state === 'idle' && feedFetcher.data == null) {
 			feedFetcher.load(`/${monitor.type}/${monitor.id}/feed-latest`);
 		}
-	}, [feedFetcher, monitor]);
+	}, [feedFetcher.state, feedFetcher.data, monitor.type, monitor.id]);
 	return (
 		<div className="space-y-2 flex-grow">
 			<Table>
@@ -98,8 +109,8 @@ export const SshSystem = ({ monitor }: { monitor: Monitor }) => {
 	);
 };
 
-export const SshStats = ({ monitor }: { monitor: Monitor }) => {
-	const drivesFetcher = useFetcher();
+export const SshStats = ({ monitor }: { monitor: MonitorLike }) => {
+	const drivesFetcher = useFetcher<{ drives?: any[] }>();
 	const location = useLocation();
 
 	// if we redirect to another monitor we need to reload drives
@@ -113,7 +124,7 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 		if (drivesFetcher.state === 'idle' && drivesFetcher.data == null) {
 			drivesFetcher.load(`/${monitor.type}/${monitor.id}/drives`);
 		}
-	}, [drivesFetcher, monitor]);
+	}, [drivesFetcher.state, drivesFetcher.data, monitor.type, monitor.id]);
 
 	return (
 		<Tabs defaultValue="storage" className="w-full">
@@ -126,8 +137,8 @@ export const SshStats = ({ monitor }: { monitor: Monitor }) => {
 				{drivesFetcher.data?.drives ? (
 					<>
 						<div className="grid gap-4 py-4 grid-cols-2">
-							{drivesFetcher.data.drives.map((drive: Drive) => (
-								<MiniDrive monitor={monitor} drive={drive} />
+							{drivesFetcher.data.drives.map((drive) => (
+								<MiniDrive monitor={monitor as any} drive={drive as any} />
 							))}
 						</div>
 					</>

@@ -1,5 +1,6 @@
 import { useNavigate } from '@remix-run/react';
 import {
+	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
 	VisibilityState,
@@ -23,15 +24,15 @@ import {
 	TableHeader,
 	TableRow,
 } from '~/components/ui/table';
-import { Database, Monitor } from '~/models/monitor.server';
 
 export const SqlDatabaseTable = ({
 	monitor,
 	databases,
 	columns,
 }: {
-	monitor: Monitor;
-	databases: Database[];
+	monitor: any;
+	databases: any[];
+	columns: ColumnDef<any>[];
 }) => {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =

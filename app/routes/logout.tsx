@@ -1,8 +1,8 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { authenticator } from '~/services/auth.server';
 
-export const action = async ({ request }: ActionArgs) =>
+export const action = async ({ request }: ActionFunctionArgs) =>
 	authenticator.logout(request, { redirectTo: '/' });
 
-export const loader = async ({ request }: LoaderArgs) =>
+export const loader = async ({ request }: LoaderFunctionArgs) =>
 	authenticator.logout(request, { redirectTo: '/' });

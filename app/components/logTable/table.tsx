@@ -32,7 +32,13 @@ import { useEffect } from 'react';
 import { useFetcher } from '@remix-run/react';
 
 export function LogTable({ url }: { url: string }) {
-	const logsFetcher = useFetcher();
+	type LogsFetcherData = {
+		data: {
+			logs: any[];
+			pages: number;
+		};
+	};
+	const logsFetcher = useFetcher<LogsFetcherData>();
 
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
@@ -47,7 +53,7 @@ export function LogTable({ url }: { url: string }) {
 		});
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
-	const [data, setData] = React.useState([]);
+	const [data, setData] = React.useState<any[]>([]);
 	const [pages, setPages] = React.useState(-1);
 
 	// rerun on url change

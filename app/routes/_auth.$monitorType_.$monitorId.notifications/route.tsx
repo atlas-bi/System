@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import {
 	getMonitorNotifications,
@@ -21,7 +21,7 @@ import { getNotifications } from '~/models/notification.server';
 import invariant from 'tiny-invariant';
 import { Separator } from '~/components/ui/separator';
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -38,7 +38,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	return json({ monitor, notifications });
 };
 
-export async function action({ request, params }: ActionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -55,7 +55,7 @@ export async function action({ request, params }: ActionArgs) {
 		connectionNotify: values.connectionNotify == 'on',
 		connectionNotifyTypes: formData
 			.getAll('connectionNotifyTypes')
-			.map((x) => x.toString()),
+			.map((x: FormDataEntryValue) => x.toString()),
 		connectionNotifyResendAfterMinutes:
 			values.connectionNotifyResend == 'on'
 				? Number(values.connectionNotifyResendAfterMinutes || '0')
@@ -64,7 +64,7 @@ export async function action({ request, params }: ActionArgs) {
 		httpCertNotify: values.httpCertNotify == 'on',
 		httpCertNotifyTypes: formData
 			.getAll('httpCertNotifyTypes')
-			.map((x) => x.toString()),
+			.map((x: FormDataEntryValue) => x.toString()),
 		httpCertNotifyResendAfterMinutes:
 			values.httpCertNotifyResend == 'on'
 				? Number(values.httpCertNotifyResendAfterMinutes || '0')
@@ -72,12 +72,12 @@ export async function action({ request, params }: ActionArgs) {
 		rebootNotify: values.rebootNotify == 'on',
 		rebootNotifyTypes: formData
 			.getAll('rebootNotifyTypes')
-			.map((x) => x.toString()),
+			.map((x: FormDataEntryValue) => x.toString()),
 
 		sqlFileSizePercentFreeNotify: values.sqlFileSizePercentFreeNotify == 'on',
 		sqlFileSizePercentFreeNotifyTypes: formData
 			.getAll('sqlFileSizePercentFreeNotifyTypes')
-			.map((x) => x.toString()),
+			.map((x: FormDataEntryValue) => x.toString()),
 		sqlFileSizePercentFreeNotifyResendAfterMinutes:
 			values.percFreeNotifyResend == 'on'
 				? Number(values.sqlFileSizePercentFreeNotifyResendAfterMinutes || '0')
@@ -116,7 +116,7 @@ export default function Index() {
 		monitor.connectionNotifyResendAfterMinutes,
 	);
 	const [percValue, setPercValue] = useState(
-		monitor.sqlFileSizePercentFreeValue,
+		(monitor.sqlFileSizePercentFreeValue ?? '') as number | '',
 	);
 
 	const [httpCertResendValue, setHttpCertResendValue] = useState(
@@ -439,7 +439,10 @@ export default function Index() {
 												type="number"
 												placeholder="10"
 												value={percValue}
-												onChange={(e) => setPercValue(Number(e.target.value))}
+												onChange={(e) => {
+													const v = e.target.value;
+													setPercValue(v === '' ? '' : Number(v));
+												}}
 											/>
 										</div>
 										<div>

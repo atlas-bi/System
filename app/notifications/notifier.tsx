@@ -1,10 +1,10 @@
-import { Monitor, getMonitor } from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import { getMonitor } from '~/models/monitor.server';
 import { getDriveLatestFeed } from '~/models/drive.server';
-import type { Drive } from '~/models/drive.server';
 import SMTP from './smtp';
 import Telegram from './telegram';
 import {
-	Notification,
+	NotificationMeta,
 	getNotificationConnection,
 } from '~/models/notification.server';
 import percentFreeNotifier from './checks/drives/percentFree';
@@ -24,7 +24,7 @@ export default async function Notifier({
 }: {
 	job: string;
 	message?: string;
-	oldMonitor?: Monitor;
+	oldMonitor?: MonitorWithRelations;
 }) {
 	const monitor = await getMonitor({ id: job });
 
@@ -39,7 +39,7 @@ export default async function Notifier({
 		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
 
 		// drive notifications
-		monitor?.drives?.map(async (drive: Drive) => {
+		monitor?.drives?.map(async (drive) => {
 			// don't report inactive drives.
 			if (drive.enabled == false) return;
 
@@ -67,7 +67,7 @@ export const sendNotification = async ({
 	subject,
 	message,
 }: {
-	notification: Notification;
+	notification: NotificationMeta;
 	subject: string;
 	message: string;
 }) => {

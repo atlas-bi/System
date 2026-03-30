@@ -5,10 +5,7 @@ export const statusCodes = [
 	{ label: '400-499', value: '400s' },
 	{ label: '500-599', value: '500s' },
 	...[...Array(999).keys()]
-		.map((x) => {
-			if (x > 99) {
-				return { label: x.toString(), value: x.toString() };
-			}
-		})
-		.filter((x) => x),
+		.flatMap((x) =>
+			x > 99 ? [{ label: x.toString(), value: x.toString() }] : [],
+		),
 ];

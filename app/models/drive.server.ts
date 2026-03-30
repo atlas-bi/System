@@ -1,4 +1,5 @@
 import { Drive } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '~/db.server';
 import searchLoader from '~/queues/searchService.server';
 
@@ -203,21 +204,28 @@ export function getDriveUsage({
 }
 
 export function getDriveLatestFeed({ id }: Pick<Drive, 'id'>) {
+	const driveLatestFeedSelect = Prisma.validator<Prisma.DriveUsageSelect>()({
+		id: true,
+		hasError: true,
+		createdAt: true,
+		free: true,
+		used: true,
+		driveId: true,
+	});
+
 	return prisma.driveUsage.findFirst({
 		where: { driveId: id },
-		select: {
-			id: true,
-			hasError: true,
-			createdAt: true,
-			free: true,
-			used: true,
-		},
+		select: driveLatestFeedSelect,
 		take: 1,
 		orderBy: {
 			createdAt: 'desc',
 		},
 	});
 }
+
+export type DriveLatestFeed = Prisma.DriveUsageGetPayload<{
+	select: Prisma.DriveUsageSelect;
+}>;
 
 export function getDriveLatestFeeds({ id }: Pick<Drive, 'id'>) {
 	return prisma.driveUsage.findMany({

@@ -23,7 +23,8 @@ import { version } from '@/package.json';
 export function UserNav() {
 	const { user } = useLoaderData<typeof loader>();
 	const [activeUser, setActiveUser] = useState<UserSerialized>(user);
-	const fetcher = useFetcher();
+	type UserFetcherData = { user: Partial<UserSerialized> };
+	const fetcher = useFetcher<UserFetcherData>();
 
 	const initials = (user: UserSerialized) => {
 		return (user?.firstName?.slice(0, 1) || 'U') + user?.lastName?.slice(0, 1);

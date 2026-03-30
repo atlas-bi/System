@@ -1,6 +1,7 @@
 // import { useMatches } from "@remix-run/react";
 // import { useMemo } from "react";
 
+import { redirect } from '@remix-run/node';
 import {
 	endOfDay,
 	endOfToday,
@@ -39,6 +40,26 @@ export function safeRedirect(
 	}
 
 	return to;
+}
+
+export async function namedAction(
+	request: Request,
+	actions: Record<string, (formData: FormData) => Promise<Response> | Response>,
+) {
+	const formData = await request.formData();
+	const action = formData.get('_action');
+	if (typeof action !== 'string' || !(action in actions)) {
+		throw new Response('Invalid action', { status: 400 });
+	}
+	return await actions[action]!(formData);
+}
+
+export function redirectBack(request: Request, { fallback }: { fallback: string }) {
+	const referer = request.headers.get('Referer');
+	if (referer) {
+		return redirect(referer);
+	}
+	return redirect(fallback);
 }
 
 // /**
