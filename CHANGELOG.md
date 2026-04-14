@@ -1,3 +1,10 @@
+## <small>1.44.2 (2026-04-14)</small>
+
+* Merge pull request #66 from atlas-bi/dev ([b28a5ac](https://github.com/atlas-bi/System/commit/b28a5ac)), closes [#66](https://github.com/atlas-bi/System/issues/66)
+* Merge pull request #67 from atlas-bi/alpha ([ed84b27](https://github.com/atlas-bi/System/commit/ed84b27)), closes [#67](https://github.com/atlas-bi/System/issues/67)
+* style(format): fixed formatting (remove prettier in favor of biome) ([a87a7b4](https://github.com/atlas-bi/System/commit/a87a7b4))
+* fix(prisma): added dep to prod ([848c298](https://github.com/atlas-bi/System/commit/848c298))
+
 ## <small>1.44.1 (2026-04-14)</small>
 
 * fixed dep ([31b632b](https://github.com/atlas-bi/System/commit/31b632b))
