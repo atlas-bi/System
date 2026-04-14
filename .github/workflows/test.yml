@@ -52,7 +52,7 @@ jobs:
         run: corepack enable
 
       - name: 📥 Download deps
-        run: pnpm install
+        run: pnpm install --prod
 
       - name: 🔬 Build
         run: pnpm run build
