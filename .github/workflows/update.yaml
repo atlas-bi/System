@@ -22,20 +22,19 @@ jobs:
           title: chore(sync) Sync dev → alpha
           labels: automated pr
 
+  master:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'alpha'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    master:
-      runs-on: ubuntu-latest
-      if: github.ref_name == 'alpha'
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-
-        - name: Create Pull Request
-          uses: peter-evans/create-pull-request@v6
-          with:
-            base: master
-            branch: alpha
-            title: chore(sync) Sync alpha → master
-            labels: automated pr
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: master
+          branch: alpha
+          title: chore(sync) Sync alpha → master
+          labels: automated pr
 
