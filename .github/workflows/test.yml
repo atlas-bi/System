@@ -55,7 +55,9 @@ jobs:
         run: pnpm install --prod
 
       - name: 🔬 Build
-        run: pnpm run build
+        run: |
+          pnpm run build:remix
+          pnpm run build:server
 
   lint:
     name: ⬣ Biome
