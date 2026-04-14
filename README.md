@@ -27,7 +27,7 @@ Atlas System is a simple tool to monitor servers, databases, websites and other 
 > Atlas System is built with [Node](https://nodejs.org/en/download/) and [Meilisearch](https://www.meilisearch.com/docs/learn/getting_started/installation#installation).
 
 - Get the code `git clone git@github.com:atlas-bi/system.git`
-- Install the project dependencies `pnpm install`
+- Enable Corepack and install the project dependencies `corepack enable && pnpm install`
 - Create a `.env` file as specified in the [docs](https://www.atlas.bi/docs/system/install/configuration/)
 - Finally, start up the website `pnpm run dev`
 
@@ -36,6 +36,8 @@ Atlas System is a simple tool to monitor servers, databases, websites and other 
 Contributions are welcome! Please open an [issue](https://github.com/atlas-bi/atlas-bi-library/issues) describing an issue or feature.
 
 This repository uses commitizen. Commit code changes for pr's with `pnpm run commit`.
+
+Use `pnpm` for the root project and commit `pnpm-lock.yaml`. Do not regenerate a root `package-lock.json`.
 
 ## 🏆 Credits
 
