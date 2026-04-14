@@ -1,3 +1,17 @@
+## <small>1.44.1 (2026-04-14)</small>
+
+* fixed dep ([31b632b](https://github.com/atlas-bi/System/commit/31b632b))
+* Merge pull request #62 from atlas-bi/dev ([1f03315](https://github.com/atlas-bi/System/commit/1f03315)), closes [#62](https://github.com/atlas-bi/System/issues/62)
+* Merge pull request #63 from atlas-bi/alpha ([2c20373](https://github.com/atlas-bi/System/commit/2c20373)), closes [#63](https://github.com/atlas-bi/System/issues/63)
+* Merge pull request #64 from atlas-bi/dev ([ef62c6e](https://github.com/atlas-bi/System/commit/ef62c6e)), closes [#64](https://github.com/atlas-bi/System/issues/64)
+* Merge pull request #65 from atlas-bi/alpha ([9df7f2e](https://github.com/atlas-bi/System/commit/9df7f2e)), closes [#65](https://github.com/atlas-bi/System/issues/65)
+* updated test ([48c9109](https://github.com/atlas-bi/System/commit/48c9109))
+* updated test ([daee629](https://github.com/atlas-bi/System/commit/daee629))
+* updated workflow ([ad12968](https://github.com/atlas-bi/System/commit/ad12968))
+* updated workflow ([c8c987a](https://github.com/atlas-bi/System/commit/c8c987a))
+* updated workflow ([ec83068](https://github.com/atlas-bi/System/commit/ec83068))
+* fix(install): fixed install, trigger release ([5afbba4](https://github.com/atlas-bi/System/commit/5afbba4))
+
 ## 1.44.0 (2026-04-14)
 
 * fix(deps) Replace dependency faker with @faker-js/faker ^5.5.3 (#15) ([e83ea6c](https://github.com/atlas-bi/System/commit/e83ea6c)), closes [#15](https://github.com/atlas-bi/System/issues/15)
