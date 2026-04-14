@@ -1,17 +1,17 @@
-import type { MonitorWithRelations } from "~/models/monitor.server";
-import { getMonitor } from "~/models/monitor.server";
-import { getDriveLatestFeed } from "~/models/drive.server";
-import SMTP from "./smtp";
-import Telegram from "./telegram";
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import { getMonitor } from '~/models/monitor.server';
+import { getDriveLatestFeed } from '~/models/drive.server';
+import SMTP from './smtp';
+import Telegram from './telegram';
 import {
 	NotificationMeta,
 	getNotificationConnection,
-} from "~/models/notification.server";
-import percentFreeNotifier from "./checks/drives/percentFree";
-import rebootNotifier from "./checks/monitors/reboot";
-import collectionNotifier from "./checks/monitors/collection";
-import httpCertNotifier from "./checks/monitors/httpCert";
-import sqlFilePercentFreeNotifier from "./checks/monitors/sqlFiles";
+} from '~/models/notification.server';
+import percentFreeNotifier from './checks/drives/percentFree';
+import rebootNotifier from './checks/monitors/reboot';
+import collectionNotifier from './checks/monitors/collection';
+import httpCertNotifier from './checks/monitors/httpCert';
+import sqlFilePercentFreeNotifier from './checks/monitors/sqlFiles';
 
 // 1. send error notification
 // 2. when error clears send an "all clear"
@@ -34,7 +34,7 @@ export default async function Notifier({
 	await httpCertNotifier({ monitor });
 	await sqlFilePercentFreeNotifier({ monitor });
 
-	if (monitor.type === "windows" || monitor.type === "ubuntu") {
+	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
 		// reboot notifier
 		if (oldMonitor) await rebootNotifier({ monitor, oldMonitor });
 
@@ -74,9 +74,9 @@ export const sendNotification = async ({
 	const meta = await getNotificationConnection({ id: notification.id });
 	if (!meta) return;
 
-	if (meta.type == "smtp") {
+	if (meta.type == 'smtp') {
 		return SMTP({ notification: meta, subject, message });
-	} else if (meta.type == "telegram") {
+	} else if (meta.type == 'telegram') {
 		return Telegram({ notification: meta, message: subject });
 	}
 };

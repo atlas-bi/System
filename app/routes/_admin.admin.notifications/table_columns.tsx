@@ -1,10 +1,10 @@
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
-import { notificationTypes } from "~/models/notification";
+import type { ColumnDef } from '@tanstack/react-table';
+import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
+import { notificationTypes } from '~/models/notification';
 
 export const columns: ColumnDef<any>[] = [
 	{
-		accessorKey: "type",
+		accessorKey: 'type',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Type" />
 		),
@@ -19,18 +19,18 @@ export const columns: ColumnDef<any>[] = [
 							{icon}
 						</div>
 					)}
-					<span className="my-auto">{row.getValue("type")}</span>
+					<span className="my-auto">{row.getValue('type')}</span>
 				</div>
 			);
 		},
 	},
 	{
-		accessorKey: "title",
+		accessorKey: 'title',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Name" />
 		),
 		cell: ({ row }) => {
-			return <div className="">{row.getValue("title")}</div>;
+			return <div className="">{row.getValue('title')}</div>;
 		},
 		enableSorting: true,
 		enableHiding: false,

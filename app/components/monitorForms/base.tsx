@@ -1,6 +1,6 @@
-import { Form, useFetcher, useNavigate, useSubmit } from "@remix-run/react";
-import { ReactNode, useEffect, useState } from "react";
-import { Button } from "~/components/ui/button";
+import { Form, useFetcher, useNavigate, useSubmit } from '@remix-run/react';
+import { ReactNode, useEffect, useState } from 'react';
+import { Button } from '~/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
@@ -9,9 +9,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 import {
 	Select,
 	SelectContent,
@@ -19,18 +19,18 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "~/components/ui/select";
+} from '~/components/ui/select';
 
-import { monitorTypes } from "~/models/monitor";
-import { Textarea } from "~/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { monitorTypes } from '~/models/monitor';
+import { Textarea } from '~/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 
-import type { Monitor } from "~/models/monitor.server";
-import SshForm from "./ssh";
-import { Switch } from "~/components/ui/switch";
-import HttpForm from "./http";
-import SqlForm from "./sql";
-import TcpForm from "./tcp";
+import type { Monitor } from '~/models/monitor.server';
+import SshForm from './ssh';
+import { Switch } from '~/components/ui/switch';
+import HttpForm from './http';
+import SqlForm from './sql';
+import TcpForm from './tcp';
 
 export default function Monitor({
 	monitor,
@@ -58,7 +58,7 @@ export default function Monitor({
 	}, [monitor]);
 
 	useEffect(() => {
-		if (fetcher.state === "idle" && fetcher.data?.monitor != null) {
+		if (fetcher.state === 'idle' && fetcher.data?.monitor != null) {
 			if (!monitor.id) {
 				setOpen(false);
 				navigate(`/${fetcher.data.monitor.type}/${fetcher.data.monitor.id}`);
@@ -74,10 +74,10 @@ export default function Monitor({
 			<DialogContent className="sm:min-w-[425px] sm:max-w-fit">
 				<DialogHeader>
 					<DialogTitle>
-						{monitor.title ? `${monitor.title}` : "Add Monitor"}
+						{monitor.title ? `${monitor.title}` : 'Add Monitor'}
 					</DialogTitle>
 					<DialogDescription>
-						{monitor.title ? `Editing monitor.` : "Add a new monitor."}
+						{monitor.title ? `Editing monitor.` : 'Add a new monitor.'}
 					</DialogDescription>
 				</DialogHeader>
 				{testFetcher.data?.error?.code ? (
@@ -93,13 +93,13 @@ export default function Monitor({
 				) : (
 					<></>
 				)}
-				{testFetcher.state !== "submitting" && testFetcher.data?.form?.error ? (
+				{testFetcher.state !== 'submitting' && testFetcher.data?.form?.error ? (
 					<small className="text-red-700">{testFetcher.data.form.error}</small>
 				) : null}
-				{fetcher.state !== "submitting" && fetcher.data?.form?.error ? (
+				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
-				{testFetcher.state !== "submitting" && testFetcher.data?.success ? (
+				{testFetcher.state !== 'submitting' && testFetcher.data?.success ? (
 					<small className="text-green-700">{testFetcher.data.success}</small>
 				) : null}
 				<Form method="post" action="/monitor/new">
@@ -111,7 +111,7 @@ export default function Monitor({
 							<Input
 								type="text"
 								id="name"
-								value={data.title || ""}
+								value={data.title || ''}
 								placeholder="Monitor 1"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, title: e.target.value })}
@@ -122,7 +122,7 @@ export default function Monitor({
 							<Textarea
 								id="description"
 								className="col-span-3"
-								value={data.description || ""}
+								value={data.description || ''}
 								onChange={(e) =>
 									setData({ ...data, description: e.target.value })
 								}
@@ -155,16 +155,16 @@ export default function Monitor({
 									</SelectGroup>
 								</SelectContent>
 							</Select>
-							{(data.type === "windows" || data.type === "ubuntu") && (
+							{(data.type === 'windows' || data.type === 'ubuntu') && (
 								<SshForm data={data} setData={setData} />
 							)}
-							{data.type === "http" && (
+							{data.type === 'http' && (
 								<HttpForm data={data} setData={setData} />
 							)}
-							{data.type === "sqlServer" && (
+							{data.type === 'sqlServer' && (
 								<SqlForm data={data} setData={setData} />
 							)}
-							{data.type === "tcp" && <TcpForm data={data} setData={setData} />}
+							{data.type === 'tcp' && <TcpForm data={data} setData={setData} />}
 						</div>
 					</div>
 					<DialogFooter className="sm:justify-between md:justify-end">
@@ -175,8 +175,8 @@ export default function Monitor({
 								onClick={(e) => {
 									e.preventDefault();
 									deleteSubmit(
-										{ _action: "delete", id: data.id },
-										{ method: "post", action: "/monitor/new" },
+										{ _action: 'delete', id: data.id },
+										{ method: 'post', action: '/monitor/new' },
 									);
 									setOpen(false);
 								}}
@@ -192,20 +192,20 @@ export default function Monitor({
 									e.preventDefault();
 									testFetcher.submit(
 										{
-											_action: "test",
+											_action: 'test',
 											...JSON.parse(
 												JSON.stringify(data, (_k, v) => v ?? undefined),
 											),
 										},
-										{ method: "post", action: "/monitor/new" },
+										{ method: 'post', action: '/monitor/new' },
 									);
 								}}
 							>
-								{testFetcher.state !== "submitting" ? (
+								{testFetcher.state !== 'submitting' ? (
 									<>Test</>
 								) : (
 									<>
-										<Loader2 size={14} className="animate-spin mr-2" />{" "}
+										<Loader2 size={14} className="animate-spin mr-2" />{' '}
 										Testing...
 									</>
 								)}
@@ -215,12 +215,12 @@ export default function Monitor({
 								onClick={(e) => {
 									fetcher.submit(
 										{
-											_action: "new",
+											_action: 'new',
 											...JSON.parse(
 												JSON.stringify(data, (_k, v) => v ?? undefined),
 											),
 										},
-										{ method: "post", action: "/monitor/new" },
+										{ method: 'post', action: '/monitor/new' },
 									);
 								}}
 							>

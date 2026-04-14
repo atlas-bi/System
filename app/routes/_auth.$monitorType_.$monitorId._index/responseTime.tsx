@@ -1,19 +1,19 @@
-import { useFetcher } from "@remix-run/react";
-import { formatInTimeZone } from "date-fns-tz";
-import { useEffect } from "react";
+import { useFetcher } from '@remix-run/react';
+import { formatInTimeZone } from 'date-fns-tz';
+import { useEffect } from 'react';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "~/components/ui/tooltip";
+} from '~/components/ui/tooltip';
 
 export function PingStat({ url }: { url: string }) {
 	const pingFetcher = useFetcher<{ feeds?: any[] }>();
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (document.visibilityState === "visible") {
+			if (document.visibilityState === 'visible') {
 				pingFetcher.load(url);
 			}
 		}, 30 * 1000);
@@ -21,7 +21,7 @@ export function PingStat({ url }: { url: string }) {
 	}, []);
 
 	useEffect(() => {
-		if (pingFetcher.state === "idle" && pingFetcher.data == null) {
+		if (pingFetcher.state === 'idle' && pingFetcher.data == null) {
 			pingFetcher.load(url);
 		}
 	}, [pingFetcher.state, pingFetcher.data, url]);
@@ -36,7 +36,7 @@ export function PingStat({ url }: { url: string }) {
 						<TooltipTrigger asChild>
 							<div
 								className={`flex-shrink-0 transition-all w-2 h-4 hover:scale-125 rounded ${
-									x.hasError ? "bg-red-300" : "bg-emerald-600"
+									x.hasError ? 'bg-red-300' : 'bg-emerald-600'
 								}`}
 							></div>
 						</TooltipTrigger>
@@ -46,8 +46,8 @@ export function PingStat({ url }: { url: string }) {
 									<div
 										className={`${
 											x.hasError
-												? "bg-red-300 border-red-400"
-												: "bg-emerald-600 border-emerald-700"
+												? 'bg-red-300 border-red-400'
+												: 'bg-emerald-600 border-emerald-700'
 										} border-1 rounded h-3 w-3 my-auto`}
 									></div>
 
@@ -56,7 +56,7 @@ export function PingStat({ url }: { url: string }) {
 										{formatInTimeZone(
 											x.createdAt,
 											Intl.DateTimeFormat().resolvedOptions().timeZone,
-											"MMM d, yyyy k:mm",
+											'MMM d, yyyy k:mm',
 										)}
 									</span>
 								</div>

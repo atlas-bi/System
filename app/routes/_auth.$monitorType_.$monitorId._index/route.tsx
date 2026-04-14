@@ -1,9 +1,9 @@
-import { H1 } from "~/components/ui/typography";
-import { redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { getMonitorMeta } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
-import { Link, useLoaderData } from "@remix-run/react";
+import { H1 } from '~/components/ui/typography';
+import { redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { getMonitorMeta } from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
+import { Link, useLoaderData } from '@remix-run/react';
 import {
 	Activity,
 	AlertTriangle,
@@ -11,20 +11,20 @@ import {
 	MoveLeft,
 	MoveRight,
 	Settings,
-} from "lucide-react";
-import invariant from "tiny-invariant";
-import { LogTable } from "~/components/logTable/table";
-import { monitorTypes } from "~/models/monitor";
-import Monitor from "~/components/monitorForms/base";
-import { Button } from "~/components/ui/button";
-import { decrypt } from "@/lib/utils";
-import { SshStats, SshSystem } from "./ssh";
-import { SqlStats, SqlSystem } from "./sql";
-import { PingChart } from "~/components/charts/pingChart";
-import { parseSql } from "~/utils.server";
-import { Badge } from "~/components/ui/badge";
-import { PingStat } from "./responseTime";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+} from 'lucide-react';
+import invariant from 'tiny-invariant';
+import { LogTable } from '~/components/logTable/table';
+import { monitorTypes } from '~/models/monitor';
+import Monitor from '~/components/monitorForms/base';
+import { Button } from '~/components/ui/button';
+import { decrypt } from '@/lib/utils';
+import { SshStats, SshSystem } from './ssh';
+import { SqlStats, SqlSystem } from './sql';
+import { PingChart } from '~/components/charts/pingChart';
+import { parseSql } from '~/utils.server';
+import { Badge } from '~/components/ui/badge';
+import { PingStat } from './responseTime';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -33,14 +33,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		)}`,
 	});
 
-	invariant(params.monitorId, "Monitor ID is required.");
-	invariant(params.monitorType, "Monitor Type is required.");
+	invariant(params.monitorId, 'Monitor ID is required.');
+	invariant(params.monitorType, 'Monitor Type is required.');
 
 	if (monitorTypes.filter((x) => x.value === params.monitorType).length === 0) {
-		return redirect("/");
+		return redirect('/');
 	}
 	const monitor = await getMonitorMeta({ id: params.monitorId });
-	invariant(monitor, "Monitor not found.");
+	invariant(monitor, 'Monitor not found.');
 
 	const parsedSqlConnectionString = monitor.sqlConnectionString
 		? parseSql(monitor.sqlConnectionString)
@@ -108,11 +108,11 @@ export default function Index() {
 						<Activity className="text-emerald-600 my-auto" size={18} />
 					)}
 					<span>{monitor.title}</span>
-					{monitor.type === "http" && monitor.httpUrl ? (
+					{monitor.type === 'http' && monitor.httpUrl ? (
 						<span>({monitor.httpUrl})</span>
-					) : monitor.type === "sqlServer" ? (
-						<span>({sqlConnectionString?.["data source"]})</span>
-					) : monitor.type === "tcp" ? (
+					) : monitor.type === 'sqlServer' ? (
+						<span>({sqlConnectionString?.['data source']})</span>
+					) : monitor.type === 'tcp' ? (
 						<span>
 							({monitor.host}:{monitor.port})
 						</span>
@@ -125,21 +125,21 @@ export default function Index() {
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{monitor.description}</div>
 
-				{(monitor.type == "windows" || monitor.type == "ubuntu") && (
+				{(monitor.type == 'windows' || monitor.type == 'ubuntu') && (
 					<>
 						<SshSystem monitor={monitor} />
 						<SshStats monitor={monitor} />
 					</>
 				)}
 
-				{monitor.type == "sqlServer" && (
+				{monitor.type == 'sqlServer' && (
 					<>
 						<SqlSystem monitor={monitor} />
 						<SqlStats monitor={monitor} />
 					</>
 				)}
 
-				{(monitor.type == "http" || monitor.type == "tcp") && (
+				{(monitor.type == 'http' || monitor.type == 'tcp') && (
 					<PingChart url={`/${monitor.type}/${monitor.id}/ping`} />
 				)}
 

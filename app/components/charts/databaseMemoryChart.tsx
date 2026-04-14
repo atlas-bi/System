@@ -1,6 +1,6 @@
-import type { DatabaseUsage } from "@prisma/client";
+import type { DatabaseUsage } from '@prisma/client';
 
-import bytes, { Unit } from "bytes";
+import bytes, { Unit } from 'bytes';
 import {
 	LineElement,
 	CategoryScale,
@@ -12,13 +12,13 @@ import {
 	Tooltip,
 	Filler,
 	TimeScale,
-} from "chart.js";
-import { useCallback, useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
-import { createLinearGradient, darkGradient, lightGradient } from "./functions";
-import { useFetcher } from "@remix-run/react";
-import { DateFilter } from "./DateFilter";
-import { dateOptions } from "~/models/dates";
+} from 'chart.js';
+import { useCallback, useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import { createLinearGradient, darkGradient, lightGradient } from './functions';
+import { useFetcher } from '@remix-run/react';
+import { DateFilter } from './DateFilter';
+import { dateOptions } from '~/models/dates';
 
 ChartJS.register([
 	CategoryScale,
@@ -30,10 +30,10 @@ ChartJS.register([
 	Tooltip,
 ]);
 
-import "chartjs-adapter-date-fns";
-import { H2, H3 } from "../ui/typography";
-import { Circle, Loader, RefreshCw } from "lucide-react";
-import { Button } from "../ui/button";
+import 'chartjs-adapter-date-fns';
+import { H2, H3 } from '../ui/typography';
+import { Circle, Loader, RefreshCw } from 'lucide-react';
+import { Button } from '../ui/button';
 
 export const MemoryChart = ({ url }: { url: string }) => {
 	type DatabaseMemoryFetcherData = {
@@ -46,39 +46,39 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		};
 	};
 	const usageFetcher = useFetcher<DatabaseMemoryFetcherData>();
-	const [unit, setUnit] = useState("last_24_hours");
+	const [unit, setUnit] = useState('last_24_hours');
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit: string): ChartOptions<"line"> => {
+		(sizeUnit: string): ChartOptions<'line'> => {
 			const startDate = usageFetcher.data?.monitor?.startDate;
 			const endDate = usageFetcher.data?.monitor?.endDate;
 			const min = startDate ? new Date(startDate).getTime() : undefined;
 			const max = endDate ? new Date(endDate).getTime() : undefined;
 
 			type AllowedTimeUnit =
-				| "millisecond"
-				| "second"
-				| "minute"
-				| "hour"
-				| "day"
-				| "week"
-				| "month"
-				| "quarter"
-				| "year";
+				| 'millisecond'
+				| 'second'
+				| 'minute'
+				| 'hour'
+				| 'day'
+				| 'week'
+				| 'month'
+				| 'quarter'
+				| 'year';
 			const allowedTimeUnits: AllowedTimeUnit[] = [
-				"millisecond",
-				"second",
-				"minute",
-				"hour",
-				"day",
-				"week",
-				"month",
-				"quarter",
-				"year",
+				'millisecond',
+				'second',
+				'minute',
+				'hour',
+				'day',
+				'week',
+				'month',
+				'quarter',
+				'year',
 			];
 			const candidateTimeUnit = dateOptions.filter((x) => x.value === unit)?.[0]
 				?.chartUnit;
@@ -93,7 +93,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				maintainAspectRatio: false,
 				interaction: {
 					intersect: false,
-					mode: "index" as const,
+					mode: 'index' as const,
 				},
 				animation: {
 					duration: 300,
@@ -106,25 +106,25 @@ export const MemoryChart = ({ url }: { url: string }) => {
 						display: false,
 					},
 					tooltip: {
-						position: "mouse",
+						position: 'mouse',
 						callbacks: {
 							label: function (tooltipItem: {
 								datasetIndex: number;
 								formattedValue: string;
 							}) {
 								if (tooltipItem.datasetIndex === 0) {
-									return tooltipItem.formattedValue + sizeUnit + " Used";
+									return tooltipItem.formattedValue + sizeUnit + ' Used';
 								}
-								return tooltipItem.formattedValue + sizeUnit + " Free";
+								return tooltipItem.formattedValue + sizeUnit + ' Free';
 							},
 						},
 					},
 				},
 				scales: {
 					y: {
-						type: "linear" as const,
+						type: 'linear' as const,
 						display: true,
-						position: "left" as const,
+						position: 'left' as const,
 						beginAtZero: true,
 						ticks: {
 							callback: function (tickValue: number | string) {
@@ -135,7 +135,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 					},
 					x: {
 						stacked: true,
-						type: "time",
+						type: 'time',
 						min,
 						max,
 						time: {
@@ -151,8 +151,8 @@ export const MemoryChart = ({ url }: { url: string }) => {
 		[unit, usageFetcher.data],
 	);
 
-	const [options, setOptions] = useState<ChartOptions<"line">>(
-		getOptions("GB"),
+	const [options, setOptions] = useState<ChartOptions<'line'>>(
+		getOptions('GB'),
 	);
 
 	useEffect(() => {
@@ -160,19 +160,19 @@ export const MemoryChart = ({ url }: { url: string }) => {
 	}, [unit]);
 
 	useEffect(() => {
-		if (usageFetcher.state === "loading") {
+		if (usageFetcher.state === 'loading') {
 			setChartData(emptyDataset);
 		}
 	}, [usageFetcher]);
 
-	const emptyDataset: ChartData<"line", { x: Date; y: number }[]> = {
+	const emptyDataset: ChartData<'line', { x: Date; y: number }[]> = {
 		datasets: [],
 	};
 	const [chartData, setChartData] =
-		useState<ChartData<"line", { x: Date; y: number }[]>>(emptyDataset);
+		useState<ChartData<'line', { x: Date; y: number }[]>>(emptyDataset);
 
 	useEffect(() => {
-		let sizeUnit = "GB";
+		let sizeUnit = 'GB';
 		const max =
 			usageFetcher.data?.database?.usage?.reduce(
 				(a: number, e: { memory?: number | null }) =>
@@ -180,21 +180,21 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				0,
 			) ?? 0;
 		if (max < 10000) {
-			sizeUnit = "KB";
+			sizeUnit = 'KB';
 		} else if (max < 100000) {
-			sizeUnit = "MB";
+			sizeUnit = 'MB';
 		}
 
 		const xUnit =
-			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || "hour";
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
 
-		const chartData: ChartData<"line", { x: Date; y: number }[]> = {
+		const chartData: ChartData<'line', { x: Date; y: number }[]> = {
 			datasets: [
 				{
-					spanGaps: 1000 * 60 * (xUnit == "hour" ? 1.5 : 90), // 1.5 min or 1.5 hour
+					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
-					label: "Used",
-					cubicInterpolationMode: "monotone" as const,
+					label: 'Used',
+					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
 					data:
 						usageFetcher.data?.database?.usage?.map((x) => {
@@ -204,17 +204,17 @@ export const MemoryChart = ({ url }: { url: string }) => {
 									bytes(Number(x?.memory) || 0, {
 										unit: sizeUnit as Unit,
 										decimalPlaces: 4,
-									})?.replace(sizeUnit, "") ?? "0",
+									})?.replace(sizeUnit, '') ?? '0',
 								),
 							};
 						}) ?? [],
 					segment: {
 						borderColor: (ctx) => {
-							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
 							return darkGradient[0];
 						},
 						backgroundColor: (ctx) => {
-							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
 							return lightGradient[0];
 						},
 					},
@@ -244,7 +244,7 @@ export const MemoryChart = ({ url }: { url: string }) => {
 				</div>
 				<div className="h-[450px] relative">
 					<Line options={options} data={chartData} />
-					{usageFetcher.state === "loading" && (
+					{usageFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />
 						</div>

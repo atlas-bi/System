@@ -1,4 +1,4 @@
-import { getLatestMonitorLog, monitorLog } from "~/models/monitor.server";
+import { getLatestMonitorLog, monitorLog } from '~/models/monitor.server';
 
 export async function Logger({
 	message,

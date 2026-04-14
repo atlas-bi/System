@@ -1,11 +1,11 @@
-import { Drive } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-import { prisma } from "~/db.server";
-import searchLoader from "~/queues/searchService.server";
+import { Drive } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { prisma } from '~/db.server';
+import searchLoader from '~/queues/searchService.server';
 
-export type { Drive, DriveUsage } from "@prisma/client";
+export type { Drive, DriveUsage } from '@prisma/client';
 
-export async function deleteDrive({ id }: Pick<Drive, "id">) {
+export async function deleteDrive({ id }: Pick<Drive, 'id'>) {
 	// delete drive usage
 	await prisma.driveUsage.deleteMany({
 		where: {
@@ -27,7 +27,7 @@ export async function deleteDrive({ id }: Pick<Drive, "id">) {
 	searchLoader.enqueue(id);
 }
 
-export function getDriveMonitor({ id }: { id: Drive["id"] }) {
+export function getDriveMonitor({ id }: { id: Drive['id'] }) {
 	return prisma.drive.findUnique({
 		where: { id },
 		select: {
@@ -36,7 +36,7 @@ export function getDriveMonitor({ id }: { id: Drive["id"] }) {
 	});
 }
 
-export function getDriveMeta({ id }: Pick<Drive, "id">) {
+export function getDriveMeta({ id }: Pick<Drive, 'id'>) {
 	return prisma.drive.findUnique({
 		where: { id },
 		select: {
@@ -64,7 +64,7 @@ export function getDriveMeta({ id }: Pick<Drive, "id">) {
 	});
 }
 
-export function getDriveNotifications({ id }: Pick<Drive, "id">) {
+export function getDriveNotifications({ id }: Pick<Drive, 'id'>) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.drive.findUnique({
@@ -107,18 +107,18 @@ export function updateDriveNotifications({
 	growthRateValue,
 }: Pick<
 	Drive,
-	| "id"
-	| "percFreeValue"
-	| "sizeFreeValue"
-	| "growthRateValue"
-	| "missingNotify"
-	| "missingNotifyResendAfterMinutes"
-	| "percFreeNotify"
-	| "percFreeNotifyResendAfterMinutes"
-	| "sizeFreeNotify"
-	| "sizeFreeNotifyResendAfterMinutes"
-	| "growthRateNotify"
-	| "growthRateNotifyResendAfterMinutes"
+	| 'id'
+	| 'percFreeValue'
+	| 'sizeFreeValue'
+	| 'growthRateValue'
+	| 'missingNotify'
+	| 'missingNotifyResendAfterMinutes'
+	| 'percFreeNotify'
+	| 'percFreeNotifyResendAfterMinutes'
+	| 'sizeFreeNotify'
+	| 'sizeFreeNotifyResendAfterMinutes'
+	| 'growthRateNotify'
+	| 'growthRateNotifyResendAfterMinutes'
 > & {
 	percFreeNotifyTypes: string[];
 	growthRateNotifyTypes: string[];
@@ -162,7 +162,7 @@ export function getDriveUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Drive, "id"> & { startDate: Date; endDate: Date }) {
+}: Pick<Drive, 'id'> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.drive.findUnique({
@@ -197,13 +197,13 @@ export function getDriveUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: "desc" },
+				orderBy: { createdAt: 'desc' },
 			},
 		},
 	});
 }
 
-export function getDriveLatestFeed({ id }: Pick<Drive, "id">) {
+export function getDriveLatestFeed({ id }: Pick<Drive, 'id'>) {
 	const driveLatestFeedSelect = Prisma.validator<Prisma.DriveUsageSelect>()({
 		id: true,
 		hasError: true,
@@ -218,7 +218,7 @@ export function getDriveLatestFeed({ id }: Pick<Drive, "id">) {
 		select: driveLatestFeedSelect,
 		take: 1,
 		orderBy: {
-			createdAt: "desc",
+			createdAt: 'desc',
 		},
 	});
 }
@@ -227,7 +227,7 @@ export type DriveLatestFeed = Prisma.DriveUsageGetPayload<{
 	select: Prisma.DriveUsageSelect;
 }>;
 
-export function getDriveLatestFeeds({ id }: Pick<Drive, "id">) {
+export function getDriveLatestFeeds({ id }: Pick<Drive, 'id'>) {
 	return prisma.driveUsage.findMany({
 		where: { driveId: id },
 		select: {
@@ -237,7 +237,7 @@ export function getDriveLatestFeeds({ id }: Pick<Drive, "id">) {
 		},
 		take: 30,
 		orderBy: {
-			createdAt: "desc",
+			createdAt: 'desc',
 		},
 	});
 }
@@ -247,7 +247,7 @@ export function editDrive({
 	title,
 	description,
 	enabled,
-}: Pick<Drive, "id" | "title" | "description" | "enabled">) {
+}: Pick<Drive, 'id' | 'title' | 'description' | 'enabled'>) {
 	return prisma.drive.update({
 		where: { id },
 		data: {
@@ -261,7 +261,7 @@ export function editDrive({
 	});
 }
 
-export function setDriveOnline({ id, online }: Pick<Drive, "id" | "online">) {
+export function setDriveOnline({ id, online }: Pick<Drive, 'id' | 'online'>) {
 	return prisma.drive.update({
 		where: { id },
 		data: { online },
@@ -271,7 +271,7 @@ export function setDriveOnline({ id, online }: Pick<Drive, "id" | "online">) {
 export function setDrivePercFreeSentAt({
 	id,
 	percFreeNotifySentAt,
-}: Pick<Drive, "id" | "percFreeNotifySentAt">) {
+}: Pick<Drive, 'id' | 'percFreeNotifySentAt'>) {
 	return prisma.drive.update({
 		where: { id },
 		data: { percFreeNotifySentAt },

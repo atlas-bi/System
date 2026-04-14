@@ -1,6 +1,6 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
-import stylesheet from "@/styles/globals.css";
-import { LinksFunction, MetaFunction } from "@remix-run/node";
+import { cssBundleHref } from '@remix-run/css-bundle';
+import stylesheet from '@/styles/globals.css';
+import { LinksFunction, MetaFunction } from '@remix-run/node';
 import {
 	Link,
 	Links,
@@ -11,18 +11,18 @@ import {
 	ScrollRestoration,
 	isRouteErrorResponse,
 	useRouteError,
-} from "@remix-run/react";
+} from '@remix-run/react';
 
 // import remixImageStyles from 'remix-image/remix-image.css';
-import { H1 } from "./components/ui/typography";
-import { ArrowLeft, MoveLeft } from "lucide-react";
+import { H1 } from './components/ui/typography';
+import { ArrowLeft, MoveLeft } from 'lucide-react';
 
 export const links: LinksFunction = () => [
-	{ rel: "stylesheet", href: stylesheet },
-	...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+	{ rel: 'stylesheet', href: stylesheet },
+	...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-export const meta: MetaFunction = () => [{ title: "Atlas System" }];
+export const meta: MetaFunction = () => [{ title: 'Atlas System' }];
 
 export default function App() {
 	return (

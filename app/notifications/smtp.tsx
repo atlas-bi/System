@@ -1,7 +1,7 @@
-import { decrypt } from "@/lib/utils";
-import nodemailer from "nodemailer";
+import { decrypt } from '@/lib/utils';
+import nodemailer from 'nodemailer';
 
-import type { Notification } from "~/models/notification.server";
+import type { Notification } from '~/models/notification.server';
 
 export default async function SMTP({
 	notification,
@@ -15,10 +15,10 @@ export default async function SMTP({
 	test?: Boolean;
 }) {
 	if (!notification.smtpHost || !notification.smtpPort) {
-		throw new Error("SMTP host and port are required");
+		throw new Error('SMTP host and port are required');
 	}
 	if (!notification.smtpToEmail || !notification.smtpFromEmail) {
-		throw new Error("SMTP to/from email are required");
+		throw new Error('SMTP to/from email are required');
 	}
 
 	const config = {
@@ -51,5 +51,5 @@ export default async function SMTP({
 		html: message,
 	});
 
-	return "Sent Successfully.";
+	return 'Sent Successfully.';
 }

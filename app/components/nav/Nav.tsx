@@ -1,10 +1,10 @@
-import { Link } from "@remix-run/react";
-import Image from "remix-image";
+import { Link } from '@remix-run/react';
+import Image from 'remix-image';
 
-import { Links } from "./Links";
-import { UserNav } from "./UserNav";
-import { Input } from "../ui/input";
-import { Search } from "./Search";
+import { Links } from './Links';
+import { UserNav } from './UserNav';
+import { Input } from '../ui/input';
+import { Search } from './Search';
 
 export default function Nav() {
 	return (

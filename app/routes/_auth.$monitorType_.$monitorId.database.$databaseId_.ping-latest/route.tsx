@@ -1,8 +1,8 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import invariant from "tiny-invariant";
-import { getDatabaseLatestFeeds } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import invariant from 'tiny-invariant';
+import { getDatabaseLatestFeeds } from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -11,7 +11,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		)}`,
 	});
 
-	invariant(params.databaseId, "Database ID is required.");
+	invariant(params.databaseId, 'Database ID is required.');
 	const feeds = await getDatabaseLatestFeeds({
 		id: params.databaseId,
 	});

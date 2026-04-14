@@ -1,14 +1,14 @@
-import { useFetcher, useLocation } from "@remix-run/react";
-import bytes from "bytes";
-import { format, formatDistance } from "date-fns";
-import { useEffect } from "react";
-import { CpuChart } from "~/components/charts/cpuChart";
-import { MemoryChart } from "~/components/charts/memoryChart";
-import { Badge } from "~/components/ui/badge";
-import { Skeleton } from "~/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { MiniDrive } from "./drive";
+import { useFetcher, useLocation } from '@remix-run/react';
+import bytes from 'bytes';
+import { format, formatDistance } from 'date-fns';
+import { useEffect } from 'react';
+import { CpuChart } from '~/components/charts/cpuChart';
+import { MemoryChart } from '~/components/charts/memoryChart';
+import { Badge } from '~/components/ui/badge';
+import { Skeleton } from '~/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { MiniDrive } from './drive';
 
 type MonitorLike = {
 	type: string;
@@ -28,13 +28,13 @@ export const SshSystem = ({ monitor }: { monitor: MonitorLike }) => {
 	const location = useLocation();
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
-		if (feedFetcher.state === "idle" && feedFetcher.data == null) {
+		if (feedFetcher.state === 'idle' && feedFetcher.data == null) {
 			feedFetcher.load(`/${monitor.type}/${monitor.id}/feed-latest`);
 		}
 	}, [location]);
 
 	useEffect(() => {
-		if (feedFetcher.state === "idle" && feedFetcher.data == null) {
+		if (feedFetcher.state === 'idle' && feedFetcher.data == null) {
 			feedFetcher.load(`/${monitor.type}/${monitor.id}/feed-latest`);
 		}
 	}, [feedFetcher.state, feedFetcher.data, monitor.type, monitor.id]);
@@ -68,10 +68,10 @@ export const SshSystem = ({ monitor }: { monitor: MonitorLike }) => {
 						<TableRow>
 							<TableCell className="py-1 font-medium">Last Reboot</TableCell>
 							<TableCell className="py-1 text-slate-700">
-								{formatDistance(new Date(monitor.lastBootTime), new Date())}{" "}
-								ago.{" "}
+								{formatDistance(new Date(monitor.lastBootTime), new Date())}{' '}
+								ago.{' '}
 								<Badge className="bg-slate-200 text-slate-900">
-									{format(new Date(monitor.lastBootTime), "MMM dd, yyyy k:mm")}
+									{format(new Date(monitor.lastBootTime), 'MMM dd, yyyy k:mm')}
 								</Badge>
 							</TableCell>
 						</TableRow>
@@ -115,13 +115,13 @@ export const SshStats = ({ monitor }: { monitor: MonitorLike }) => {
 
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
-		if (drivesFetcher.state === "idle" && drivesFetcher.data == null) {
+		if (drivesFetcher.state === 'idle' && drivesFetcher.data == null) {
 			drivesFetcher.load(`/${monitor.type}/${monitor.id}/drives`);
 		}
 	}, [location]);
 
 	useEffect(() => {
-		if (drivesFetcher.state === "idle" && drivesFetcher.data == null) {
+		if (drivesFetcher.state === 'idle' && drivesFetcher.data == null) {
 			drivesFetcher.load(`/${monitor.type}/${monitor.id}/drives`);
 		}
 	}, [drivesFetcher.state, drivesFetcher.data, monitor.type, monitor.id]);

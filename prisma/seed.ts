@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function seed() {
-	const email = "rachel@remix.run";
-	const slug = "rachel";
+	const email = 'rachel@remix.run';
+	const slug = 'rachel';
 
 	await prisma.user.upsert({
 		where: { email },

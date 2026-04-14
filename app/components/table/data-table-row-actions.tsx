@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import type { Row } from "@tanstack/react-table";
-import { Button } from "~/components/ui/button";
+import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import type { Row } from '@tanstack/react-table';
+import { Button } from '~/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
+} from '~/components/ui/dropdown-menu';
 
 // import { labels } from "../data/data"
 // import { taskSchema } from "../data/schema"
@@ -26,23 +26,23 @@ interface DataTableRowActionsProps<TData> {
 
 export const labels = [
 	{
-		value: "bug",
-		label: "Bug",
+		value: 'bug',
+		label: 'Bug',
 	},
 	{
-		value: "feature",
-		label: "Feature",
+		value: 'feature',
+		label: 'Feature',
 	},
 	{
-		value: "documentation",
-		label: "Documentation",
+		value: 'documentation',
+		label: 'Documentation',
 	},
 ];
 
 export function DataTableRowActions<TData>({
 	row,
 }: DataTableRowActionsProps<TData>) {
-	const task = { id: "1", title: "hi", label: "bug" }; //taskSchema.parse(row.original)
+	const task = { id: '1', title: 'hi', label: 'bug' }; //taskSchema.parse(row.original)
 
 	return (
 		<DropdownMenu>

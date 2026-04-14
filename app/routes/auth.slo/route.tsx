@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { logout } from "~/services/session.server";
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { logout } from '~/services/session.server';
 
 /* can't do idp initiated logout w/ cookie sessions, but can still 
 use

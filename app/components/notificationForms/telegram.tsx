@@ -1,9 +1,9 @@
-import { Checkbox } from "~/components/ui/checkbox";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Dispatch } from "react";
+import { Checkbox } from '~/components/ui/checkbox';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
+import { Dispatch } from 'react';
 
-import type { Notification } from "~/models/notification.server";
+import type { Notification } from '~/models/notification.server';
 
 export function TelegramForm({
 	data,
@@ -22,11 +22,11 @@ export function TelegramForm({
 					type="password"
 					id="tgBotToken"
 					placeholder="123"
-					value={data.tgBotToken || ""}
+					value={data.tgBotToken || ''}
 					onChange={(e) => setData({ ...data, tgBotToken: e.target.value })}
 				/>
 				<small className="text-muted-foreground">
-					You can get a token from{" "}
+					You can get a token from{' '}
 					<a href="https://t.me/BotFather" target="_blank">
 						https://t.me/BotFather
 					</a>
@@ -40,7 +40,7 @@ export function TelegramForm({
 				<Input
 					type="text"
 					id="tgChatId"
-					value={data.tgChatId || ""}
+					value={data.tgChatId || ''}
 					placeholder="1AD32"
 					onChange={(e) => setData({ ...data, tgChatId: e.target.value })}
 				/>
@@ -58,7 +58,7 @@ export function TelegramForm({
 				<Input
 					type="text"
 					id="tgThreadId"
-					value={data.tgThreadId || ""}
+					value={data.tgThreadId || ''}
 					placeholder="tgThreadId"
 					onChange={(e) => setData({ ...data, tgThreadId: e.target.value })}
 				/>

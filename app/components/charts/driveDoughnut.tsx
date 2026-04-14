@@ -1,14 +1,14 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 import {
 	Chart as ChartJS,
 	ArcElement,
 	ChartData,
 	type ScriptableContext,
-} from "chart.js";
-import React, { useEffect, useRef, useState } from "react";
-import { Doughnut } from "react-chartjs-2";
-import { createConicGradient, darkGradient, lightGradient } from "./functions";
+} from 'chart.js';
+import React, { useEffect, useRef, useState } from 'react';
+import { Doughnut } from 'react-chartjs-2';
+import { createConicGradient, darkGradient, lightGradient } from './functions';
 
 ChartJS.register(ArcElement);
 
@@ -29,7 +29,7 @@ const DoughnutChart = React.forwardRef<
 	HTMLDivElement,
 	React.HTMLAttributes<HTMLDivElement> & Data
 >(({ className, data, ...props }, ref) => {
-	const [chartData, setChartData] = useState<ChartData<"doughnut">>({
+	const [chartData, setChartData] = useState<ChartData<'doughnut'>>({
 		datasets: [],
 	});
 
@@ -38,38 +38,38 @@ const DoughnutChart = React.forwardRef<
 			...data,
 			datasets: data.datasets.map((dataset) => ({
 				...dataset,
-				backgroundColor: (ctx: ScriptableContext<"doughnut">) =>
+				backgroundColor: (ctx: ScriptableContext<'doughnut'>) =>
 					ctx.dataIndex === 0
 						? createConicGradient(
 								ctx.chart.ctx,
 								ctx.chart.chartArea,
 								lightGradient,
 							)
-						: "#e2e8f0",
-				hoverBackgroundColor: (ctx: ScriptableContext<"doughnut">) =>
+						: '#e2e8f0',
+				hoverBackgroundColor: (ctx: ScriptableContext<'doughnut'>) =>
 					ctx.dataIndex === 0
 						? createConicGradient(
 								ctx.chart.ctx,
 								ctx.chart.chartArea,
 								darkGradient,
 							)
-						: "#e2e8f0",
-				borderColor: (ctx: ScriptableContext<"doughnut">) =>
+						: '#e2e8f0',
+				borderColor: (ctx: ScriptableContext<'doughnut'>) =>
 					ctx.dataIndex === 0
 						? createConicGradient(
 								ctx.chart.ctx,
 								ctx.chart.chartArea,
 								darkGradient,
 							)
-						: "#cbd5e1",
-				hoverBorderColor: (ctx: ScriptableContext<"doughnut">) =>
+						: '#cbd5e1',
+				hoverBorderColor: (ctx: ScriptableContext<'doughnut'>) =>
 					ctx.dataIndex === 0
 						? createConicGradient(
 								ctx.chart.ctx,
 								ctx.chart.chartArea,
 								darkGradient,
 							)
-						: "#cbd5e1",
+						: '#cbd5e1',
 				borderWidth: 1,
 				borderRadius: [
 					{
@@ -92,7 +92,7 @@ const DoughnutChart = React.forwardRef<
 	}, []);
 
 	return (
-		<div ref={ref} className={cn("m-auto", className)} {...props}>
+		<div ref={ref} className={cn('m-auto', className)} {...props}>
 			<Doughnut
 				options={{
 					responsive: true,
@@ -110,7 +110,7 @@ const DoughnutChart = React.forwardRef<
 						animateScale: false,
 						animateRotate: true,
 					},
-					cutout: "65%",
+					cutout: '65%',
 					transitions: {
 						active: {
 							animation: {
@@ -122,7 +122,7 @@ const DoughnutChart = React.forwardRef<
 				data={chartData}
 				plugins={[
 					{
-						id: "centerText",
+						id: 'centerText',
 						beforeDraw: function (chart, args, options) {
 							const used = Number(chart.data.datasets?.[0]?.data?.[0] ?? 0);
 							const free = Number(chart.data.datasets?.[0]?.data?.[1] ?? 0);
@@ -132,12 +132,12 @@ const DoughnutChart = React.forwardRef<
 									: -1;
 
 							const text =
-								percent > 0 ? percent.toString() + "%" : percent.toString();
+								percent > 0 ? percent.toString() + '%' : percent.toString();
 
-							let color = "#475569";
+							let color = '#475569';
 
 							if (percent > 80) {
-								color = "#881337";
+								color = '#881337';
 							}
 
 							const { ctx } = chart;
@@ -147,9 +147,9 @@ const DoughnutChart = React.forwardRef<
 								height = chart.height,
 								fontSize = (height / 114).toFixed(2);
 
-							ctx.font = fontSize + "em sans-serif";
+							ctx.font = fontSize + 'em sans-serif';
 							ctx.fillStyle = color;
-							ctx.textBaseline = "middle";
+							ctx.textBaseline = 'middle';
 
 							let textX = Math.round((width - ctx.measureText(text).width) / 2);
 							const textY = height / 2;
@@ -157,7 +157,7 @@ const DoughnutChart = React.forwardRef<
 							ctx.fillText(text, textX, textY);
 							// add "full"
 							if (percent > 0) {
-								const fullText = "full";
+								const fullText = 'full';
 
 								let textX = Math.round(
 									(width - ctx.measureText(fullText).width) / 2,
@@ -174,6 +174,6 @@ const DoughnutChart = React.forwardRef<
 	);
 });
 
-DoughnutChart.displayName = "Doughnut Chart";
+DoughnutChart.displayName = 'Doughnut Chart';
 
 export { DoughnutChart };

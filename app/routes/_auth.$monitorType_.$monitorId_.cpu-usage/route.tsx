@@ -1,11 +1,11 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { startOfDay, startOfHour } from "date-fns";
-import invariant from "tiny-invariant";
-import { dateOptions } from "~/models/dates";
-import { getCpuUsage } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
-import { dateRange } from "~/utils";
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { startOfDay, startOfHour } from 'date-fns';
+import invariant from 'tiny-invariant';
+import { dateOptions } from '~/models/dates';
+import { getCpuUsage } from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
+import { dateRange } from '~/utils';
 
 type dataType = {
 	createdAt: Date;
@@ -24,7 +24,7 @@ type aType = {
 
 function reducer(unit: string, data: dataType[]) {
 	switch (unit) {
-		case "hour":
+		case 'hour':
 			return data.reduce(
 				(
 					a: aType,
@@ -42,7 +42,7 @@ function reducer(unit: string, data: dataType[]) {
 				},
 				{},
 			);
-		case "day":
+		case 'day':
 		default:
 			return data.reduce(
 				(
@@ -95,7 +95,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get("range") || "last_24_hours",
+		url.searchParams.get('range') || 'last_24_hours',
 	);
 
 	const monitor = await getCpuUsage({
@@ -104,19 +104,19 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		endDate,
 	});
 	if (!monitor) {
-		throw new Response("Not Found", { status: 404 });
+		throw new Response('Not Found', { status: 404 });
 	}
 
 	const groupSize = dateOptions.filter(
-		(x) => x.value == url.searchParams.get("range"),
+		(x) => x.value == url.searchParams.get('range'),
 	)?.[0]?.unit;
 
-	if (url.searchParams.get("range") === "all_time") {
+	if (url.searchParams.get('range') === 'all_time') {
 		startDate = undefined;
 		endDate = undefined;
 	}
 
-	if (groupSize === "minute") {
+	if (groupSize === 'minute') {
 		return json({
 			monitor: {
 				...monitor,

@@ -1,17 +1,17 @@
 import {
 	getFileUsageLatest,
 	setFilePercFreeSentAt,
-} from "~/models/monitor.server";
-import type { MonitorWithRelations } from "~/models/monitor.server";
-import type { NotificationMeta } from "~/models/notification.server";
-import { Logger } from "~/notifications/logger";
-import { sendNotification } from "~/notifications/notifier";
-import { render } from "@react-email/render";
+} from '~/models/monitor.server';
+import type { MonitorWithRelations } from '~/models/monitor.server';
+import type { NotificationMeta } from '~/models/notification.server';
+import { Logger } from '~/notifications/logger';
+import { sendNotification } from '~/notifications/notifier';
+import { render } from '@react-email/render';
 
 import {
 	ErrorEmail,
 	SuccessEmail,
-} from "~/notifications/email/monitors/sqlFiles";
+} from '~/notifications/email/monitors/sqlFiles';
 
 async function allClear({
 	monitor,
@@ -19,8 +19,8 @@ async function allClear({
 	file,
 }: {
 	monitor: MonitorWithRelations;
-	database: MonitorWithRelations["databases"][number];
-	file: MonitorWithRelations["databases"][number]["files"][number];
+	database: MonitorWithRelations['databases'][number];
+	file: MonitorWithRelations['databases'][number]['files'][number];
 }) {
 	if (file.sqlFileSizePercentFreeNotifySentAt) {
 		// send an all clear alert
@@ -50,7 +50,7 @@ async function allClear({
 				} catch (e) {
 					return Logger({
 						message: `Failed to send ${notification.name}: ${e}`,
-						type: "error",
+						type: 'error',
 						monitor,
 						database,
 						file,
@@ -61,7 +61,7 @@ async function allClear({
 
 		return Logger({
 			message: `Free space now below limit of ${monitor.sqlFileSizePercentFreeValue}%`,
-			type: "success",
+			type: 'success',
 			monitor,
 			file,
 		});
@@ -76,7 +76,7 @@ async function reset({ monitor }: { monitor: MonitorWithRelations }) {
 async function resetFile({
 	file,
 }: {
-	file: MonitorWithRelations["databases"][number]["files"][number];
+	file: MonitorWithRelations['databases'][number]['files'][number];
 }) {
 	return setFilePercFreeSentAt({
 		id: file.id,
@@ -90,7 +90,7 @@ export default async function sqlFilePercentFreeNotifier({
 	monitor: MonitorWithRelations;
 }) {
 	// only for sql
-	if (monitor.type !== "sqlServer") return;
+	if (monitor.type !== 'sqlServer') return;
 
 	// if monitor is enabled
 	// don't notify if disabled.
@@ -151,7 +151,7 @@ export default async function sqlFilePercentFreeNotifier({
 			if (message) {
 				await Logger({
 					message,
-					type: "error",
+					type: 'error',
 					monitor,
 					database,
 					file,
@@ -199,7 +199,7 @@ export default async function sqlFilePercentFreeNotifier({
 							} catch (e) {
 								return Logger({
 									message: `Failed to send ${notification.name}: ${e}`,
-									type: "error",
+									type: 'error',
 									monitor,
 									file,
 									database,

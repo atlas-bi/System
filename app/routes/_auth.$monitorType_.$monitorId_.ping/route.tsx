@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import invariant from "tiny-invariant";
-import { dateOptions } from "~/models/dates";
-import { getPing } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
-import { dateRange } from "~/utils";
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import invariant from 'tiny-invariant';
+import { dateOptions } from '~/models/dates';
+import { getPing } from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
+import { dateRange } from '~/utils';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -19,7 +19,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get("range") || "last_24_hours",
+		url.searchParams.get('range') || 'last_24_hours',
 	);
 
 	const monitor = await getPing({
@@ -28,10 +28,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		endDate,
 	});
 	if (!monitor) {
-		throw new Response("Not Found", { status: 404 });
+		throw new Response('Not Found', { status: 404 });
 	}
 
-	if (url.searchParams.get("range") === "all_time") {
+	if (url.searchParams.get('range') === 'all_time') {
 		startDate = undefined;
 		endDate = undefined;
 	}

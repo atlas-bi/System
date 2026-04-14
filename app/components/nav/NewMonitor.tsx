@@ -1,5 +1,5 @@
-import { Button } from "~/components/ui/button";
-import Monitor from "~/components/monitorForms/base";
+import { Button } from '~/components/ui/button';
+import Monitor from '~/components/monitorForms/base';
 
 export default function NewMonitor({ className }: { className: string }) {
 	return (

@@ -1,4 +1,4 @@
-import type { MonitorFeeds } from "~/models/monitor.server";
+import type { MonitorFeeds } from '~/models/monitor.server';
 
 import {
 	LineElement,
@@ -12,18 +12,18 @@ import {
 	Tooltip,
 	Filler,
 	TimeScale,
-} from "chart.js";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Line } from "react-chartjs-2";
+} from 'chart.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Line } from 'react-chartjs-2';
 import {
 	darkErrorGradient,
 	darkGradient,
 	lightErrorGradient,
 	lightGradient,
-} from "./functions";
-import { useFetcher } from "@remix-run/react";
-import { DateFilter } from "./DateFilter";
-import { dateOptions } from "~/models/dates";
+} from './functions';
+import { useFetcher } from '@remix-run/react';
+import { DateFilter } from './DateFilter';
+import { dateOptions } from '~/models/dates';
 
 ChartJS.register([
 	CategoryScale,
@@ -35,10 +35,10 @@ ChartJS.register([
 	Tooltip,
 ]);
 
-import "chartjs-adapter-date-fns";
-import { H2, H3 } from "../ui/typography";
-import { Loader, RefreshCw } from "lucide-react";
-import { Button } from "../ui/button";
+import 'chartjs-adapter-date-fns';
+import { H2, H3 } from '../ui/typography';
+import { Loader, RefreshCw } from 'lucide-react';
+import { Button } from '../ui/button';
 
 export const PingChart = ({ url }: { url: string }) => {
 	type PingFetcherData = {
@@ -53,37 +53,37 @@ export const PingChart = ({ url }: { url: string }) => {
 		};
 	};
 	const pingFetcher = useFetcher<PingFetcherData>();
-	const [unit, setUnit] = useState("last_24_hours");
+	const [unit, setUnit] = useState('last_24_hours');
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
 
-	const getOptions = useCallback((): ChartOptions<"line"> => {
+	const getOptions = useCallback((): ChartOptions<'line'> => {
 		const startDate = pingFetcher.data?.monitor?.startDate;
 		const endDate = pingFetcher.data?.monitor?.endDate;
 		const min = startDate ? new Date(startDate).getTime() : undefined;
 		const max = endDate ? new Date(endDate).getTime() : undefined;
 		type AllowedTimeUnit =
-			| "millisecond"
-			| "second"
-			| "minute"
-			| "hour"
-			| "day"
-			| "week"
-			| "month"
-			| "quarter"
-			| "year";
+			| 'millisecond'
+			| 'second'
+			| 'minute'
+			| 'hour'
+			| 'day'
+			| 'week'
+			| 'month'
+			| 'quarter'
+			| 'year';
 		const allowedTimeUnits: AllowedTimeUnit[] = [
-			"millisecond",
-			"second",
-			"minute",
-			"hour",
-			"day",
-			"week",
-			"month",
-			"quarter",
-			"year",
+			'millisecond',
+			'second',
+			'minute',
+			'hour',
+			'day',
+			'week',
+			'month',
+			'quarter',
+			'year',
 		];
 		const candidateTimeUnit = dateOptions.filter((x) => x.value === unit)?.[0]
 			?.chartUnit;
@@ -98,7 +98,7 @@ export const PingChart = ({ url }: { url: string }) => {
 			maintainAspectRatio: false,
 			interaction: {
 				intersect: false,
-				mode: "index" as const,
+				mode: 'index' as const,
 			},
 			animation: {
 				duration: 300,
@@ -111,19 +111,19 @@ export const PingChart = ({ url }: { url: string }) => {
 					display: false,
 				},
 				tooltip: {
-					position: "mouse",
+					position: 'mouse',
 					callbacks: {
 						label: function (tooltipItem: { formattedValue: string }) {
-							return tooltipItem.formattedValue + "ms";
+							return tooltipItem.formattedValue + 'ms';
 						},
 					},
 				},
 			},
 			scales: {
 				y: {
-					type: "linear" as const,
+					type: 'linear' as const,
 					display: true,
-					position: "left" as const,
+					position: 'left' as const,
 					beginAtZero: true,
 					ticks: {
 						callback: function (tickValue: number | string) {
@@ -134,7 +134,7 @@ export const PingChart = ({ url }: { url: string }) => {
 				},
 				x: {
 					stacked: true,
-					type: "time",
+					type: 'time',
 					min,
 					max,
 					time: {
@@ -148,32 +148,32 @@ export const PingChart = ({ url }: { url: string }) => {
 		};
 	}, [unit, pingFetcher.data]);
 
-	const [options, setOptions] = useState<ChartOptions<"line">>(getOptions());
+	const [options, setOptions] = useState<ChartOptions<'line'>>(getOptions());
 
 	useEffect(() => {
 		pingFetcher.load(url + `?range=${unit}`);
 	}, [unit]);
 
 	useEffect(() => {
-		if (pingFetcher.state === "loading") {
+		if (pingFetcher.state === 'loading') {
 			setChartData(emptyDataset);
 		}
 	}, [pingFetcher]);
 
-	const emptyDataset: ChartData<"line", { x: Date; y: number }[]> = {
+	const emptyDataset: ChartData<'line', { x: Date; y: number }[]> = {
 		datasets: [],
 	};
 	const [chartData, setChartData] =
-		useState<ChartData<"line", { x: Date; y: number }[]>>(emptyDataset);
+		useState<ChartData<'line', { x: Date; y: number }[]>>(emptyDataset);
 
 	useEffect(() => {
-		const chartData: ChartData<"line", { x: Date; y: number }[]> = {
+		const chartData: ChartData<'line', { x: Date; y: number }[]> = {
 			datasets: [
 				{
 					spanGaps: 1000 * 60 * 1.5, // 1.5 min
 					fill: true,
-					label: "Response Time",
-					cubicInterpolationMode: "monotone" as const,
+					label: 'Response Time',
+					cubicInterpolationMode: 'monotone' as const,
 					tension: 0.4,
 					data:
 						pingFetcher.data?.monitor?.feeds?.map((x) => ({
@@ -182,14 +182,14 @@ export const PingChart = ({ url }: { url: string }) => {
 						})) ?? [],
 					segment: {
 						borderColor: (ctx: ScriptableLineSegmentContext) => {
-							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError
 								? darkErrorGradient[0]
 								: darkGradient[0];
 						},
 						backgroundColor: (ctx: ScriptableLineSegmentContext) => {
-							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
+							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
 							return pingFetcher.data?.monitor?.feeds?.[ctx.p0DataIndex]
 								?.hasError
 								? lightErrorGradient[0]
@@ -223,7 +223,7 @@ export const PingChart = ({ url }: { url: string }) => {
 				</div>
 				<div className="h-[450px] relative">
 					<Line options={options} data={chartData} />
-					{pingFetcher.state === "loading" && (
+					{pingFetcher.state === 'loading' && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />
 						</div>

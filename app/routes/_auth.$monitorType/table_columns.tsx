@@ -1,23 +1,23 @@
-import type { ColumnDef } from "@tanstack/react-table";
-import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from "lucide-react";
-import { monitorTypes } from "~/models/monitor";
-import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
-import { Minus } from "lucide-react";
-import { MonitorFeeds } from "@prisma/client";
-import { formatInTimeZone } from "date-fns-tz";
+import type { ColumnDef } from '@tanstack/react-table';
+import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
+import { monitorTypes } from '~/models/monitor';
+import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
+import { Minus } from 'lucide-react';
+import { MonitorFeeds } from '@prisma/client';
+import { formatInTimeZone } from 'date-fns-tz';
 
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "~/components/ui/tooltip";
-import { useFetcher } from "@remix-run/react";
-import { useEffect } from "react";
+} from '~/components/ui/tooltip';
+import { useFetcher } from '@remix-run/react';
+import { useEffect } from 'react';
 
 export const columnsSsh: ColumnDef<any>[] = [
 	{
-		accessorKey: "title",
+		accessorKey: 'title',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Title" />
 		),
@@ -32,22 +32,22 @@ export const columnsSsh: ColumnDef<any>[] = [
 							{icon}
 						</div>
 					)}
-					<span className="my-auto">{row.getValue("title")}</span>
+					<span className="my-auto">{row.getValue('title')}</span>
 				</div>
 			);
 		},
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "enabled",
+		accessorKey: 'enabled',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Enabled" />
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{row.getValue("enabled") ? (
+				{row.getValue('enabled') ? (
 					<ToggleRight className="text-emerald-700" />
 				) : (
 					<ToggleLeft className="text-slate-400" />
@@ -56,15 +56,15 @@ export const columnsSsh: ColumnDef<any>[] = [
 		),
 	},
 	{
-		accessorKey: "hasError",
+		accessorKey: 'hasError',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Status" />
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{!row.getValue("enabled") ? (
+				{!row.getValue('enabled') ? (
 					<Minus className="text-slate-400" size={14} />
-				) : row.getValue("hasError") ? (
+				) : row.getValue('hasError') ? (
 					<AlertTriangle className="text-red-500" size={14} />
 				) : (
 					<Activity className="text-emerald-600" size={14} />
@@ -73,82 +73,82 @@ export const columnsSsh: ColumnDef<any>[] = [
 		),
 	},
 	{
-		accessorKey: "host",
+		accessorKey: 'host',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Host" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("host")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('host')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "caption",
+		accessorKey: 'caption',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Caption" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("caption")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('caption')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "model",
+		accessorKey: 'model',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Model" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("model")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('model')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "name",
+		accessorKey: 'name',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Name" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('name')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "dnsHostName",
+		accessorKey: 'dnsHostName',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="DNS Hostname" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("dnsHostName")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('dnsHostName')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "domain",
+		accessorKey: 'domain',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Domain" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("domain")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('domain')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "manufacturer",
+		accessorKey: 'manufacturer',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Manufacturer" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("manufacturer")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('manufacturer')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "os",
+		accessorKey: 'os',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Operating System" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("os")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('os')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "osVersion",
+		accessorKey: 'osVersion',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="OS Version" />
 		),
-		cell: ({ row }) => <div className="">{row.getValue("osVersion")}</div>,
-		sortingFn: "alphanumeric",
+		cell: ({ row }) => <div className="">{row.getValue('osVersion')}</div>,
+		sortingFn: 'alphanumeric',
 	},
 ];
 
 export const columnsPing: ColumnDef<any>[] = [
 	{
-		accessorKey: "title",
+		accessorKey: 'title',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Title" />
 		),
@@ -163,22 +163,22 @@ export const columnsPing: ColumnDef<any>[] = [
 							{icon}
 						</div>
 					)}
-					<span className="my-auto">{row.getValue("title")}</span>
+					<span className="my-auto">{row.getValue('title')}</span>
 				</div>
 			);
 		},
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortingFn: 'alphanumeric',
 	},
 	{
-		accessorKey: "enabled",
+		accessorKey: 'enabled',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Enabled" />
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{row.getValue("enabled") ? (
+				{row.getValue('enabled') ? (
 					<ToggleRight className="text-emerald-700" />
 				) : (
 					<ToggleLeft className="text-slate-400" />
@@ -187,15 +187,15 @@ export const columnsPing: ColumnDef<any>[] = [
 		),
 	},
 	{
-		accessorKey: "hasError",
+		accessorKey: 'hasError',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Status" />
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{!row.getValue("enabled") ? (
+				{!row.getValue('enabled') ? (
 					<Minus className="text-slate-400" size={14} />
-				) : row.getValue("hasError") ? (
+				) : row.getValue('hasError') ? (
 					<AlertTriangle className="text-red-500" size={14} />
 				) : (
 					<Activity className="text-emerald-600" size={14} />
@@ -204,7 +204,7 @@ export const columnsPing: ColumnDef<any>[] = [
 		),
 	},
 	{
-		accessorKey: "feeds",
+		accessorKey: 'feeds',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Ping" />
 		),
@@ -214,7 +214,7 @@ export const columnsPing: ColumnDef<any>[] = [
 
 			useEffect(() => {
 				const interval = setInterval(() => {
-					if (document.visibilityState === "visible") {
+					if (document.visibilityState === 'visible') {
 						pingFetcher.load(url);
 					}
 				}, 30 * 1000);
@@ -222,7 +222,7 @@ export const columnsPing: ColumnDef<any>[] = [
 			}, []);
 
 			useEffect(() => {
-				if (pingFetcher.state === "idle" && pingFetcher.data == null) {
+				if (pingFetcher.state === 'idle' && pingFetcher.data == null) {
 					pingFetcher.load(url);
 				}
 			}, [pingFetcher.state, pingFetcher.data, url]);
@@ -230,7 +230,7 @@ export const columnsPing: ColumnDef<any>[] = [
 			return (
 				<div
 					className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse ${
-						row.original.enabled ? "" : "opacity-50 group-hover:opacity-100"
+						row.original.enabled ? '' : 'opacity-50 group-hover:opacity-100'
 					}`}
 				>
 					{pingFetcher.data?.feeds?.map((x: any) => (
@@ -243,7 +243,7 @@ export const columnsPing: ColumnDef<any>[] = [
 								<TooltipTrigger asChild>
 									<div
 										className={`transition-all w-2 h-4 hover:scale-125 rounded ${
-											x.hasError ? "bg-red-300" : "bg-emerald-600"
+											x.hasError ? 'bg-red-300' : 'bg-emerald-600'
 										}`}
 									></div>
 								</TooltipTrigger>
@@ -253,8 +253,8 @@ export const columnsPing: ColumnDef<any>[] = [
 											<div
 												className={`${
 													x.hasError
-														? "bg-red-300 border-red-400"
-														: "bg-emerald-600 border-emerald-700"
+														? 'bg-red-300 border-red-400'
+														: 'bg-emerald-600 border-emerald-700'
 												} border-1 rounded h-3 w-3 my-auto`}
 											></div>
 
@@ -263,7 +263,7 @@ export const columnsPing: ColumnDef<any>[] = [
 												{formatInTimeZone(
 													x.createdAt,
 													Intl.DateTimeFormat().resolvedOptions().timeZone,
-													"MMM d, yyyy k:mm",
+													'MMM d, yyyy k:mm',
 												)}
 											</span>
 										</div>

@@ -1,25 +1,25 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import {
 	getMonitorNotifications,
 	updateMonitorNotifications,
-} from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
-import { Form, Link, useLoaderData, useParams } from "@remix-run/react";
-import { H1, H3 } from "~/components/ui/typography";
-import { Loader2, MoveLeft } from "lucide-react";
-import { Switch } from "~/components/ui/switch";
-import { useSubmit, useNavigation } from "@remix-run/react";
-import { Collapsible, CollapsibleContent } from "~/components/ui/collapsible";
+} from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
+import { Form, Link, useLoaderData, useParams } from '@remix-run/react';
+import { H1, H3 } from '~/components/ui/typography';
+import { Loader2, MoveLeft } from 'lucide-react';
+import { Switch } from '~/components/ui/switch';
+import { useSubmit, useNavigation } from '@remix-run/react';
+import { Collapsible, CollapsibleContent } from '~/components/ui/collapsible';
 
-import { Label } from "~/components/ui/label";
+import { Label } from '~/components/ui/label';
 
-import { useRef, useState } from "react";
-import { Input } from "~/components/ui/input";
-import { MultiSelect } from "~/components/ui/multiselect";
-import { getNotifications } from "~/models/notification.server";
-import invariant from "tiny-invariant";
-import { Separator } from "~/components/ui/separator";
+import { useRef, useState } from 'react';
+import { Input } from '~/components/ui/input';
+import { MultiSelect } from '~/components/ui/multiselect';
+import { getNotifications } from '~/models/notification.server';
+import invariant from 'tiny-invariant';
+import { Separator } from '~/components/ui/separator';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -30,7 +30,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	invariant(params.monitorId);
 	const monitor = await getMonitorNotifications({ id: params.monitorId });
 	if (!monitor) {
-		throw new Response("Not Found", { status: 404 });
+		throw new Response('Not Found', { status: 404 });
 	}
 
 	const notifications = await getNotifications();
@@ -52,35 +52,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	await updateMonitorNotifications({
 		id: params.monitorId,
 
-		connectionNotify: values.connectionNotify == "on",
+		connectionNotify: values.connectionNotify == 'on',
 		connectionNotifyTypes: formData
-			.getAll("connectionNotifyTypes")
+			.getAll('connectionNotifyTypes')
 			.map((x: FormDataEntryValue) => x.toString()),
 		connectionNotifyResendAfterMinutes:
-			values.connectionNotifyResend == "on"
-				? Number(values.connectionNotifyResendAfterMinutes || "0")
+			values.connectionNotifyResend == 'on'
+				? Number(values.connectionNotifyResendAfterMinutes || '0')
 				: 0,
-		connectionNotifyRetries: Number(values.connectionNotifyRetries || "0"),
-		httpCertNotify: values.httpCertNotify == "on",
+		connectionNotifyRetries: Number(values.connectionNotifyRetries || '0'),
+		httpCertNotify: values.httpCertNotify == 'on',
 		httpCertNotifyTypes: formData
-			.getAll("httpCertNotifyTypes")
+			.getAll('httpCertNotifyTypes')
 			.map((x: FormDataEntryValue) => x.toString()),
 		httpCertNotifyResendAfterMinutes:
-			values.httpCertNotifyResend == "on"
-				? Number(values.httpCertNotifyResendAfterMinutes || "0")
+			values.httpCertNotifyResend == 'on'
+				? Number(values.httpCertNotifyResendAfterMinutes || '0')
 				: 0,
-		rebootNotify: values.rebootNotify == "on",
+		rebootNotify: values.rebootNotify == 'on',
 		rebootNotifyTypes: formData
-			.getAll("rebootNotifyTypes")
+			.getAll('rebootNotifyTypes')
 			.map((x: FormDataEntryValue) => x.toString()),
 
-		sqlFileSizePercentFreeNotify: values.sqlFileSizePercentFreeNotify == "on",
+		sqlFileSizePercentFreeNotify: values.sqlFileSizePercentFreeNotify == 'on',
 		sqlFileSizePercentFreeNotifyTypes: formData
-			.getAll("sqlFileSizePercentFreeNotifyTypes")
+			.getAll('sqlFileSizePercentFreeNotifyTypes')
 			.map((x: FormDataEntryValue) => x.toString()),
 		sqlFileSizePercentFreeNotifyResendAfterMinutes:
-			values.percFreeNotifyResend == "on"
-				? Number(values.sqlFileSizePercentFreeNotifyResendAfterMinutes || "0")
+			values.percFreeNotifyResend == 'on'
+				? Number(values.sqlFileSizePercentFreeNotifyResendAfterMinutes || '0')
 				: 0,
 		sqlFileSizePercentFreeValue: Number(
 			values.sqlFileSizePercentFreeValue || 0,
@@ -116,7 +116,7 @@ export default function Index() {
 		monitor.connectionNotifyResendAfterMinutes,
 	);
 	const [percValue, setPercValue] = useState(
-		(monitor.sqlFileSizePercentFreeValue ?? "") as number | "",
+		(monitor.sqlFileSizePercentFreeValue ?? '') as number | '',
 	);
 
 	const [httpCertResendValue, setHttpCertResendValue] = useState(
@@ -150,7 +150,7 @@ export default function Index() {
 				<Link
 					to={`/${monitorType}/${monitorId}`}
 					className={`transition-colors flex content-center space-x-2  text-slate-600 ${
-						transition.state === "submitting" ? "pointer-events-none" : ""
+						transition.state === 'submitting' ? 'pointer-events-none' : ''
 					}`}
 					prefetch="intent"
 				>
@@ -159,7 +159,7 @@ export default function Index() {
 						Back to <strong>{monitor.title}</strong>
 					</span>
 				</Link>
-				{transition.state === "submitting" ? (
+				{transition.state === 'submitting' ? (
 					<Loader2 size={14} className="animate-spin my-auto" />
 				) : null}
 			</div>
@@ -186,7 +186,7 @@ export default function Index() {
 
 							<div
 								className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-									connection ? "" : "opacity-50 text-slate-600"
+									connection ? '' : 'opacity-50 text-slate-600'
 								}`}
 							></div>
 							<Collapsible open={connection}>
@@ -228,7 +228,7 @@ export default function Index() {
 									</div>
 									<div
 										className={`space-y-2 ${
-											connectionNotifyResend ? "" : "opacity-50 text-slate-600"
+											connectionNotifyResend ? '' : 'opacity-50 text-slate-600'
 										}`}
 									>
 										<div className={`flex justify-between `}>
@@ -258,7 +258,7 @@ export default function Index() {
 							</Collapsible>
 						</div>
 					</div>
-					{(monitor.type == "windows" || monitor.type == "ubuntu") && (
+					{(monitor.type == 'windows' || monitor.type == 'ubuntu') && (
 						<div className=" rounded-lg border p-4 max-w-[500px]">
 							<div className="space-y-2">
 								<div className="space-y-2 flex justify-between">
@@ -278,7 +278,7 @@ export default function Index() {
 								</div>
 								<div
 									className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-										reboot ? "" : "opacity-50 text-slate-600"
+										reboot ? '' : 'opacity-50 text-slate-600'
 									}`}
 								></div>
 								<Collapsible open={reboot}>
@@ -311,8 +311,8 @@ export default function Index() {
 							</div>
 						</div>
 					)}
-					{monitor.type == "http" &&
-						monitor.httpUrl?.startsWith("https:") &&
+					{monitor.type == 'http' &&
+						monitor.httpUrl?.startsWith('https:') &&
 						monitor.httpCheckCert && (
 							<div className=" rounded-lg border p-4 max-w-[500px]">
 								<div className="space-y-2">
@@ -334,7 +334,7 @@ export default function Index() {
 									</div>
 									<div
 										className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-											httpCert ? "" : "opacity-50 text-slate-600"
+											httpCert ? '' : 'opacity-50 text-slate-600'
 										}`}
 									></div>
 									<Collapsible open={httpCert}>
@@ -365,8 +365,8 @@ export default function Index() {
 											<div
 												className={`space-y-2 ${
 													httpCertNotifyResend
-														? ""
-														: "opacity-50 text-slate-600"
+														? ''
+														: 'opacity-50 text-slate-600'
 												}`}
 											>
 												<div className={`flex justify-between `}>
@@ -397,13 +397,13 @@ export default function Index() {
 								</div>
 							</div>
 						)}
-					{monitor.type === "sqlServer" && (
+					{monitor.type === 'sqlServer' && (
 						<div className=" rounded-lg border p-4 max-w-[500px]">
 							<div className="space-y-2">
 								<H3 className="text-2xl">File Free Space</H3>
 								<div className="text-muted-foreground pb-2">
 									Recieve notification when files free space meets certain
-									criteria.{" "}
+									criteria.{' '}
 									<strong>
 										This applies to files with auto growth disabled or file with
 										a max size.
@@ -412,7 +412,7 @@ export default function Index() {
 								<Separator />
 								<div
 									className={`space-x-6 flex flex-row items-center justify-between transition-colors ${
-										perc ? "" : "opacity-50 text-slate-600"
+										perc ? '' : 'opacity-50 text-slate-600'
 									}`}
 								>
 									<div className="flex-grow">
@@ -441,7 +441,7 @@ export default function Index() {
 												value={percValue}
 												onChange={(e) => {
 													const v = e.target.value;
-													setPercValue(v === "" ? "" : Number(v));
+													setPercValue(v === '' ? '' : Number(v));
 												}}
 											/>
 										</div>
@@ -470,7 +470,7 @@ export default function Index() {
 										</div>
 										<div
 											className={`space-y-2 ${
-												percFreeNotifyResend ? "" : "opacity-50 text-slate-600"
+												percFreeNotifyResend ? '' : 'opacity-50 text-slate-600'
 											}`}
 										>
 											<div className={`flex justify-between `}>

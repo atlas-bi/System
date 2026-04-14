@@ -1,10 +1,10 @@
-import { Dispatch } from "react";
+import { Dispatch } from 'react';
 
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 
-import type { Monitor } from "~/models/monitor.server";
-import { Switch } from "../ui/switch";
+import type { Monitor } from '~/models/monitor.server';
+import { Switch } from '../ui/switch';
 
 export default function SqlForm({
 	data,
@@ -21,11 +21,11 @@ export default function SqlForm({
 			<Input
 				type="text"
 				id="host"
-				value={data.sqlConnectionString || ""}
+				value={data.sqlConnectionString || ''}
 				placeholder={`${
-					data.type === "sqlServer"
-						? "SERVER=server_name;DATABASE=database_name;UID=username;PWD=password;TrustServerCertificate=Yes"
-						: "server1"
+					data.type === 'sqlServer'
+						? 'SERVER=server_name;DATABASE=database_name;UID=username;PWD=password;TrustServerCertificate=Yes'
+						: 'server1'
 				}`}
 				className="col-span-3"
 				onChange={(e) =>

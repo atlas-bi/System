@@ -1,4 +1,4 @@
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from '@remix-run/react';
 import {
 	ColumnDef,
 	ColumnFiltersState,
@@ -12,10 +12,10 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from "@tanstack/react-table";
-import React from "react";
-import { DataTablePagination } from "~/components/table/data-table-pagination";
-import { DataTableToolbar } from "~/components/table/data-table-toolbar";
+} from '@tanstack/react-table';
+import React from 'react';
+import { DataTablePagination } from '~/components/table/data-table-pagination';
+import { DataTableToolbar } from '~/components/table/data-table-toolbar';
 import {
 	Table,
 	TableBody,
@@ -23,9 +23,9 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "~/components/ui/table";
-import { H3 } from "~/components/ui/typography";
-import type { DatabaseFile } from "~/models/monitor.server";
+} from '~/components/ui/table';
+import { H3 } from '~/components/ui/typography';
+import type { DatabaseFile } from '~/models/monitor.server';
 
 export const FilesTable = ({
 	database,
@@ -48,7 +48,7 @@ export const FilesTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: "fileName", desc: false },
+		{ id: 'fileName', desc: false },
 	]);
 
 	const table = useReactTable({
@@ -104,7 +104,7 @@ export const FilesTable = ({
 								<TableRow
 									key={row.id}
 									className={`cursor-pointer group`}
-									data-state={row.getIsSelected() ? "selected" : null}
+									data-state={row.getIsSelected() ? 'selected' : null}
 									onClick={() =>
 										navigate(
 											`/${database.monitor.type}/${database.monitor.id}/database/${database.id}/file/${row.original.id}`,

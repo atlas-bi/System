@@ -1,11 +1,13 @@
-import type { Group, User } from "@prisma/client";
-import slugify from "slugify";
-import { prisma } from "~/db.server";
+import type { Group, User } from '@prisma/client';
+import slugify from 'slugify';
+import { prisma } from '~/db.server';
 
-export type { User } from "@prisma/client";
+export type { User } from '@prisma/client';
 
-export interface UserSerialized
-	extends Omit<User, "createdAt" | "updatedAt" | "profilePhoto"> {
+export interface UserSerialized extends Omit<
+	User,
+	'createdAt' | 'updatedAt' | 'profilePhoto'
+> {
 	createdAt?: Date | string;
 	updatedAt?: Date | string;
 	profilePhoto?: string | null;
@@ -37,21 +39,21 @@ export const fullUserFields = {
 };
 
 const slugger = (email: string) => {
-	return slugify(email.substring(0, email.indexOf("@")).replace(".", "-"), {
+	return slugify(email.substring(0, email.indexOf('@')).replace('.', '-'), {
 		lower: true, // convert to lower case, defaults to `false`
 		strict: true,
 	});
 };
 
-export async function getUserById(id: User["id"]) {
+export async function getUserById(id: User['id']) {
 	return prisma.user.findUnique({ where: { id }, include: { groups: true } });
 }
 
-async function getUserByEmail(email: User["email"]) {
+async function getUserByEmail(email: User['email']) {
 	return prisma.user.findUnique({ where: { email }, select: slimUserFields });
 }
 
-export function createUser(email: User["email"]) {
+export function createUser(email: User['email']) {
 	return prisma.user.create({
 		data: {
 			email,
@@ -61,7 +63,7 @@ export function createUser(email: User["email"]) {
 	});
 }
 
-function createGroup(name: Group["name"]) {
+function createGroup(name: Group['name']) {
 	return prisma.group.create({
 		data: {
 			name,
@@ -72,15 +74,15 @@ function createGroup(name: Group["name"]) {
 		},
 	});
 }
-function getGroupByName(name: Group["name"]) {
+function getGroupByName(name: Group['name']) {
 	return prisma.group.findUnique({ where: { name } });
 }
 
-export async function getUserBySlug(slug: User["slug"]) {
+export async function getUserBySlug(slug: User['slug']) {
 	return prisma.user.findUnique({ where: { slug }, select: fullUserFields });
 }
 
-async function getOrCreateGroup(name: Group["name"]) {
+async function getOrCreateGroup(name: Group['name']) {
 	const group = await getGroupByName(name);
 
 	if (group) return group;
@@ -88,7 +90,7 @@ async function getOrCreateGroup(name: Group["name"]) {
 	return createGroup(name);
 }
 
-export async function getOrCreateUser(email: User["email"]) {
+export async function getOrCreateUser(email: User['email']) {
 	const user = await getUserByEmail(email);
 	if (user) return user;
 
@@ -96,11 +98,11 @@ export async function getOrCreateUser(email: User["email"]) {
 }
 
 export async function updateUserProps(
-	email: User["email"],
-	firstName: User["firstName"],
-	lastName: User["lastName"],
-	groups: Group["name"][],
-	profilePhoto: User["profilePhoto"],
+	email: User['email'],
+	firstName: User['firstName'],
+	lastName: User['lastName'],
+	groups: Group['name'][],
+	profilePhoto: User['profilePhoto'],
 ): Promise<UserSerialized> {
 	await getOrCreateUser(email);
 

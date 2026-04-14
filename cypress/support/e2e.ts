@@ -1,28 +1,28 @@
-import "@testing-library/cypress/add-commands";
+import '@testing-library/cypress/add-commands';
 
-import { faker } from "@faker-js/faker";
+import { faker } from '@faker-js/faker';
 
 function login({
-	email = faker.internet.email({ provider: "example.com" }),
+	email = faker.internet.email({ provider: 'example.com' }),
 }: {
 	email?: string;
 } = {}) {
-	cy.then(() => ({ email })).as("user");
+	cy.then(() => ({ email })).as('user');
 	cy.exec(
 		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require dotenv/config --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`,
 	).then(({ stdout }) => {
 		const setCookieHeader = stdout
-			.replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, "$<cookieValue>")
+			.replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, '$<cookieValue>')
 			.trim();
 		// Parse the Set-Cookie header to extract just the cookie value
 		// Format: "__session=value; Path=/; HttpOnly; SameSite=Lax"
 		const match = setCookieHeader.match(/__session=([^;]+)/);
 		if (match) {
 			const cookieValue = match[1];
-			cy.setCookie("__session", cookieValue);
+			cy.setCookie('__session', cookieValue);
 		}
 	});
-	return cy.get("@user");
+	return cy.get('@user');
 }
 
 function deleteUserByEmail(email: string) {
@@ -30,33 +30,33 @@ function deleteUserByEmail(email: string) {
 		`pnpm exec ts-node --transpile-only -P cypress/tsconfig.json --require dotenv/config --require tsconfig-paths/register ./cypress/support/delete-user.ts "${email}"`,
 		{ failOnNonZeroExit: false },
 	);
-	cy.clearCookie("__session");
+	cy.clearCookie('__session');
 }
 
 function cleanupUser({ email }: { email?: string } = {}) {
 	if (email) {
 		deleteUserByEmail(email);
 	} else {
-		cy.get("@user").then((user) => {
+		cy.get('@user').then((user) => {
 			const email = (user as { email?: string }).email;
 			if (email) {
 				deleteUserByEmail(email);
 			}
 		});
 	}
-	cy.clearCookie("__session");
+	cy.clearCookie('__session');
 }
 
 function visitAndCheck(url: string, waitTime: number = 1000) {
 	cy.visit(url);
-	cy.location("pathname").should("contain", url).wait(waitTime);
+	cy.location('pathname').should('contain', url).wait(waitTime);
 }
 
-Cypress.Commands.add("login", login);
-Cypress.Commands.add("cleanupUser", cleanupUser);
-Cypress.Commands.add("visitAndCheck", visitAndCheck);
+Cypress.Commands.add('login', login);
+Cypress.Commands.add('cleanupUser', cleanupUser);
+Cypress.Commands.add('visitAndCheck', visitAndCheck);
 
-Cypress.on("uncaught:exception", (err) => {
+Cypress.on('uncaught:exception', (err) => {
 	// Cypress and React Hydrating the document don't get along
 	// for some unknown reason. Hopefully we figure out why eventually
 	// so we can remove this.

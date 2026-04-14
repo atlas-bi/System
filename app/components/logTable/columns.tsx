@@ -1,19 +1,19 @@
-import type { ColumnDef } from "@tanstack/react-table";
-import { Activity, AlertCircle, AlertTriangle } from "lucide-react";
-import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
-import { format } from "date-fns";
-import { Link } from "@remix-run/react";
-import { jsonParser } from "@/lib/utils";
+import type { ColumnDef } from '@tanstack/react-table';
+import { Activity, AlertCircle, AlertTriangle } from 'lucide-react';
+import { DataTableColumnHeader } from '~/components/table/data-table-column-header';
+import { format } from 'date-fns';
+import { Link } from '@remix-run/react';
+import { jsonParser } from '@/lib/utils';
 
 export const columns: ColumnDef<any>[] = [
 	{
-		accessorKey: "type",
+		accessorKey: 'type',
 		header: () => <></>,
 		cell: ({ row }) => (
 			<div className="">
-				{row.getValue("type") == "error" ? (
+				{row.getValue('type') == 'error' ? (
 					<AlertTriangle className="text-red-500" size={14} />
-				) : row.getValue("type") == "warning" ? (
+				) : row.getValue('type') == 'warning' ? (
 					<AlertCircle className="text-orange-600" size={14} />
 				) : (
 					<Activity className="text-emerald-600" size={14} />
@@ -22,23 +22,23 @@ export const columns: ColumnDef<any>[] = [
 		),
 	},
 	{
-		accessorKey: "createdAt",
+		accessorKey: 'createdAt',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Date" />
 		),
 		cell: ({ row }) => (
 			<div className="">
-				{format(new Date(row.getValue("createdAt")), "MMM dd, yyyy k:mm")}
+				{format(new Date(row.getValue('createdAt')), 'MMM dd, yyyy k:mm')}
 			</div>
 		),
 	},
 	{
-		accessorKey: "message",
+		accessorKey: 'message',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Message" />
 		),
 		cell: ({ row }) => {
-			const message = jsonParser(row.getValue("message"));
+			const message = jsonParser(row.getValue('message'));
 
 			return (
 				<div className="space-x-2">

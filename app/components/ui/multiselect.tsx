@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { X } from "lucide-react";
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import { X } from 'lucide-react';
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
-import { Command as CommandPrimitive } from "cmdk";
-import { Badge } from "./badge";
-import { Command, CommandGroup, CommandItem, CommandEmpty } from "./command";
-import { Label } from "./label";
+import { Command as CommandPrimitive } from 'cmdk';
+import { Badge } from './badge';
+import { Command, CommandGroup, CommandItem, CommandEmpty } from './command';
+import { Label } from './label';
 
-type DataItem = Record<"value" | "label", string>;
+type DataItem = Record<'value' | 'label', string>;
 
 export function MultiSelect({
-	label = "Select an item",
-	placeholder = "Select an item",
+	label = 'Select an item',
+	placeholder = 'Select an item',
 	parentClassName,
 	data,
 	onChange,
@@ -31,22 +31,22 @@ export function MultiSelect({
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [open, setOpen] = React.useState(false);
 	const [selected, setSelected] = React.useState<DataItem[]>(active);
-	const [inputValue, setInputValue] = React.useState("");
+	const [inputValue, setInputValue] = React.useState('');
 
 	const handleUnselect = React.useCallback((item: DataItem) => {
 		setSelected((prev) => prev.filter((s) => s.value !== item.value));
 	}, []);
 
 	React.useEffect(() => {
-		if (typeof onChange == "function") onChange(selected);
+		if (typeof onChange == 'function') onChange(selected);
 	}, [selected]);
 
 	const handleKeyDown = React.useCallback(
 		(e: React.KeyboardEvent<HTMLDivElement>) => {
 			const input = inputRef.current;
 			if (input) {
-				if (e.key === "Delete" || e.key === "Backspace") {
-					if (input.value === "") {
+				if (e.key === 'Delete' || e.key === 'Backspace') {
+					if (input.value === '') {
 						setSelected((prev) => {
 							const newSelected = [...prev];
 							newSelected.pop();
@@ -55,7 +55,7 @@ export function MultiSelect({
 					}
 				}
 				// This is not a default behaviour of the <input /> field
-				if (e.key === "Escape") {
+				if (e.key === 'Escape') {
 					input.blur();
 				}
 			}
@@ -68,9 +68,9 @@ export function MultiSelect({
 	return (
 		<div
 			className={cn(
-				label && "gap-1.5",
+				label && 'gap-1.5',
 				parentClassName,
-				"grid w-full items-center",
+				'grid w-full items-center',
 			)}
 		>
 			{label && (
@@ -95,7 +95,7 @@ export function MultiSelect({
 									<button
 										className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 										onKeyDown={(e) => {
-											if (e.key === "Enter") {
+											if (e.key === 'Enter') {
 												handleUnselect(item);
 											}
 										}}
@@ -126,7 +126,7 @@ export function MultiSelect({
 				<div
 					className="relative mt-2 z-10"
 					onMouseDown={(e) => {
-						console.log("mouse down list");
+						console.log('mouse down list');
 						e.preventDefault();
 						return false;
 					}}
@@ -144,7 +144,7 @@ export function MultiSelect({
 												e.stopPropagation();
 											}}
 											onSelect={(value) => {
-												setInputValue("");
+												setInputValue('');
 												setSelected((prev) => [...prev, framework]);
 											}}
 										>

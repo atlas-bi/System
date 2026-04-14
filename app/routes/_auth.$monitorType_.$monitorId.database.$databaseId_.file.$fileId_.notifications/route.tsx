@@ -1,17 +1,17 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { getFileNotifications } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
-import { H1, H3 } from "~/components/ui/typography";
-import { Loader2, MoveLeft } from "lucide-react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { getFileNotifications } from '~/models/monitor.server';
+import { authenticator } from '~/services/auth.server';
+import { Link, useLoaderData, useParams } from '@remix-run/react';
+import { H1, H3 } from '~/components/ui/typography';
+import { Loader2, MoveLeft } from 'lucide-react';
 
-import { useSubmit, useNavigation } from "@remix-run/react";
+import { useSubmit, useNavigation } from '@remix-run/react';
 
-import { useRef } from "react";
+import { useRef } from 'react';
 
-import { getNotifications } from "~/models/notification.server";
-import invariant from "tiny-invariant";
+import { getNotifications } from '~/models/notification.server';
+import invariant from 'tiny-invariant';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -24,7 +24,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 	const file = await getFileNotifications({ id: params.fileId });
 	if (!file) {
-		throw new Response("Not Found", { status: 404 });
+		throw new Response('Not Found', { status: 404 });
 	}
 
 	const notifications = await getNotifications();
@@ -68,7 +68,7 @@ export default function Index() {
 				<Link
 					to={`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}`}
 					className={`transition-colors flex content-center space-x-2  text-slate-600 ${
-						transition.state === "submitting" ? "pointer-events-none" : ""
+						transition.state === 'submitting' ? 'pointer-events-none' : ''
 					}`}
 					prefetch="intent"
 				>
@@ -77,7 +77,7 @@ export default function Index() {
 						Back to <strong>{file.fileName}</strong>
 					</span>
 				</Link>
-				{transition.state === "submitting" ? (
+				{transition.state === 'submitting' ? (
 					<Loader2 size={14} className="animate-spin my-auto" />
 				) : null}
 			</div>
@@ -90,7 +90,7 @@ export default function Index() {
 								<H3 className="text-2xl">Free Space</H3>
 								<div className="text-muted-foreground pb-2">
 									Recieve notification when files free space meets certain
-									criteria.{" "}
+									criteria.{' '}
 									<strong>
 										This only applies to files with auto growth disabled.
 									</strong>

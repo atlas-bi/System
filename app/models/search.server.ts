@@ -1,4 +1,4 @@
-import { prisma } from "~/db.server";
+import { prisma } from '~/db.server';
 
 export async function getSearchData() {
 	const monitors = await prisma.monitor.findMany({
@@ -127,9 +127,9 @@ export async function getSearchData() {
 		...drives.map((x) => ({
 			id: `${x.monitor.type}-${x.monitor.id}-drive-${x.id}`,
 			url: `/${x.monitor.type}/${x.monitor.id}/drive/${x.id}`,
-			title: (x.root ? x.root + " " : "") + (x.monitor.name || x.monitor.title),
+			title: (x.root ? x.root + ' ' : '') + (x.monitor.name || x.monitor.title),
 			name: x.name,
-			tags: ["drive"],
+			tags: ['drive'],
 			enabled: x.enabled,
 			hasError: x.hasError,
 			description: x.description,
@@ -140,8 +140,8 @@ export async function getSearchData() {
 			url: `/${x.monitor.type}/${x.monitor.id}/database/${x.id}`,
 			name: x.name,
 			title:
-				(x.title ? x.title + " " : "") + (x.monitor.name || x.monitor.title),
-			tags: ["database"],
+				(x.title ? x.title + ' ' : '') + (x.monitor.name || x.monitor.title),
+			tags: ['database'],
 			enabled: x.enabled,
 			hasError: false,
 			description: x.description,
@@ -152,9 +152,9 @@ export async function getSearchData() {
 			name: x.fileName,
 			title:
 				(x.database.name || x.database.title) +
-				" " +
+				' ' +
 				(x.database.monitor.name || x.database.monitor.title),
-			tags: ["file"],
+			tags: ['file'],
 			enabled: x.enabled,
 			meta: [x.filePath],
 		})),

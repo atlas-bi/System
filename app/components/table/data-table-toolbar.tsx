@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
 	ArrowDownIcon,
@@ -10,14 +10,14 @@ import {
 	CrossCircledIcon,
 	QuestionMarkCircledIcon,
 	StopwatchIcon,
-} from "@radix-ui/react-icons";
-import type { Table } from "@tanstack/react-table";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+} from '@radix-ui/react-icons';
+import type { Table } from '@tanstack/react-table';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
 
 // import { priorities, statuses } from "../data/data"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { DataTableFacetedFilter } from './data-table-faceted-filter';
+import { DataTableViewOptions } from './data-table-view-options';
 
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
@@ -25,46 +25,46 @@ interface DataTableToolbarProps<TData> {
 
 export const statuses = [
 	{
-		value: "backlog",
-		label: "Backlog",
+		value: 'backlog',
+		label: 'Backlog',
 		icon: QuestionMarkCircledIcon,
 	},
 	{
-		value: "todo",
-		label: "Todo",
+		value: 'todo',
+		label: 'Todo',
 		icon: CircleIcon,
 	},
 	{
-		value: "in progress",
-		label: "In Progress",
+		value: 'in progress',
+		label: 'In Progress',
 		icon: StopwatchIcon,
 	},
 	{
-		value: "done",
-		label: "Done",
+		value: 'done',
+		label: 'Done',
 		icon: CheckCircledIcon,
 	},
 	{
-		value: "canceled",
-		label: "Canceled",
+		value: 'canceled',
+		label: 'Canceled',
 		icon: CrossCircledIcon,
 	},
 ];
 
 export const priorities = [
 	{
-		label: "Low",
-		value: "low",
+		label: 'Low',
+		value: 'low',
 		icon: ArrowDownIcon,
 	},
 	{
-		label: "Medium",
-		value: "medium",
+		label: 'Medium',
+		value: 'medium',
 		icon: ArrowRightIcon,
 	},
 	{
-		label: "High",
-		value: "high",
+		label: 'High',
+		value: 'high',
 		icon: ArrowUpIcon,
 	},
 ];
@@ -79,7 +79,7 @@ export function DataTableToolbar<TData>({
 			<div className="flex flex-1 items-center space-x-2">
 				<Input
 					placeholder="Filter..."
-					value={(table.getAllColumns()?.[0]?.getFilterValue() as string) ?? ""}
+					value={(table.getAllColumns()?.[0]?.getFilterValue() as string) ?? ''}
 					onChange={(event) =>
 						table.getAllColumns()?.[0]?.setFilterValue(event.target.value)
 					}

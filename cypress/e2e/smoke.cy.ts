@@ -1,37 +1,37 @@
-import { faker } from "@faker-js/faker";
+import { faker } from '@faker-js/faker';
 
-describe("smoke tests", () => {
+describe('smoke tests', () => {
 	afterEach(() => {
 		cy.cleanupUser();
 	});
 
-	it("should allow you to register and login", () => {
+	it('should allow you to register and login', () => {
 		cy.login({ email: `${faker.internet.username()}@example.com` });
-		cy.visitAndCheck("/");
-		cy.findByRole("link", { name: /notes/i }).click();
-		cy.findByRole("link", { name: /log out/i }).click();
-		cy.findByRole("heading", { name: /atlas system/i });
+		cy.visitAndCheck('/');
+		cy.findByRole('link', { name: /notes/i }).click();
+		cy.findByRole('link', { name: /log out/i }).click();
+		cy.findByRole('heading', { name: /atlas system/i });
 	});
 
-	it("should allow you to make a note", () => {
+	it('should allow you to make a note', () => {
 		const testNote = {
 			title: faker.lorem.words(1),
 			body: faker.lorem.sentences(1),
 		};
 		cy.login();
-		cy.visitAndCheck("/");
+		cy.visitAndCheck('/');
 
-		cy.findByRole("link", { name: /notes/i }).click();
-		cy.findByText("No notes yet");
+		cy.findByRole('link', { name: /notes/i }).click();
+		cy.findByText('No notes yet');
 
-		cy.findByRole("link", { name: /\+ new note/i }).click();
+		cy.findByRole('link', { name: /\+ new note/i }).click();
 
-		cy.findByRole("textbox", { name: /title/i }).type(testNote.title);
-		cy.findByRole("textbox", { name: /body/i }).type(testNote.body);
-		cy.findByRole("button", { name: /save/i }).click();
+		cy.findByRole('textbox', { name: /title/i }).type(testNote.title);
+		cy.findByRole('textbox', { name: /body/i }).type(testNote.body);
+		cy.findByRole('button', { name: /save/i }).click();
 
-		cy.findByRole("button", { name: /delete/i }).click();
+		cy.findByRole('button', { name: /delete/i }).click();
 
-		cy.findByText("No notes yet");
+		cy.findByText('No notes yet');
 	});
 });
