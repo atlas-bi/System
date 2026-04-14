@@ -1,19 +1,19 @@
-import { redirect, type ActionFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { NodeSSH } from 'node-ssh';
-import { namedAction } from '~/utils';
+import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { NodeSSH } from "node-ssh";
+import { namedAction } from "~/utils";
 import {
 	createMonitor,
 	deleteMonitor,
 	editMonitor,
-} from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
-import { HttpCheck } from '~/monitors/http.server';
-import mssql from 'mssql';
-import { encrypt } from '@/lib/utils';
-import { TcpCheck } from '~/monitors/tcp.server';
+} from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
+import { HttpCheck } from "~/monitors/http.server";
+import mssql from "mssql";
+import { encrypt } from "@/lib/utils";
+import { TcpCheck } from "~/monitors/tcp.server";
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
-	if (str === undefined || str === null || str.toString().trim() === '') {
+	if (str === undefined || str === null || str.toString().trim() === "") {
 		return true;
 	}
 	return false;
@@ -34,10 +34,10 @@ const checkBase = function ({
 	values: { title?: string; type?: string };
 }) {
 	if (isNullOrEmpty(values.title)) {
-		return json({ form: { error: 'Name is required.' } });
+		return json({ form: { error: "Name is required." } });
 	}
 	if (isNullOrEmpty(values.type)) {
-		return json({ form: { error: 'Type is required.' } });
+		return json({ form: { error: "Type is required." } });
 	}
 };
 
@@ -46,10 +46,10 @@ const checkHttp = function ({
 }: {
 	values: { type?: string; httpUrl?: string };
 }) {
-	if (values.type !== 'http') return null;
+	if (values.type !== "http") return null;
 
 	if (isNullOrEmpty(values.httpUrl)) {
-		return json({ form: { error: 'URL is required.' } });
+		return json({ form: { error: "URL is required." } });
 	}
 };
 
@@ -58,10 +58,10 @@ const checkSql = function ({
 }: {
 	values: { type?: string; sqlConnectionString?: string };
 }) {
-	if (values.type !== 'sqlServer') return null;
+	if (values.type !== "sqlServer") return null;
 
 	if (isNullOrEmpty(values.sqlConnectionString)) {
-		return json({ form: { error: 'Connection string is required.' } });
+		return json({ form: { error: "Connection string is required." } });
 	}
 };
 
@@ -76,19 +76,19 @@ const checkSsh = function ({
 		privateKey?: string;
 	};
 }) {
-	if (values.type !== 'windows' && values.type !== 'ubuntu') return null;
+	if (values.type !== "windows" && values.type !== "ubuntu") return null;
 
 	if (isNullOrEmpty(values.host)) {
-		return json({ form: { error: 'Host is required.' } });
+		return json({ form: { error: "Host is required." } });
 	}
 
 	if (isNullOrEmpty(values.username)) {
-		return json({ form: { error: 'Username is required.' } });
+		return json({ form: { error: "Username is required." } });
 	}
 
 	if (isNullOrEmpty(values.password) && isNullOrEmpty(values.privateKey)) {
 		return json({
-			form: { error: 'Password or Private Key is required.' },
+			form: { error: "Password or Private Key is required." },
 		});
 	}
 };
@@ -102,14 +102,14 @@ const checkTcp = function ({
 		port?: string;
 	};
 }) {
-	if (values.type !== 'tcp') return null;
+	if (values.type !== "tcp") return null;
 
 	if (isNullOrEmpty(values.host)) {
-		return json({ form: { error: 'Host is required.' } });
+		return json({ form: { error: "Host is required." } });
 	}
 
 	if (isNullOrEmpty(values.port)) {
-		return json({ form: { error: 'Port is required.' } });
+		return json({ form: { error: "Port is required." } });
 	}
 };
 
@@ -158,21 +158,21 @@ export async function action({ request }: ActionFunctionArgs) {
 					title: values.title.toString(),
 					host: values.host ? values.host.toString() : null,
 					username: values.username ? values.username.toString() : null,
-					enabled: values.enabled.toString() == 'true',
+					enabled: values.enabled.toString() == "true",
 					password: values.password ? values.password.toString() : null,
 					privateKey:
-						values.privateKey && values.privateKey.toString() != 'null'
+						values.privateKey && values.privateKey.toString() != "null"
 							? values.privateKey.toString()
 							: null,
 					port: (values.port || 22).toString(),
 					type: values.type.toString(),
 					description:
-						values.description && values.description.toString() != 'null'
+						values.description && values.description.toString() != "null"
 							? values.description.toString()
 							: null,
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
-					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
-					httpCheckCert: values.httpCheckCert?.toString() == 'true',
+					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
+					httpCheckCert: values.httpCheckCert?.toString() == "true",
 					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
 						? jsonParser(values.httpAcceptedStatusCodes)
 						: [],
@@ -205,7 +205,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					sqlConnectionString: values.sqlConnectionString
 						? values.sqlConnectionString.toString()
 						: null,
-					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == 'true',
+					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == "true",
 				});
 
 				return json({ monitor });
@@ -214,21 +214,21 @@ export async function action({ request }: ActionFunctionArgs) {
 					title: values.title.toString(),
 					host: values.host ? values.host.toString() : null,
 					username: values.username ? values.username.toString() : null,
-					enabled: values.enabled?.toString() == 'true',
+					enabled: values.enabled?.toString() == "true",
 					password: values.password ? values.password.toString() : null,
 					privateKey:
-						values.privateKey && values.privateKey.toString() != 'null'
+						values.privateKey && values.privateKey.toString() != "null"
 							? values.privateKey.toString()
 							: null,
 					port: (values.port || 22).toString(),
 					type: values.type.toString(),
 					description:
-						values.description && values.description.toString() != 'null'
+						values.description && values.description.toString() != "null"
 							? values.description.toString()
 							: null,
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
-					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == 'true',
-					httpCheckCert: values.httpCheckCert?.toString() == 'true',
+					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
+					httpCheckCert: values.httpCheckCert?.toString() == "true",
 					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
 						? jsonParser(values.httpAcceptedStatusCodes)
 						: [],
@@ -261,7 +261,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					sqlConnectionString: values.sqlConnectionString
 						? values.sqlConnectionString.toString()
 						: null,
-					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == 'true',
+					sqlDisableDbMemory: values.sqlDisableDbMemory?.toString() == "true",
 				});
 			}
 			return json({ monitor });
@@ -271,7 +271,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			await deleteMonitor({ id: values.id.toString() });
-			return redirect('/');
+			return redirect("/");
 		},
 		async test() {
 			const formData = await request.formData();
@@ -304,8 +304,8 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			if (
-				values.type?.toString() === 'windows' ||
-				values.type?.toString() === 'ubuntu'
+				values.type?.toString() === "windows" ||
+				values.type?.toString() === "ubuntu"
 			) {
 				const ssh = new NodeSSH();
 
@@ -317,10 +317,10 @@ export async function action({ request }: ActionFunctionArgs) {
 					console.log(e);
 					return json({ error: e });
 				}
-				return json({ success: 'Connection successful.' });
+				return json({ success: "Connection successful." });
 			}
 
-			if (values.type?.toString() === 'http') {
+			if (values.type?.toString() === "http") {
 				let startTime = Date.now();
 
 				try {
@@ -331,7 +331,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						httpPassword: values.httpPassword
 							? encrypt(values.httpPassword?.toString())
 							: undefined,
-						httpIgnoreSsl: values.httpIgnoreSsl?.toString() === 'true',
+						httpIgnoreSsl: values.httpIgnoreSsl?.toString() === "true",
 						httpBodyEncoding: values.httpBodyEncoding?.toString(),
 						httpUrl: values.httpUrl?.toString(),
 						httpMethod: values.httpMethod?.toString(),
@@ -340,7 +340,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
 						httpDomain: values.httpDomain?.toString(),
 						httpWorkstation: values.httpWorkstation?.toString(),
-						httpCheckCert: values.httpCheckCert?.toString() === 'true',
+						httpCheckCert: values.httpCheckCert?.toString() === "true",
 					});
 					const ping = Date.now() - startTime;
 					return json({
@@ -351,16 +351,16 @@ export async function action({ request }: ActionFunctionArgs) {
 				}
 			}
 
-			if (values.type?.toString() === 'sqlServer') {
+			if (values.type?.toString() === "sqlServer") {
 				let pool;
 				try {
 					pool = new mssql.ConnectionPool(
 						values.sqlConnectionString?.toString(),
 					);
 					await pool.connect();
-					await pool.request().query('select @@version');
+					await pool.request().query("select @@version");
 					pool.close();
-					return json({ success: 'Connection successful.' });
+					return json({ success: "Connection successful." });
 				} catch (e) {
 					if (pool) {
 						pool.close();
@@ -369,13 +369,13 @@ export async function action({ request }: ActionFunctionArgs) {
 				}
 			}
 
-			if (values.type?.toString() == 'tcp') {
+			if (values.type?.toString() == "tcp") {
 				try {
 					await TcpCheck({
 						address: values.host?.toString(),
 						port: Number(values.port),
 					});
-					return json({ success: 'Connection successful.' });
+					return json({ success: "Connection successful." });
 				} catch (e) {
 					return json({ error: { message: e.toString() } });
 				}

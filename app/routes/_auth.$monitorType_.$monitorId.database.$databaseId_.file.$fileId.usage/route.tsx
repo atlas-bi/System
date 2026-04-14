@@ -1,14 +1,11 @@
-import type { LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
-import invariant from 'tiny-invariant';
-import { dateOptions } from '~/models/dates';
-import {
-	DatabaseFile,
-	getFileUsage,
-} from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
-import { dateRange } from '~/utils';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { differenceInDays, startOfDay, startOfHour } from "date-fns";
+import invariant from "tiny-invariant";
+import { dateOptions } from "~/models/dates";
+import { DatabaseFile, getFileUsage } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
+import { dateRange } from "~/utils";
 
 type UsagePoint = {
 	createdAt: Date;
@@ -64,19 +61,19 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range'),
+		url.searchParams.get("range"),
 	);
 
 	const file = await getFileUsage({ id: params.fileId, startDate, endDate });
 	if (!file) {
-		throw new Response('Not Found', { status: 404 });
+		throw new Response("Not Found", { status: 404 });
 	}
 
 	const groupSize = dateOptions.filter(
-		(x) => x.value == url.searchParams.get('range'),
+		(x) => x.value == url.searchParams.get("range"),
 	)?.[0]?.unit;
 
-	if (url.searchParams.get('range') === 'all_time') {
+	if (url.searchParams.get("range") === "all_time") {
 		startDate = undefined;
 		endDate = undefined;
 	}
@@ -92,7 +89,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	});
 
 	switch (groupSize) {
-		case 'minute':
+		case "minute":
 			// minute is db default
 			return json({
 				file: {
@@ -109,7 +106,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 					endDate,
 				},
 			});
-		case 'hour':
+		case "hour":
 			file.usage.reduce((a, e) => {
 				const key = startOfHour(e.createdAt).toISOString();
 				if (!a[key]) {
@@ -123,7 +120,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 				return a;
 			}, grouped);
 			break;
-		case 'day':
+		case "day":
 		default:
 			file.usage.reduce((a, e) => {
 				const key = startOfDay(e.createdAt).toISOString();

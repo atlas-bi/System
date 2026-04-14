@@ -33,6 +33,29 @@ jobs:
   #        shellcheck **/install
   #        shellcheck **/postinst
   #        shellcheck **/preinst
+  build:
+    name: 🧪 Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛑 Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.13.1
+
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v6
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 18
+
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
+      - name: 📥 Download deps
+        run: pnpm install
+
+      - name: 🔬 Build
+        run: pnpm run build
 
   lint:
     name: ⬣ Biome

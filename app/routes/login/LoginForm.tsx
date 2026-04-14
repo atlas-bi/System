@@ -1,18 +1,18 @@
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import {
 	Form,
 	useActionData,
 	useLoaderData,
 	useNavigation,
-} from '@remix-run/react';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+} from "@remix-run/react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
-import type { loader } from './route';
+import type { loader } from "./route";
 
 type actionData = { error: string } | undefined;
 
@@ -35,7 +35,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		if (navigation.state == 'submitting') {
+		if (navigation.state == "submitting") {
 			setIsLoading(true);
 		} else {
 			setIsLoading(false);
@@ -43,7 +43,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 	}, [navigation]);
 
 	return (
-		<div className={cn('grid gap-6', className)} {...props}>
+		<div className={cn("grid gap-6", className)} {...props}>
 			<Form method="post" className="space-y-2">
 				{loaderError ? <ErrorMessage message={loaderError.message} /> : null}
 				{actionData?.error ? <ErrorMessage message={actionData.error} /> : null}

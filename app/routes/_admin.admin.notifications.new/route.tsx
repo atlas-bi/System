@@ -1,19 +1,19 @@
-import type { ActionFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { namedAction, redirectBack } from '~/utils';
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { namedAction, redirectBack } from "~/utils";
 
-import { authenticator } from '~/services/auth.server';
+import { authenticator } from "~/services/auth.server";
 
-import SMTP from '~/notifications/smtp';
-import Telegram from '~/notifications/telegram';
+import SMTP from "~/notifications/smtp";
+import Telegram from "~/notifications/telegram";
 import {
 	createNotification,
 	editNotification,
 	deleteNotification,
-} from '~/models/notification.server';
+} from "~/models/notification.server";
 
 const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
-	if (str === undefined || str === null || str.toString().trim() === '') {
+	if (str === undefined || str === null || str.toString().trim() === "") {
 		return true;
 	}
 	return false;
@@ -21,44 +21,44 @@ const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 
 const validateForm = ({ values }: { values: any }) => {
 	if (isNullOrEmpty(values.name)) {
-		return json({ form: { error: 'Name is required.' } });
+		return json({ form: { error: "Name is required." } });
 	}
 
 	if (isNullOrEmpty(values.type)) {
-		return json({ form: { error: 'Type is required.' } });
+		return json({ form: { error: "Type is required." } });
 	}
 
-	if (values.type.toString() === 'smtp') {
+	if (values.type.toString() === "smtp") {
 		if (isNullOrEmpty(values.smtpHost)) {
-			return json({ form: { error: 'Host is required.' } });
+			return json({ form: { error: "Host is required." } });
 		}
 
 		if (isNullOrEmpty(values.smtpPort)) {
-			return json({ form: { error: 'Port is required.' } });
+			return json({ form: { error: "Port is required." } });
 		}
 
 		if (isNullOrEmpty(values.smtpSecurity)) {
-			return json({ form: { error: 'Security is required.' } });
+			return json({ form: { error: "Security is required." } });
 		}
 
 		if (isNullOrEmpty(values.smtpFromEmail)) {
-			return json({ form: { error: 'From email is required.' } });
+			return json({ form: { error: "From email is required." } });
 		}
 
 		if (isNullOrEmpty(values.smtpToEmail) && isNullOrEmpty(values.privateKey)) {
 			return json({
-				form: { error: 'To email is required.' },
+				form: { error: "To email is required." },
 			});
 		}
 	}
 
-	if (values.type.toString() === 'telegram') {
+	if (values.type.toString() === "telegram") {
 		if (isNullOrEmpty(values.tgBotToken)) {
-			return json({ form: { error: 'Bot token is required.' } });
+			return json({ form: { error: "Bot token is required." } });
 		}
 
 		if (isNullOrEmpty(values.tgChatId)) {
-			return json({ form: { error: 'Chat ID is required.' } });
+			return json({ form: { error: "Chat ID is required." } });
 		}
 	}
 };
@@ -97,7 +97,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						? values.smtpSecurity.toString()
 						: null,
 					ignoreSSLErrors: values.ignoreSSLErrors
-						? values.ignoreSSLErrors.toString() == 'true'
+						? values.ignoreSSLErrors.toString() == "true"
 						: null,
 					smtpFromName: values.smtpFromName
 						? values.smtpFromName.toString()
@@ -112,10 +112,10 @@ export async function action({ request }: ActionFunctionArgs) {
 					tgChatId: values.tgChatId ? values.tgChatId.toString() : null,
 					tgThreadId: values.tgThreadId ? values.tgThreadId.toString() : null,
 					tgSendSilently: values.tgSendSilently
-						? values.tgSendSilently.toString() == 'true'
+						? values.tgSendSilently.toString() == "true"
 						: null,
 					tgProtectMessage: values.tgProtectMessage
-						? values.tgProtectMessage.toString() == 'true'
+						? values.tgProtectMessage.toString() == "true"
 						: null,
 				});
 
@@ -136,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					? values.smtpSecurity.toString()
 					: null,
 				ignoreSSLErrors: values.ignoreSSLErrors
-					? values.ignoreSSLErrors.toString() == 'true'
+					? values.ignoreSSLErrors.toString() == "true"
 					: null,
 				smtpFromName: values.smtpFromName
 					? values.smtpFromName.toString()
@@ -149,10 +149,10 @@ export async function action({ request }: ActionFunctionArgs) {
 				tgChatId: values.tgChatId ? values.tgChatId.toString() : null,
 				tgThreadId: values.tgThreadId ? values.tgThreadId.toString() : null,
 				tgSendSilently: values.tgSendSilently
-					? values.tgSendSilently.toString() == 'true'
+					? values.tgSendSilently.toString() == "true"
 					: null,
 				tgProtectMessage: values.tgProtectMessage
-					? values.tgProtectMessage.toString() == 'true'
+					? values.tgProtectMessage.toString() == "true"
 					: null,
 			});
 
@@ -162,7 +162,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			await deleteNotification({ id: values.id.toString() });
-			return redirectBack(request, { fallback: '/admin/notifications' });
+			return redirectBack(request, { fallback: "/admin/notifications" });
 		},
 		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
@@ -171,32 +171,32 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			if (errors) return errors;
 
-			if (values.type === 'smtp') {
+			if (values.type === "smtp") {
 				try {
 					await SMTP({
-						subject: 'connection test',
-						message: 'connection test',
+						subject: "connection test",
+						message: "connection test",
 						notification: values as any,
 						test: true,
 					});
 				} catch (e) {
 					return json({ error: e });
 				}
-				return json({ success: 'Connection successful, test message sent.' });
-			} else if (values.type === 'telegram') {
+				return json({ success: "Connection successful, test message sent." });
+			} else if (values.type === "telegram") {
 				try {
 					await Telegram({
-						message: 'connection test',
+						message: "connection test",
 						notification: values as any,
 						test: true,
 					});
 				} catch (e) {
 					return json({ error: e });
 				}
-				return json({ success: 'Connection successful, test message sent.' });
+				return json({ success: "Connection successful, test message sent." });
 			}
 
-			return json({ error: 'Failed to test.' });
+			return json({ error: "Failed to test." });
 		},
 	});
 }

@@ -3,10 +3,10 @@ import {
 	NavigationMenuItem,
 	NavigationMenuList,
 	navigationMenuTriggerStyle,
-} from '~/components/ui/navigation-menu';
+} from "~/components/ui/navigation-menu";
 
-import NewMonitor from './NewMonitor';
-import NewNotification from './NewNotification';
+import NewMonitor from "./NewMonitor";
+import NewNotification from "./NewNotification";
 
 export function Links() {
 	return (

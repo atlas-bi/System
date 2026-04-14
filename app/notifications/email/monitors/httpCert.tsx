@@ -1,17 +1,17 @@
-import { Button } from '@react-email/button';
-import { Html } from '@react-email/html';
-import { Head } from '@react-email/head';
-import { Preview } from '@react-email/preview';
-import { Link } from '@react-email/link';
-import { Tailwind } from '@react-email/tailwind';
-import { Text } from '@react-email/text';
-import type { MonitorWithRelations } from '~/models/monitor.server';
-import { Body } from '@react-email/body';
-import { Container } from '@react-email/container';
-import { Section } from '@react-email/section';
-import { Heading } from '@react-email/heading';
-import { Hr } from '@react-email/hr';
-import { Header } from '../helpers';
+import { Button } from "@react-email/button";
+import { Html } from "@react-email/html";
+import { Head } from "@react-email/head";
+import { Preview } from "@react-email/preview";
+import { Link } from "@react-email/link";
+import { Tailwind } from "@react-email/tailwind";
+import { Text } from "@react-email/text";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Section } from "@react-email/section";
+import { Heading } from "@react-email/heading";
+import { Hr } from "@react-email/hr";
+import { Header } from "../helpers";
 
 export const SuccessEmail = ({
 	hostname,
@@ -35,7 +35,7 @@ export const SuccessEmail = ({
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Certificate valid on{' '}
+							Certificate valid on{" "}
 							<strong>{monitor.name || monitor.title}</strong>.
 							<br />
 							{monitor.httpUrl ? (
