@@ -6,6 +6,7 @@ import morgan from "morgan";
 import path from "path";
 import { ChildProcess, spawnSync } from "child_process";
 import { symmetric } from "secure-webhooks";
+import "dotenv/config";
 /*
 
 1. start quirrel
@@ -99,18 +100,28 @@ const fetchWithRetries: FetchWithRetries = async (
 		process.env.QUIRREL_BASE_URL = `http://127.0.0.1:${port}`;
 
 		if (!DISABLE_BACKGROUND_SERVICES) {
-			child = await startQuirrel();
-			search = await startMeili();
+			console.log("starting quirrel...");
+			startQuirrel();
+			console.log("quirrel started");
+
+			console.log("starting meili...");
+			startMeili();
+			console.log("meili started");
+
 			await getQuirrelToken();
+			console.log("quirrel token ready");
 		}
 	}
 
 	const app = express();
+
 	app.listen(port, () => {
 		// require the built app so we're ready when the first request comes in
+		console.log("trying to start with build dir:", BUILD_DIR);
 		require(BUILD_DIR);
 		console.log(`✅ app ready: http://127.0.0.1:${port}`);
 	});
+
 	app.use((req, res, next) => {
 		// helpful headers:
 		res.set("x-fly-region", process.env.FLY_REGION ?? "unknown");
