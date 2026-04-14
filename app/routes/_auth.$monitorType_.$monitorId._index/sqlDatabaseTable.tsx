@@ -1,4 +1,4 @@
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from "@remix-run/react";
 import {
 	ColumnDef,
 	ColumnFiltersState,
@@ -12,10 +12,10 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from '@tanstack/react-table';
-import React from 'react';
-import { DataTablePagination } from '~/components/table/data-table-pagination';
-import { DataTableToolbar } from '~/components/table/data-table-toolbar';
+} from "@tanstack/react-table";
+import React from "react";
+import { DataTablePagination } from "~/components/table/data-table-pagination";
+import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 import {
 	Table,
 	TableBody,
@@ -23,7 +23,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '~/components/ui/table';
+} from "~/components/ui/table";
 
 export const SqlDatabaseTable = ({
 	monitor,
@@ -48,7 +48,7 @@ export const SqlDatabaseTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'name', desc: false },
+		{ id: "name", desc: false },
 	]);
 
 	const table = useReactTable({
@@ -103,9 +103,9 @@ export const SqlDatabaseTable = ({
 								<TableRow
 									key={row.id}
 									className={`cursor-pointer group ${
-										row.original.enabled ? '' : 'bg-slate-100/40'
+										row.original.enabled ? "" : "bg-slate-100/40"
 									}`}
-									data-state={row.getIsSelected() ? 'selected' : null}
+									data-state={row.getIsSelected() ? "selected" : null}
 									onClick={() =>
 										navigate(
 											`/${monitor.type}/${monitor.id}/database/${row.original.id}`,

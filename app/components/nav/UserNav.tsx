@@ -1,11 +1,11 @@
-import type { UserSerialized } from '~/models/user.server';
-import { useLoaderData } from '@remix-run/react';
-import { Link } from '@remix-run/react';
-import { useFetcher } from '@remix-run/react';
-import { BellRing, Github, LogOut } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
+import type { UserSerialized } from "~/models/user.server";
+import { useLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
+import { BellRing, Github, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,11 +14,11 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
+} from "~/components/ui/dropdown-menu";
 
-import type { loader } from '~/routes/_auth/route';
+import type { loader } from "~/routes/_auth/route";
 
-import { version } from '@/package.json';
+import { version } from "@/package.json";
 
 export function UserNav() {
 	const { user } = useLoaderData<typeof loader>();
@@ -27,11 +27,11 @@ export function UserNav() {
 	const fetcher = useFetcher<UserFetcherData>();
 
 	const initials = (user: UserSerialized) => {
-		return (user?.firstName?.slice(0, 1) || 'U') + user?.lastName?.slice(0, 1);
+		return (user?.firstName?.slice(0, 1) || "U") + user?.lastName?.slice(0, 1);
 	};
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && !fetcher.data) {
+		if (fetcher.state === "idle" && !fetcher.data) {
 			fetcher.load(`/api/user/${user.slug}?index`);
 		} else if (fetcher.data) {
 			setActiveUser({ ...activeUser, ...fetcher.data.user });

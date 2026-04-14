@@ -1,4 +1,4 @@
-import bytes, { Unit } from 'bytes';
+import bytes, { Unit } from "bytes";
 import {
 	LineElement,
 	CategoryScale,
@@ -10,13 +10,13 @@ import {
 	Tooltip,
 	Filler,
 	TimeScale,
-} from 'chart.js';
-import { useCallback, useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { createLinearGradient, darkGradient, lightGradient } from './functions';
-import { useFetcher } from '@remix-run/react';
-import { DateFilter } from './DateFilter';
-import { dateOptions } from '~/models/dates';
+} from "chart.js";
+import { useCallback, useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
+import { createLinearGradient, darkGradient, lightGradient } from "./functions";
+import { useFetcher } from "@remix-run/react";
+import { DateFilter } from "./DateFilter";
+import { dateOptions } from "~/models/dates";
 
 ChartJS.register([
 	CategoryScale,
@@ -28,12 +28,12 @@ ChartJS.register([
 	Tooltip,
 ]);
 
-import 'chartjs-adapter-date-fns';
-import { H3 } from '../ui/typography';
-import { CalendarDays, Circle, Loader, RefreshCw } from 'lucide-react';
-import { Button } from '../ui/button';
-import { TrendingUp } from 'lucide-react';
-import { DriveUsage } from '~/models/monitor.server';
+import "chartjs-adapter-date-fns";
+import { H3 } from "../ui/typography";
+import { CalendarDays, Circle, Loader, RefreshCw } from "lucide-react";
+import { Button } from "../ui/button";
+import { TrendingUp } from "lucide-react";
+import { DriveUsage } from "~/models/monitor.server";
 
 export const DriveChart = ({ url }: { url: string }) => {
 	type DriveFetcherData = {
@@ -50,39 +50,39 @@ export const DriveChart = ({ url }: { url: string }) => {
 		};
 	};
 	const usageFetcher = useFetcher<DriveFetcherData>();
-	const [unit, setUnit] = useState('last_24_hours');
+	const [unit, setUnit] = useState("last_24_hours");
 
 	Tooltip.positioners.mouse = function (items, evtPos) {
 		return evtPos;
 	};
 
 	const getOptions = useCallback(
-		(sizeUnit: string): ChartOptions<'line'> => {
+		(sizeUnit: string): ChartOptions<"line"> => {
 			const startDate = usageFetcher.data?.drive?.startDate;
 			const endDate = usageFetcher.data?.drive?.endDate;
 			const min = startDate ? new Date(startDate).getTime() : undefined;
 			const max = endDate ? new Date(endDate).getTime() : undefined;
 
 			type AllowedTimeUnit =
-				| 'millisecond'
-				| 'second'
-				| 'minute'
-				| 'hour'
-				| 'day'
-				| 'week'
-				| 'month'
-				| 'quarter'
-				| 'year';
+				| "millisecond"
+				| "second"
+				| "minute"
+				| "hour"
+				| "day"
+				| "week"
+				| "month"
+				| "quarter"
+				| "year";
 			const allowedTimeUnits: AllowedTimeUnit[] = [
-				'millisecond',
-				'second',
-				'minute',
-				'hour',
-				'day',
-				'week',
-				'month',
-				'quarter',
-				'year',
+				"millisecond",
+				"second",
+				"minute",
+				"hour",
+				"day",
+				"week",
+				"month",
+				"quarter",
+				"year",
 			];
 			const candidateTimeUnit = dateOptions.filter((x) => x.value === unit)?.[0]
 				?.chartUnit;
@@ -97,7 +97,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 				maintainAspectRatio: false,
 				interaction: {
 					intersect: false,
-					mode: 'index' as const,
+					mode: "index" as const,
 				},
 				animation: {
 					duration: 300,
@@ -120,9 +120,9 @@ export const DriveChart = ({ url }: { url: string }) => {
 				},
 				scales: {
 					y: {
-						type: 'linear' as const,
+						type: "linear" as const,
 						display: true,
-						position: 'left' as const,
+						position: "left" as const,
 						beginAtZero: true,
 						ticks: {
 							callback: function (tickValue: number | string) {
@@ -133,7 +133,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 					},
 					x: {
 						stacked: true,
-						type: 'time',
+						type: "time",
 						min,
 						max,
 						time: {
@@ -149,8 +149,8 @@ export const DriveChart = ({ url }: { url: string }) => {
 		[unit, usageFetcher.data],
 	);
 
-	const [options, setOptions] = useState<ChartOptions<'line'>>(
-		getOptions('GB'),
+	const [options, setOptions] = useState<ChartOptions<"line">>(
+		getOptions("GB"),
 	);
 
 	useEffect(() => {
@@ -158,19 +158,19 @@ export const DriveChart = ({ url }: { url: string }) => {
 	}, [unit]);
 
 	useEffect(() => {
-		if (usageFetcher.state === 'loading') {
+		if (usageFetcher.state === "loading") {
 			setChartData(emptyDataset);
 		}
 	}, [usageFetcher]);
 
-	const emptyDataset: ChartData<'line', { x: Date; y: number }[]> = {
+	const emptyDataset: ChartData<"line", { x: Date; y: number }[]> = {
 		datasets: [],
 	};
 	const [chartData, setChartData] =
-		useState<ChartData<'line', { x: Date; y: number }[]>>(emptyDataset);
+		useState<ChartData<"line", { x: Date; y: number }[]>>(emptyDataset);
 
 	useEffect(() => {
-		let sizeUnit = 'GB';
+		let sizeUnit = "GB";
 		const max =
 			usageFetcher.data?.drive?.usage?.reduce(
 				(a: number, e: { used?: number | null }) =>
@@ -178,21 +178,21 @@ export const DriveChart = ({ url }: { url: string }) => {
 				0,
 			) ?? 0;
 		if (max < 10000) {
-			sizeUnit = 'KB';
+			sizeUnit = "KB";
 		} else if (max < 100000) {
-			sizeUnit = 'MB';
+			sizeUnit = "MB";
 		}
 
 		const xUnit =
-			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || 'hour';
+			dateOptions.filter((x) => x.value === unit)?.[0]?.chartUnit || "hour";
 
-		const chartData: ChartData<'line', { x: Date; y: number }[]> = {
+		const chartData: ChartData<"line", { x: Date; y: number }[]> = {
 			datasets: [
 				{
-					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
+					spanGaps: 1000 * 60 * (xUnit == "hour" ? 1.5 : 90), // 1.5 min or 1.5 hour
 					fill: true,
-					label: 'Used',
-					cubicInterpolationMode: 'monotone' as const,
+					label: "Used",
+					cubicInterpolationMode: "monotone" as const,
 					tension: 0.4,
 					data:
 						usageFetcher.data?.drive?.usage?.map((x) => ({
@@ -200,25 +200,25 @@ export const DriveChart = ({ url }: { url: string }) => {
 							y: Number(
 								bytes(Number(x.used), { unit: sizeUnit as Unit })?.replace(
 									sizeUnit,
-									'',
-								) ?? '0',
+									"",
+								) ?? "0",
 							),
 						})) ?? [],
 					segment: {
 						borderColor: (ctx) => {
-							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
 							return darkGradient[0];
 						},
 						backgroundColor: (ctx) => {
-							if (ctx.p0.skip || ctx.p1.skip) return 'transparent';
+							if (ctx.p0.skip || ctx.p1.skip) return "transparent";
 							return lightGradient[0];
 						},
 					},
 					pointStyle: false as const,
 				},
 				{
-					spanGaps: 1000 * 60 * (xUnit == 'hour' ? 1.5 : 90), // 1.5 min or 1.5 hour
-					label: 'Free',
+					spanGaps: 1000 * 60 * (xUnit == "hour" ? 1.5 : 90), // 1.5 min or 1.5 hour
+					label: "Free",
 					fill: true,
 					data:
 						usageFetcher.data?.drive?.usage?.map((x) => ({
@@ -226,13 +226,13 @@ export const DriveChart = ({ url }: { url: string }) => {
 							y: Number(
 								bytes(Number(x.free), { unit: sizeUnit as Unit })?.replace(
 									sizeUnit,
-									'',
-								) ?? '0',
+									"",
+								) ?? "0",
 							),
 						})) ?? [],
-					borderColor: '#cbd5e1',
-					backgroundColor: '#e2e8f0',
-					cubicInterpolationMode: 'monotone' as const,
+					borderColor: "#cbd5e1",
+					backgroundColor: "#e2e8f0",
+					cubicInterpolationMode: "monotone" as const,
 					pointStyle: false as const,
 					tension: 0.4,
 				},
@@ -276,7 +276,7 @@ export const DriveChart = ({ url }: { url: string }) => {
 				</div>
 				<div className="h-[450px] relative">
 					<Line options={options} data={chartData} />
-					{usageFetcher.state === 'loading' && (
+					{usageFetcher.state === "loading" && (
 						<div className="absolute flex content-center top-0 bottom-0 right-0 left-0">
 							<Loader className="m-auto animate-spin" />
 						</div>

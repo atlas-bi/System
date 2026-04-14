@@ -1,4 +1,4 @@
-import { encrypt } from '@/lib/utils';
+import { encrypt } from "@/lib/utils";
 import type {
 	Database,
 	DatabaseFile,
@@ -6,11 +6,11 @@ import type {
 	Monitor,
 	MonitorFeeds,
 	MonitorLogs,
-} from '@prisma/client';
-import { Prisma } from '@prisma/client';
-import { prisma } from '~/db.server';
-import monitorRunner from '~/queues/monitor.server';
-import searchLoader from '~/queues/searchService.server';
+} from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "~/db.server";
+import monitorRunner from "~/queues/monitor.server";
+import searchLoader from "~/queues/searchService.server";
 
 export type {
 	DatabaseFile,
@@ -24,9 +24,9 @@ export type {
 	Drive,
 	DriveUsage,
 	Notification,
-} from '@prisma/client';
+} from "@prisma/client";
 
-export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
+export async function deleteMonitor({ id }: Pick<Monitor, "id">) {
 	// delete database file usage
 	await prisma.databaseFileUsage.deleteMany({
 		where: {
@@ -94,7 +94,7 @@ export async function deleteMonitor({ id }: Pick<Monitor, 'id'>) {
 	searchLoader.enqueue(id);
 }
 
-export function getMonitorMeta({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorMeta({ id }: Pick<Monitor, "id">) {
 	return prisma.monitor.findUnique({
 		where: { id },
 		select: {
@@ -309,7 +309,7 @@ export type MonitorWithRelations = Prisma.MonitorGetPayload<{
 	select: typeof monitorWithRelationsSelect;
 }>;
 
-export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorNotifications({ id }: Pick<Monitor, "id">) {
 	return prisma.monitor.findUnique({
 		where: { id },
 		select: {
@@ -366,7 +366,7 @@ export function getMonitorNotifications({ id }: Pick<Monitor, 'id'>) {
 	});
 }
 
-export function getMonitor({ id }: Pick<Monitor, 'id'>) {
+export function getMonitor({ id }: Pick<Monitor, "id">) {
 	return prisma.monitor.findFirst({
 		where: { id },
 		select: monitorWithRelationsSelect,
@@ -375,12 +375,12 @@ export function getMonitor({ id }: Pick<Monitor, 'id'>) {
 
 export function getMonitorTypes() {
 	return prisma.monitor.groupBy({
-		by: ['type'],
+		by: ["type"],
 		_count: { type: true },
 	});
 }
 
-export function monitorError({ id }: Pick<Monitor, 'id'>) {
+export function monitorError({ id }: Pick<Monitor, "id">) {
 	return prisma.monitor.update({
 		where: { id },
 		data: {
@@ -398,14 +398,14 @@ export function monitorLog({
 	message,
 }: Pick<
 	MonitorLogs,
-	'monitorId' | 'type' | 'message' | 'driveId' | 'databaseId' | 'fileId'
+	"monitorId" | "type" | "message" | "driveId" | "databaseId" | "fileId"
 >) {
 	return prisma.monitorLogs.create({
 		data: { monitorId, type, message, driveId, databaseId, fileId },
 	});
 }
 
-export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
+export function getDatabaseFile({ id }: Pick<DatabaseFile, "id">) {
 	return prisma.databaseFile.findUnique({
 		where: { id },
 		select: {
@@ -428,7 +428,7 @@ export function getDatabaseFile({ id }: Pick<DatabaseFile, 'id'>) {
 	});
 }
 
-export function getFileNotifications({ id }: Pick<DatabaseFile, 'id'>) {
+export function getFileNotifications({ id }: Pick<DatabaseFile, "id">) {
 	return prisma.databaseFile.findUnique({
 		where: { id },
 		select: {
@@ -438,7 +438,7 @@ export function getFileNotifications({ id }: Pick<DatabaseFile, 'id'>) {
 	});
 }
 
-export function getDatabaseMeta({ id }: Pick<Database, 'id'>) {
+export function getDatabaseMeta({ id }: Pick<Database, "id">) {
 	return prisma.database.findUnique({
 		where: { id },
 		select: {
@@ -470,7 +470,7 @@ export function getDatabaseMeta({ id }: Pick<Database, 'id'>) {
 
 export function getDatabaseFiles({
 	databaseId,
-}: Pick<DatabaseFile, 'databaseId'>) {
+}: Pick<DatabaseFile, "databaseId">) {
 	return prisma.databaseFile.findMany({
 		where: { databaseId },
 		select: {
@@ -488,7 +488,7 @@ export function getDatabaseFiles({
 
 export function getFileUsageLatest({
 	databaseFileId,
-}: Pick<DatabaseFileUsage, 'databaseFileId'>) {
+}: Pick<DatabaseFileUsage, "databaseFileId">) {
 	return prisma.databaseFileUsage.findFirst({
 		where: { databaseFileId },
 		select: {
@@ -499,7 +499,7 @@ export function getFileUsageLatest({
 		},
 
 		orderBy: {
-			createdAt: 'desc',
+			createdAt: "desc",
 		},
 	});
 }
@@ -508,7 +508,7 @@ export function getFileUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<DatabaseFile, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<DatabaseFile, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.databaseFile.findUnique({
@@ -545,7 +545,7 @@ export function getFileUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 		},
 	});
@@ -555,7 +555,7 @@ export function getDatabaseUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Database, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<Database, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.database.findUnique({
@@ -586,7 +586,7 @@ export function getDatabaseUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 		},
 	});
@@ -596,7 +596,7 @@ export function getCpuUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<Monitor, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.monitor.findUnique({
@@ -618,7 +618,7 @@ export function getCpuUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 			cpus: {
 				select: {
@@ -637,7 +637,7 @@ export function getCpuUsage({
 								lt: endDate,
 							},
 						},
-						orderBy: { createdAt: 'desc' },
+						orderBy: { createdAt: "desc" },
 					},
 				},
 			},
@@ -649,7 +649,7 @@ export function getPing({
 	id,
 	startDate,
 	endDate,
-}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<Monitor, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.monitor.findUnique({
@@ -671,7 +671,7 @@ export function getPing({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 		},
 	});
@@ -681,7 +681,7 @@ export function getDatabaseMemoryUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<Monitor, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.database.findUnique({
@@ -701,7 +701,7 @@ export function getDatabaseMemoryUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 		},
 	});
@@ -711,7 +711,7 @@ export function getMemoryUsage({
 	id,
 	startDate,
 	endDate,
-}: Pick<Monitor, 'id'> & { startDate: Date; endDate: Date }) {
+}: Pick<Monitor, "id"> & { startDate: Date; endDate: Date }) {
 	let lastMonth = new Date();
 	lastMonth = new Date(lastMonth.setMonth(lastMonth.getMonth() - 1));
 	return prisma.monitor.findUnique({
@@ -733,7 +733,7 @@ export function getMemoryUsage({
 						lt: endDate,
 					},
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { createdAt: "desc" },
 			},
 		},
 	});
@@ -744,7 +744,7 @@ export function getLatestMonitorLog({
 	monitorId,
 	databaseId,
 	fileId,
-}: Pick<MonitorLogs, 'monitorId'> & {
+}: Pick<MonitorLogs, "monitorId"> & {
 	driveId?: string;
 	databaseId?: string;
 	fileId?: string;
@@ -757,7 +757,7 @@ export function getLatestMonitorLog({
 			fileId,
 		},
 		orderBy: {
-			createdAt: 'desc',
+			createdAt: "desc",
 		},
 	});
 }
@@ -769,7 +769,7 @@ export async function getMonitorLogs({
 	fileId,
 	page = 0,
 	size = 10,
-}: Pick<MonitorLogs, 'monitorId'> & {
+}: Pick<MonitorLogs, "monitorId"> & {
 	driveId?: string;
 	databaseId?: string;
 	fileId?: string;
@@ -786,8 +786,8 @@ export async function getMonitorLogs({
 				fileId,
 				NOT: {
 					message: {
-						contains: 'clientVersion',
-						mode: 'insensitive',
+						contains: "clientVersion",
+						mode: "insensitive",
 					},
 				},
 			},
@@ -800,8 +800,8 @@ export async function getMonitorLogs({
 				fileId,
 				NOT: {
 					message: {
-						contains: 'clientVersion',
-						mode: 'insensitive',
+						contains: "clientVersion",
+						mode: "insensitive",
 					},
 				},
 			},
@@ -834,7 +834,7 @@ export async function getMonitorLogs({
 			skip: page * size,
 			take: size,
 			orderBy: {
-				createdAt: 'desc',
+				createdAt: "desc",
 			},
 		}),
 	]);
@@ -849,7 +849,7 @@ export async function getMonitorLogs({
 export function getMonitorDisabledDatabases({
 	monitorId,
 }: {
-	monitorId: Monitor['id'];
+	monitorId: Monitor["id"];
 }) {
 	return prisma.database.findMany({
 		where: { monitorId, enabled: false },
@@ -864,7 +864,7 @@ export function getMonitorDisabledDatabases({
 export function getMonitorDisabledDrives({
 	monitorId,
 }: {
-	monitorId: Monitor['id'];
+	monitorId: Monitor["id"];
 }) {
 	return prisma.drive.findMany({
 		where: { monitorId, enabled: false },
@@ -881,7 +881,7 @@ export function getMonitorDisabledDrives({
 export function getMonitorDatabases({
 	monitorId,
 }: {
-	monitorId: Monitor['id'];
+	monitorId: Monitor["id"];
 }) {
 	return prisma.database.findMany({
 		where: { monitorId },
@@ -907,11 +907,11 @@ export function getMonitorDatabases({
 				},
 			},
 		},
-		orderBy: [{ enabled: 'desc' }, { name: 'asc' }],
+		orderBy: [{ enabled: "desc" }, { name: "asc" }],
 	});
 }
 
-export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
+export function getMonitorDrives({ monitorId }: { monitorId: Monitor["id"] }) {
 	return prisma.drive.findMany({
 		where: { monitorId },
 		select: {
@@ -928,10 +928,10 @@ export function getMonitorDrives({ monitorId }: { monitorId: Monitor['id'] }) {
 			online: true,
 		},
 		orderBy: [
-			{ online: 'desc' },
-			{ enabled: 'desc' },
-			{ size: 'desc' },
-			{ name: 'asc' },
+			{ online: "desc" },
+			{ enabled: "desc" },
+			{ size: "desc" },
+			{ name: "asc" },
 		],
 	});
 }
@@ -964,31 +964,31 @@ export async function createMonitor({
 	sqlDisableDbMemory,
 }: Pick<
 	Monitor,
-	| 'title'
-	| 'port'
-	| 'privateKey'
-	| 'username'
-	| 'password'
-	| 'host'
-	| 'type'
-	| 'description'
-	| 'enabled'
-	| 'httpUrl'
-	| 'httpIgnoreSsl'
-	| 'httpCheckCert'
-	| 'httpAcceptedStatusCodes'
-	| 'httpMaxRedirects'
-	| 'httpRequestMethod'
-	| 'httpBodyEncoding'
-	| 'httpBody'
-	| 'httpHeaders'
-	| 'httpAuthentication'
-	| 'httpUsername'
-	| 'httpPassword'
-	| 'httpDomain'
-	| 'httpWorkstation'
-	| 'sqlConnectionString'
-	| 'sqlDisableDbMemory'
+	| "title"
+	| "port"
+	| "privateKey"
+	| "username"
+	| "password"
+	| "host"
+	| "type"
+	| "description"
+	| "enabled"
+	| "httpUrl"
+	| "httpIgnoreSsl"
+	| "httpCheckCert"
+	| "httpAcceptedStatusCodes"
+	| "httpMaxRedirects"
+	| "httpRequestMethod"
+	| "httpBodyEncoding"
+	| "httpBody"
+	| "httpHeaders"
+	| "httpAuthentication"
+	| "httpUsername"
+	| "httpPassword"
+	| "httpDomain"
+	| "httpWorkstation"
+	| "sqlConnectionString"
+	| "sqlDisableDbMemory"
 >) {
 	const monitor = await prisma.monitor.create({
 		data: {
@@ -1040,7 +1040,7 @@ export function editDatabase({
 	title,
 	description,
 	enabled,
-}: Pick<Database, 'id' | 'title' | 'description' | 'enabled'>) {
+}: Pick<Database, "id" | "title" | "description" | "enabled">) {
 	return prisma.database.update({
 		where: { id },
 		data: {
@@ -1058,7 +1058,7 @@ export function editFile({
 	id,
 
 	enabled,
-}: Pick<DatabaseFile, 'id' | 'enabled'>) {
+}: Pick<DatabaseFile, "id" | "enabled">) {
 	return prisma.databaseFile.update({
 		where: { id },
 		data: {
@@ -1099,32 +1099,32 @@ export async function editMonitor({
 	sqlDisableDbMemory,
 }: Pick<
 	Monitor,
-	| 'id'
-	| 'title'
-	| 'port'
-	| 'privateKey'
-	| 'username'
-	| 'password'
-	| 'host'
-	| 'type'
-	| 'description'
-	| 'enabled'
-	| 'httpUrl'
-	| 'httpIgnoreSsl'
-	| 'httpCheckCert'
-	| 'httpAcceptedStatusCodes'
-	| 'httpMaxRedirects'
-	| 'httpRequestMethod'
-	| 'httpBodyEncoding'
-	| 'httpBody'
-	| 'httpHeaders'
-	| 'httpAuthentication'
-	| 'httpUsername'
-	| 'httpPassword'
-	| 'httpDomain'
-	| 'httpWorkstation'
-	| 'sqlConnectionString'
-	| 'sqlDisableDbMemory'
+	| "id"
+	| "title"
+	| "port"
+	| "privateKey"
+	| "username"
+	| "password"
+	| "host"
+	| "type"
+	| "description"
+	| "enabled"
+	| "httpUrl"
+	| "httpIgnoreSsl"
+	| "httpCheckCert"
+	| "httpAcceptedStatusCodes"
+	| "httpMaxRedirects"
+	| "httpRequestMethod"
+	| "httpBodyEncoding"
+	| "httpBody"
+	| "httpHeaders"
+	| "httpAuthentication"
+	| "httpUsername"
+	| "httpPassword"
+	| "httpDomain"
+	| "httpWorkstation"
+	| "sqlConnectionString"
+	| "sqlDisableDbMemory"
 >) {
 	const monitor = await prisma.monitor.update({
 		where: { id },
@@ -1181,7 +1181,7 @@ export function getEnabledMonitors() {
 	});
 }
 
-export function getDatabaseLatestFeeds({ id }: Pick<Database, 'id'>) {
+export function getDatabaseLatestFeeds({ id }: Pick<Database, "id">) {
 	return prisma.databaseUsage.findMany({
 		where: { databaseId: id },
 		select: {
@@ -1191,12 +1191,12 @@ export function getDatabaseLatestFeeds({ id }: Pick<Database, 'id'>) {
 		},
 		take: 30,
 		orderBy: {
-			createdAt: 'desc',
+			createdAt: "desc",
 		},
 	});
 }
 
-export function getMonitorLatestFeeds({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorLatestFeeds({ id }: Pick<Monitor, "id">) {
 	return prisma.monitorFeeds.findMany({
 		where: { monitorId: id },
 		select: {
@@ -1208,12 +1208,12 @@ export function getMonitorLatestFeeds({ id }: Pick<Monitor, 'id'>) {
 		},
 		take: 30,
 		orderBy: {
-			createdAt: 'desc',
+			createdAt: "desc",
 		},
 	});
 }
 
-export function getMonitorLatestFeed({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorLatestFeed({ id }: Pick<Monitor, "id">) {
 	return prisma.monitorFeeds.findMany({
 		where: { monitorId: id },
 		select: {
@@ -1229,12 +1229,12 @@ export function getMonitorLatestFeed({ id }: Pick<Monitor, 'id'>) {
 		},
 		take: 1,
 		orderBy: {
-			createdAt: 'desc',
+			createdAt: "desc",
 		},
 	});
 }
 
-export function getMonitors({ type }: Pick<Monitor, 'type'>) {
+export function getMonitors({ type }: Pick<Monitor, "type">) {
 	return prisma.monitor.findMany({
 		where: { type },
 		select: {
@@ -1257,10 +1257,10 @@ export function getMonitors({ type }: Pick<Monitor, 'type'>) {
 		},
 		orderBy: [
 			{
-				hasError: 'desc',
+				hasError: "desc",
 			},
 			{
-				title: 'asc',
+				title: "asc",
 			},
 		],
 	});
@@ -1283,16 +1283,16 @@ export function updateMonitorNotifications({
 	sqlFileSizePercentFreeValue,
 }: Pick<
 	Monitor,
-	| 'id'
-	| 'connectionNotify'
-	| 'connectionNotifyResendAfterMinutes'
-	| 'rebootNotify'
-	| 'connectionNotifyRetries'
-	| 'httpCertNotify'
-	| 'httpCertNotifyResendAfterMinutes'
-	| 'sqlFileSizePercentFreeNotify'
-	| 'sqlFileSizePercentFreeNotifyResendAfterMinutes'
-	| 'sqlFileSizePercentFreeValue'
+	| "id"
+	| "connectionNotify"
+	| "connectionNotifyResendAfterMinutes"
+	| "rebootNotify"
+	| "connectionNotifyRetries"
+	| "httpCertNotify"
+	| "httpCertNotifyResendAfterMinutes"
+	| "sqlFileSizePercentFreeNotify"
+	| "sqlFileSizePercentFreeNotifyResendAfterMinutes"
+	| "sqlFileSizePercentFreeValue"
 > & {
 	sqlFileSizePercentFreeNotifyTypes: string[];
 	httpCertNotifyTypes: string[];
@@ -1334,7 +1334,7 @@ export function updateMonitor({
 	drives,
 	databases,
 	cpus,
-}: Pick<Monitor, 'id'> & {
+}: Pick<Monitor, "id"> & {
 	data?: {
 		caption?: string;
 		name?: string;
@@ -1634,7 +1634,7 @@ export type UpdateMonitorResult = Prisma.MonitorGetPayload<
 export function setFileDays({
 	id,
 	daysTillFull,
-}: Pick<DatabaseFile, 'id' | 'daysTillFull'>) {
+}: Pick<DatabaseFile, "id" | "daysTillFull">) {
 	return prisma.databaseFile.update({
 		where: { id },
 		data: { daysTillFull },
@@ -1644,7 +1644,7 @@ export function setFileDays({
 export function setFileGrowth({
 	id,
 	growthRate,
-}: Pick<DatabaseFile, 'id' | 'growthRate'>) {
+}: Pick<DatabaseFile, "id" | "growthRate">) {
 	return prisma.databaseFile.update({
 		where: { id },
 		data: { growthRate },
@@ -1654,7 +1654,7 @@ export function setFileGrowth({
 export function setFilePercFreeSentAt({
 	id,
 	sqlFileSizePercentFreeNotifySentAt,
-}: Pick<DatabaseFile, 'id' | 'sqlFileSizePercentFreeNotifySentAt'>) {
+}: Pick<DatabaseFile, "id" | "sqlFileSizePercentFreeNotifySentAt">) {
 	return prisma.databaseFile.update({
 		where: { id },
 		data: { sqlFileSizePercentFreeNotifySentAt },
@@ -1664,7 +1664,7 @@ export function setFilePercFreeSentAt({
 export function setMonitorConnectionRetried({
 	id,
 	connectionNotifyRetried,
-}: Pick<Monitor, 'id' | 'connectionNotifyRetried'>) {
+}: Pick<Monitor, "id" | "connectionNotifyRetried">) {
 	return prisma.monitor.update({
 		where: { id },
 		data: { connectionNotifyRetried },
@@ -1674,7 +1674,7 @@ export function setMonitorConnectionRetried({
 export function setMonitorConnectionSentAt({
 	id,
 	connectionNotifySentAt,
-}: Pick<Monitor, 'id' | 'connectionNotifySentAt'>) {
+}: Pick<Monitor, "id" | "connectionNotifySentAt">) {
 	return prisma.monitor.update({
 		where: { id },
 		data: { connectionNotifySentAt },
@@ -1684,7 +1684,7 @@ export function setMonitorConnectionSentAt({
 export function setMonitorRebootSentAt({
 	id,
 	rebootNotifySentAt,
-}: Pick<Monitor, 'id' | 'rebootNotifySentAt'>) {
+}: Pick<Monitor, "id" | "rebootNotifySentAt">) {
 	return prisma.monitor.update({
 		where: { id },
 		data: { rebootNotifySentAt },
@@ -1694,7 +1694,7 @@ export function setMonitorRebootSentAt({
 export function setMonitorHttpCertSentAt({
 	id,
 	httpCertNotifySentAt,
-}: Pick<Monitor, 'id' | 'httpCertNotifySentAt'>) {
+}: Pick<Monitor, "id" | "httpCertNotifySentAt">) {
 	return prisma.monitor.update({
 		where: { id },
 		data: { httpCertNotifySentAt },
@@ -1705,14 +1705,14 @@ export function setFeedError({
 	id,
 	message,
 	hasError,
-}: Pick<MonitorFeeds, 'id' | 'hasError' | 'message'>) {
+}: Pick<MonitorFeeds, "id" | "hasError" | "message">) {
 	return prisma.monitorFeeds.update({
 		where: { id },
 		data: { hasError, message },
 	});
 }
 
-export function getMonitorBootTime({ id }: Pick<Monitor, 'id'>) {
+export function getMonitorBootTime({ id }: Pick<Monitor, "id">) {
 	return prisma.monitor.findUnique({
 		where: { id },
 		select: {

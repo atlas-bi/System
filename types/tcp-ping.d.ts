@@ -1,4 +1,4 @@
-declare module 'tcp-ping' {
+declare module "tcp-ping" {
 	export interface PingResult {
 		address: string;
 		port: number;

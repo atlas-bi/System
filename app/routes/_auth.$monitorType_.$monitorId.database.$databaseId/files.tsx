@@ -1,9 +1,9 @@
-import { useFetcher, useLocation, useParams } from '@remix-run/react';
-import { useEffect } from 'react';
-import { Database } from '~/models/monitor.server';
-import { columns } from './filesTableColumns';
-import { FilesTable } from './filesTable';
-import { Skeleton } from '~/components/ui/skeleton';
+import { useFetcher, useLocation, useParams } from "@remix-run/react";
+import { useEffect } from "react";
+import { Database } from "~/models/monitor.server";
+import { columns } from "./filesTableColumns";
+import { FilesTable } from "./filesTable";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export const FilesMeta = ({ database }: { database: Database | any }) => {
 	let { monitorId, monitorType } = useParams();
@@ -12,7 +12,7 @@ export const FilesMeta = ({ database }: { database: Database | any }) => {
 	const location = useLocation();
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
-		if (fileFetcher.state === 'idle' && fileFetcher.data == null) {
+		if (fileFetcher.state === "idle" && fileFetcher.data == null) {
 			fileFetcher.load(
 				`/${monitorType}/${monitorId}/database/${database.id}/files`,
 			);
@@ -26,7 +26,7 @@ export const FilesMeta = ({ database }: { database: Database | any }) => {
 	]);
 
 	useEffect(() => {
-		if (fileFetcher.state === 'idle' && fileFetcher.data == null) {
+		if (fileFetcher.state === "idle" && fileFetcher.data == null) {
 			fileFetcher.load(
 				`/${monitorType}/${monitorId}/database/${database.id}/files`,
 			);
@@ -34,7 +34,7 @@ export const FilesMeta = ({ database }: { database: Database | any }) => {
 	}, [location]);
 
 	useEffect(() => {
-		if (fileFetcher.state === 'idle' && fileFetcher.data == null) {
+		if (fileFetcher.state === "idle" && fileFetcher.data == null) {
 			fileFetcher.load(
 				`/${monitorType}/${monitorId}/database/${database.id}/files`,
 			);

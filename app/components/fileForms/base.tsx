@@ -1,6 +1,6 @@
-import { Form, useFetcher } from '@remix-run/react';
-import { ReactNode, useEffect, useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { Form, useFetcher } from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -9,11 +9,11 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '~/components/ui/dialog';
+} from "~/components/ui/dialog";
 
-import { Label } from '~/components/ui/label';
-import type { DatabaseFile } from '~/models/monitor.server';
-import { Switch } from '../ui/switch';
+import { Label } from "~/components/ui/label";
+import type { DatabaseFile } from "~/models/monitor.server";
+import { Switch } from "../ui/switch";
 
 export default function File({
 	file,
@@ -37,7 +37,7 @@ export default function File({
 	useEffect(() => setData(file), [file]);
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.file != null) {
+		if (fetcher.state === "idle" && fetcher.data?.file != null) {
 			setOpen(false);
 		}
 	}, [fetcher.state, fetcher.data]);
@@ -50,7 +50,7 @@ export default function File({
 					<DialogTitle>{file.fileName}</DialogTitle>
 					<DialogDescription>Editing file.</DialogDescription>
 				</DialogHeader>
-				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
+				{fetcher.state !== "submitting" && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
 				<Form method="post" action="/monitor/new">
@@ -73,12 +73,12 @@ export default function File({
 								onClick={(e) => {
 									fetcher.submit(
 										{
-											_action: 'edit',
+											_action: "edit",
 											...JSON.parse(
 												JSON.stringify(data, (k, v) => v ?? undefined),
 											),
 										},
-										{ method: 'post', action: '/file/edit' },
+										{ method: "post", action: "/file/edit" },
 									);
 									setter(data);
 								}}

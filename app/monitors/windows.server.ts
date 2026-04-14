@@ -1,5 +1,5 @@
-import { decrypt } from '@/lib/utils';
-import { NodeSSH } from 'node-ssh';
+import { decrypt } from "@/lib/utils";
+import { NodeSSH } from "node-ssh";
 import {
 	Monitor,
 	getMonitor,
@@ -7,12 +7,12 @@ import {
 	monitorError,
 	updateMonitor,
 	UpdateMonitorResult,
-} from '~/models/monitor.server';
+} from "~/models/monitor.server";
 
-import { setDriveOnline } from '~/models/drive.server';
-import Notifier from '~/notifications/notifier';
-import { disposeSsh } from './helpers.server';
-import { differenceInDays } from 'date-fns';
+import { setDriveOnline } from "~/models/drive.server";
+import Notifier from "~/notifications/notifier";
+import { disposeSsh } from "./helpers.server";
+import { differenceInDays } from "date-fns";
 
 function cpuBuilder(data: any) {
 	// list of cpu for each socket
@@ -69,7 +69,7 @@ export default async function WindowsMonitor({
 			'powershell -command "Get-Host | Select-Object Version|ConvertTo-Json"',
 		);
 
-		let pwshCommand = 'powershell';
+		let pwshCommand = "powershell";
 
 		if (pwshVersionCheck.stderr) {
 			throw pwshVersionCheck.stderr.toString();
@@ -84,7 +84,7 @@ export default async function WindowsMonitor({
 
 			let pwshVersion = JSON.parse(pwshVersionCheck.stdout);
 			if (pwshVersion?.Version?.Major > 4) {
-				pwshCommand = 'pwsh';
+				pwshCommand = "pwsh";
 			}
 		}
 
@@ -133,33 +133,33 @@ export default async function WindowsMonitor({
 
 		const cs = JSON.parse(
 			csRaw.stdout.replace(
-				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
-				'',
+				"WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n",
+				"",
 			),
 		);
 		const os = JSON.parse(
 			osRaw.stdout.replace(
-				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
-				'',
+				"WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n",
+				"",
 			),
 		);
 
 		const pc = cpuBuilder(
 			JSON.parse(
 				pcRaw.stdout.replace(
-					'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
-					'',
+					"WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n",
+					"",
 				),
 			),
 		);
 
 		const cpus = cpuRaw.stdout
 			.split(/\r?\n/)
-			.map((cpu: string) => cpu.split(': '))
+			.map((cpu: string) => cpu.split(": "))
 			.map((cpu: string[]) => {
 				return { name: cpu[0], used: cpu[1] };
 			})
-			.filter((cpu) => cpu.name !== '_Total');
+			.filter((cpu) => cpu.name !== "_Total");
 
 		if (storage.code !== 0) {
 			throw storage;
@@ -167,8 +167,8 @@ export default async function WindowsMonitor({
 
 		const s = JSON.parse(
 			storage.stdout.replace(
-				'WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n',
-				'',
+				"WARNING: Resulting JSON is truncated as serialization has exceeded the set depth of 2.\r\n",
+				"",
 			),
 		);
 
@@ -195,7 +195,7 @@ export default async function WindowsMonitor({
 		// 2023-01-22T00:23:47.493832-06:00
 		if (/Date.+?/.test(os.LastBootUpTime)) {
 			const stripedString = Number(
-				os.LastBootUpTime.replace('/Date(', '').replace(')/', ''),
+				os.LastBootUpTime.replace("/Date(", "").replace(")/", ""),
 			);
 			lastBoot = new Date(stripedString);
 		} else {
@@ -289,7 +289,7 @@ export default async function WindowsMonitor({
 		try {
 			message = JSON.stringify(e);
 			// don't return nothing
-			if (message === '{}') {
+			if (message === "{}") {
 				message = e.toString();
 			}
 		} catch (e) {}

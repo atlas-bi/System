@@ -1,30 +1,30 @@
-import type { LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { getDatabaseMeta } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { getDatabaseMeta } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
 import {
 	Link,
 	useFetcher,
 	useLoaderData,
 	useParams,
 	useSearchParams,
-} from '@remix-run/react';
-import { H1, H3 } from '~/components/ui/typography';
-import { MoveLeft, Settings } from 'lucide-react';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import bytes from 'bytes';
-import { useEffect, useState } from 'react';
+} from "@remix-run/react";
+import { H1, H3 } from "~/components/ui/typography";
+import { MoveLeft, Settings } from "lucide-react";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import bytes from "bytes";
+import { useEffect, useState } from "react";
 
-import { LogTable } from '~/components/logTable/table';
-import { Button } from '~/components/ui/button';
-import Database from '~/components/databaseForms/base';
-import { format, formatDistance } from 'date-fns';
-import { Badge } from '~/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { MemoryChart } from '~/components/charts/databaseMemoryChart';
-import invariant from 'tiny-invariant';
-import { FilesMeta } from './files';
-import { Skeleton } from '~/components/ui/skeleton';
+import { LogTable } from "~/components/logTable/table";
+import { Button } from "~/components/ui/button";
+import Database from "~/components/databaseForms/base";
+import { format, formatDistance } from "date-fns";
+import { Badge } from "~/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { MemoryChart } from "~/components/charts/databaseMemoryChart";
+import invariant from "tiny-invariant";
+import { FilesMeta } from "./files";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -57,7 +57,7 @@ export default function Index() {
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (document.visibilityState === 'visible') {
+			if (document.visibilityState === "visible") {
 				dataFetcher.load(window.location.pathname);
 			}
 		}, 30 * 1000);
@@ -71,7 +71,7 @@ export default function Index() {
 	}, [dataFetcher.data]);
 
 	useEffect(() => {
-		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (usageFetcher.state === "idle" && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${monitorType}/${monitorId}/database/${database.id}/usage`,
 			);
@@ -143,9 +143,9 @@ export default function Index() {
 								<TableCell className="py-1 font-medium">Status</TableCell>
 								<TableCell
 									className={`py-1 ${
-										database.state !== 'ONLINE'
-											? 'text-orange-700'
-											: 'text-slate-700 '
+										database.state !== "ONLINE"
+											? "text-orange-700"
+											: "text-slate-700 "
 									}`}
 								>
 									{database.state}
@@ -172,20 +172,20 @@ export default function Index() {
 									Last Data Backup
 								</TableCell>
 								<TableCell className="py-1 text-slate-700 space-x-2">
-									<span>{bytes(Number(database.backupDataSize)) || '-1'}</span>
+									<span>{bytes(Number(database.backupDataSize)) || "-1"}</span>
 									{database.backupDataDate && (
 										<>
 											<span>
 												{formatDistance(
 													new Date(database.backupDataDate),
 													new Date(),
-												)}{' '}
+												)}{" "}
 												ago.
 											</span>
 											<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
 												{format(
 													new Date(database.backupDataDate),
-													'MMM dd, yyyy k:mm',
+													"MMM dd, yyyy k:mm",
 												)}
 											</Badge>
 										</>
@@ -197,20 +197,20 @@ export default function Index() {
 									Last Logs Backup
 								</TableCell>
 								<TableCell className="py-1 text-slate-700 space-x-2">
-									<span>{bytes(Number(database.backupLogSize)) || '-1'}</span>
+									<span>{bytes(Number(database.backupLogSize)) || "-1"}</span>
 									{database.backupLogDate && (
 										<>
 											<span>
 												{formatDistance(
 													new Date(database.backupLogDate),
 													new Date(),
-												)}{' '}
+												)}{" "}
 												ago.
 											</span>
 											<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
 												{format(
 													new Date(database.backupLogDate),
-													'MMM dd, yyyy k:mm',
+													"MMM dd, yyyy k:mm",
 												)}
 											</Badge>
 										</>
@@ -225,7 +225,7 @@ export default function Index() {
 											Number(
 												[...usageFetcher.data?.database?.usage]?.pop()?.memory,
 											),
-										) || '-1'
+										) || "-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}
@@ -240,7 +240,7 @@ export default function Index() {
 				</div>
 
 				<Tabs
-					defaultValue={`${searchParams.get('tab') || 'memory'}`}
+					defaultValue={`${searchParams.get("tab") || "memory"}`}
 					className="w-full"
 				>
 					<TabsList className="grid max-w-[400px] grid-cols-2">

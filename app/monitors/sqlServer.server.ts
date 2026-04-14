@@ -6,11 +6,11 @@ import {
 	setFileGrowth,
 	UpdateMonitorResult,
 	getMonitorDisabledDatabases,
-} from '~/models/monitor.server';
-import mssql from 'mssql';
-import Notifier from '~/notifications/notifier';
-import { decrypt } from '@/lib/utils';
-import { differenceInDays } from 'date-fns';
+} from "~/models/monitor.server";
+import mssql from "mssql";
+import Notifier from "~/notifications/notifier";
+import { decrypt } from "@/lib/utils";
+import { differenceInDays } from "date-fns";
 
 export default async function SqlServerMonitor({
 	monitor,
@@ -22,7 +22,7 @@ export default async function SqlServerMonitor({
 	let startTime = Date.now();
 
 	try {
-		if (!sqlConnectionString) throw new Error('Connection string not defined.');
+		if (!sqlConnectionString) throw new Error("Connection string not defined.");
 
 		let name,
 			version,
@@ -170,9 +170,9 @@ from sys.dm_os_windows_info`)
 			await pool.request().query(``);
 			// database info
 
-			let memQuery = '',
-				memJoin = '',
-				memCol = '';
+			let memQuery = "",
+				memJoin = "",
+				memCol = "";
 			if (monitor.sqlDisableDbMemory !== true) {
 				memQuery = `
 				    drop table if exists #mem;
@@ -420,7 +420,7 @@ OPTION (
 		try {
 			message = JSON.stringify(e);
 			// don't return nothing
-			if (message === '{}') {
+			if (message === "{}") {
 				message = e.toString();
 			}
 		} catch (e) {}

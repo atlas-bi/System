@@ -1,13 +1,13 @@
-import { setDrivePercFreeSentAt } from '~/models/drive.server';
-import type { Notification } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { render } from '@react-email/render';
+import { setDrivePercFreeSentAt } from "~/models/drive.server";
+import type { Notification } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { render } from "@react-email/render";
 
 import {
 	ErrorEmail,
 	SuccessEmail,
-} from '~/notifications/email/drives/percentFree';
+} from "~/notifications/email/drives/percentFree";
 
 async function allClear({ monitor, drive }: { monitor: any; drive: any }) {
 	if (drive.percFreeNotifySentAt) {
@@ -37,7 +37,7 @@ async function allClear({ monitor, drive }: { monitor: any; drive: any }) {
 				} catch (e) {
 					return Logger({
 						message: `Failed to send ${notification.name}: ${e}`,
-						type: 'error',
+						type: "error",
 						monitor,
 						drive,
 					});
@@ -47,7 +47,7 @@ async function allClear({ monitor, drive }: { monitor: any; drive: any }) {
 
 		return Logger({
 			message: `Free space now below limit of ${drive.percFreeValue}%`,
-			type: 'success',
+			type: "success",
 			monitor,
 			drive,
 		});
@@ -88,7 +88,7 @@ export default async function percentFreeNotifier({
 
 	await Logger({
 		message,
-		type: 'error',
+		type: "error",
 		monitor,
 		drive,
 	});
@@ -129,7 +129,7 @@ export default async function percentFreeNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 					drive,
 				});

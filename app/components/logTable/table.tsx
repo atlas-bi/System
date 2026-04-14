@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
 	ColumnDef,
 	ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
 	getFilteredRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
 import {
 	Table,
@@ -23,13 +23,13 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '~/components/ui/table';
+} from "~/components/ui/table";
 
-import { columns } from './columns';
-import { H3 } from '../ui/typography';
-import { LogTablePagination } from './pagination';
-import { useEffect } from 'react';
-import { useFetcher } from '@remix-run/react';
+import { columns } from "./columns";
+import { H3 } from "../ui/typography";
+import { LogTablePagination } from "./pagination";
+import { useEffect } from "react";
+import { useFetcher } from "@remix-run/react";
 
 export function LogTable({ url }: { url: string }) {
 	type LogsFetcherData = {
@@ -65,7 +65,7 @@ export function LogTable({ url }: { url: string }) {
 	// Get fresh data every 30 seconds.
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (document.visibilityState === 'visible') {
+			if (document.visibilityState === "visible") {
 				logsFetcher.load(`${url}?page=${pageIndex}&size=${pageSize}`);
 			}
 		}, 30 * 1000);
@@ -78,7 +78,7 @@ export function LogTable({ url }: { url: string }) {
 	}, [pageIndex, pageSize]);
 
 	useEffect(() => {
-		if (logsFetcher.state === 'idle' && logsFetcher.data) {
+		if (logsFetcher.state === "idle" && logsFetcher.data) {
 			setData(logsFetcher.data.data.logs);
 			setPages(logsFetcher.data.data.pages);
 		}
@@ -148,7 +148,7 @@ export function LogTable({ url }: { url: string }) {
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
-									data-state={row.getIsSelected() && 'selected'}
+									data-state={row.getIsSelected() && "selected"}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>

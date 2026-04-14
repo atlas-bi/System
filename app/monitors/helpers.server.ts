@@ -1,12 +1,12 @@
-import { AxiosResponse } from 'axios';
-import { differenceInDays } from 'date-fns';
-import { NodeSSH } from 'node-ssh';
+import { AxiosResponse } from "axios";
+import { differenceInDays } from "date-fns";
+import { NodeSSH } from "node-ssh";
 
 export function disposeSsh(ssh: NodeSSH) {
 	if (ssh.connection) {
 		// @ts-ignore
 		ssh.getConnection().end();
-		ssh.connection.on('error', function () {
+		ssh.connection.on("error", function () {
 			/* No Op */
 		});
 		ssh.dispose();
@@ -28,8 +28,8 @@ const parseCertificateInfo = function (info: any) {
 		}
 		link.validTo = new Date(link.valid_to);
 		link.validFor = link.subjectaltname
-			?.replace(/DNS:|IP Address:/g, '')
-			.split(', ');
+			?.replace(/DNS:|IP Address:/g, "")
+			.split(", ");
 		link.daysRemaining = differenceInDays(link.validTo, new Date());
 
 		// @ts-ignore
@@ -37,22 +37,22 @@ const parseCertificateInfo = function (info: any) {
 
 		// Move up the chain until loop is encountered
 		if (link.issuerCertificate == null) {
-			link.certType = i === 0 ? 'self-signed' : 'root CA';
+			link.certType = i === 0 ? "self-signed" : "root CA";
 			break;
 		} else if (link.issuerCertificate.fingerprint in existingList) {
 			// a root CA certificate is typically "signed by itself"  (=> "self signed certificate") and thus the "issuerCertificate" is a reference to itself.
 			// console.log("cert", `[Last] ${link.issuerCertificate.fingerprint}`);
-			link.certType = i === 0 ? 'self-signed' : 'root CA';
+			link.certType = i === 0 ? "self-signed" : "root CA";
 			link.issuerCertificate = null;
 			break;
 		} else {
-			link.certType = i === 0 ? 'server' : 'intermediate CA';
+			link.certType = i === 0 ? "server" : "intermediate CA";
 			link = link.issuerCertificate;
 		}
 
 		// Should be no use, but just in case.
 		if (i > 500) {
-			throw new Error('Dead loop occurred in parseCertificateInfo');
+			throw new Error("Dead loop occurred in parseCertificateInfo");
 		}
 		i++;
 	}
@@ -61,7 +61,7 @@ const parseCertificateInfo = function (info: any) {
 };
 export const checkCertificate = function (res: AxiosResponse<any, any>) {
 	if (!res?.request?.res?.socket && !res?.request?.res?.req?.socket) {
-		throw new Error('No socket found');
+		throw new Error("No socket found");
 	}
 	const socket = res?.request?.res?.socket || res?.request?.res?.req?.socket;
 	const info = socket.getPeerCertificate(true);
