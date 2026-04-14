@@ -1,5 +1,6 @@
-import { LoaderArgs, json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import {
 	ColumnFiltersState,
 	SortingState,
@@ -12,13 +13,13 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from '@tanstack/react-table';
-import Notification from '~/components/notificationForms/base';
-import React from 'react';
-import { DataTableToolbar } from '~/components/table/data-table-toolbar';
-import { getNotificationsDetail } from '~/models/notification.server';
-import { authenticator } from '~/services/auth.server';
-import { columns } from './table_columns';
+} from "@tanstack/react-table";
+import Notification from "~/components/notificationForms/base";
+import React from "react";
+import { DataTableToolbar } from "~/components/table/data-table-toolbar";
+import { getNotificationsDetail } from "~/models/notification.server";
+import { authenticator } from "~/services/auth.server";
+import { columns } from "./table_columns";
 import {
 	Table,
 	TableBody,
@@ -26,11 +27,11 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '~/components/ui/table';
-import { DataTablePagination } from '~/components/table/data-table-pagination';
-import { decrypt } from '@/lib/utils';
+} from "~/components/ui/table";
+import { DataTablePagination } from "~/components/table/data-table-pagination";
+import { decrypt } from "@/lib/utils";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -59,7 +60,7 @@ export default function Index() {
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'title', desc: false },
+		{ id: "title", desc: false },
 	]);
 
 	const table = useReactTable({
@@ -101,7 +102,7 @@ export default function Index() {
 													: flexRender(
 															header.column.columnDef.header,
 															header.getContext(),
-													  )}
+														)}
 											</TableHead>
 										);
 									})}
@@ -115,7 +116,7 @@ export default function Index() {
 										<TableRow
 											key={row.id}
 											className="cursor-pointer"
-											data-state={row.getIsSelected() ? 'selected' : null}
+											data-state={row.getIsSelected() ? "selected" : null}
 										>
 											{row.getVisibleCells().map((cell) => (
 												<TableCell key={cell.id}>

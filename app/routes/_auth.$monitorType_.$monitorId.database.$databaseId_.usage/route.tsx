@@ -1,13 +1,13 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { startOfDay, startOfHour } from 'date-fns';
-import invariant from 'tiny-invariant';
-import { dateOptions } from '~/models/dates';
-import { getDatabaseUsage } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
-import { dateRange } from '~/utils';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { startOfDay, startOfHour } from "date-fns";
+import invariant from "tiny-invariant";
+import { dateOptions } from "~/models/dates";
+import { getDatabaseUsage } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
+import { dateRange } from "~/utils";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -19,7 +19,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range'),
+		url.searchParams.get("range"),
 	);
 
 	const database = await getDatabaseUsage({
@@ -28,14 +28,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		endDate,
 	});
 	if (!database) {
-		throw new Response('Not Found', { status: 404 });
+		throw new Response("Not Found", { status: 404 });
 	}
 
 	const groupSize = dateOptions.filter(
-		(x) => x.value == url.searchParams.get('range'),
+		(x) => x.value == url.searchParams.get("range"),
 	)?.[0]?.unit;
 
-	if (url.searchParams.get('range') === 'all_time') {
+	if (url.searchParams.get("range") === "all_time") {
 		startDate = undefined;
 		endDate = undefined;
 	}
@@ -52,12 +52,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		createdAt: Date;
 	};
 	switch (groupSize) {
-		case 'minute':
+		case "minute":
 			// minute is db default
 			return json({
 				database: { ...database, startDate, endDate },
 			});
-		case 'hour':
+		case "hour":
 			grouped = database.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfHour(e.createdAt).toISOString()]) {
 					a[startOfHour(e.createdAt).toISOString()] = [];
@@ -68,7 +68,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				return a;
 			}, {});
 			break;
-		case 'day':
+		case "day":
 		default:
 			grouped = database.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfDay(e.createdAt).toISOString()]) {

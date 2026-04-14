@@ -1,13 +1,13 @@
-import { Dispatch, Fragment } from 'react';
+import { Dispatch, Fragment } from "react";
 import {
 	Select,
 	SelectContent,
 	SelectItemNoIndicator,
 	SelectTrigger,
 	SelectValue,
-} from '~/components/ui/select';
-import { Separator } from '~/components/ui/separator';
-import { dateOptions } from '~/models/dates';
+} from "~/components/ui/select";
+import { Separator } from "~/components/ui/separator";
+import { dateOptions } from "~/models/dates";
 
 export const DateFilter = ({
 	value,
@@ -17,12 +17,12 @@ export const DateFilter = ({
 	onChange: Dispatch<string>;
 }) => {
 	return (
-		<Select value={value || 'last_24_hours'} onValueChange={onChange}>
+		<Select value={value || "last_24_hours"} onValueChange={onChange}>
 			<SelectTrigger className="h-8 w-[150px] focus:ring-0 focus:ring-offset-0">
 				<SelectValue
 					placeholder={
 						dateOptions.filter((x) => x.value === value)?.[0]?.name ||
-						'Last 24 hours'
+						"Last 24 hours"
 					}
 				/>
 			</SelectTrigger>

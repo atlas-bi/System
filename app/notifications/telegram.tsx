@@ -1,6 +1,6 @@
-import type { Notification } from '~/models/notification.server';
-import axios from 'axios';
-import { decrypt } from '@/lib/utils';
+import type { Notification } from "~/models/notification.server";
+import axios from "axios";
+import { decrypt } from "@/lib/utils";
 
 export default async function Telegram({
 	notification,
@@ -22,7 +22,11 @@ export default async function Telegram({
 
 		await axios.get(
 			`https://api.telegram.org/bot${
-				test ? notification.tgBotToken : decrypt(notification.tgBotToken)
+				test
+					? notification.tgBotToken
+					: notification.tgBotToken
+						? decrypt(notification.tgBotToken)
+						: ""
 			}/sendMessage`,
 			{
 				params: params,

@@ -1,15 +1,15 @@
-import { Dispatch } from 'react';
+import { Dispatch } from "react";
 
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
-import { Textarea } from '~/components/ui/textarea';
+import { Textarea } from "~/components/ui/textarea";
 
-import type { Monitor } from '~/models/monitor.server';
-import { Switch } from '../ui/switch';
-import { statusCodes } from '~/models/statusCodes';
-import { MultiSelect } from '../ui/multiselect';
-import { requestMethods } from '~/models/requestMethods';
+import type { Monitor } from "~/models/monitor.server";
+import { Switch } from "../ui/switch";
+import { statusCodes } from "~/models/statusCodes";
+import { MultiSelect } from "../ui/multiselect";
+import { requestMethods } from "~/models/requestMethods";
 import {
 	Select,
 	SelectContent,
@@ -17,10 +17,10 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '../ui/select';
-import { encodingTypes } from '~/models/encodingTypes';
-import { authTypes } from '~/models/authTypes';
-import { jsonParser } from '~/utils';
+} from "../ui/select";
+import { encodingTypes } from "~/models/encodingTypes";
+import { authTypes } from "~/models/authTypes";
+import { jsonParser } from "~/utils";
 
 export default function HttpForm({
 	data,
@@ -29,6 +29,17 @@ export default function HttpForm({
 	data: Monitor;
 	setData: Dispatch<Monitor>;
 }) {
+	const httpAcceptedStatusCodes = (() => {
+		const parsed = jsonParser(data.httpAcceptedStatusCodes);
+		if (Array.isArray(parsed)) {
+			return parsed.map((v) => v.toString());
+		}
+		if (typeof parsed === "string" || typeof parsed === "number") {
+			return [parsed.toString()];
+		}
+		return [];
+	})();
+
 	return (
 		<>
 			<Label htmlFor="httpUrl" className="text-right">
@@ -37,7 +48,7 @@ export default function HttpForm({
 			<Input
 				type="text"
 				id="httpUrl"
-				value={data.httpUrl || ''}
+				value={data.httpUrl || ""}
 				placeholder="https://google.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, httpUrl: e.target.value })}
@@ -52,7 +63,7 @@ export default function HttpForm({
 					}
 				/>
 			</div>
-			{data.httpUrl && data.httpUrl.startsWith('https') && (
+			{data.httpUrl && data.httpUrl.startsWith("https") && (
 				<>
 					<Label className="text-right">Cert Expiration Warning</Label>
 					<div className="self-start col-span-3">
@@ -73,22 +84,14 @@ export default function HttpForm({
 				placeholder="choose"
 				parentClassName="col-span-3"
 				data={statusCodes}
-				active={statusCodes.filter((x: { value: string }) => {
-					const codes = jsonParser(data.httpAcceptedStatusCodes);
-					if (!codes) return false;
-					if (typeof codes === 'string' || typeof codes === 'number') {
-						return codes.toString() === x.value;
-					}
-					return (
-						codes.filter((t: string | number) => t.toString() == x.value)
-							.length > 0
-					);
-				})}
+				active={statusCodes.filter((x) =>
+					httpAcceptedStatusCodes.includes(x.value),
+				)}
 				name="httpAcceptedStatusCodes"
-				onChange={(x) => {
+				onChange={(x: Array<{ value: string }>) => {
 					setData({
 						...data,
-						httpAcceptedStatusCodes: JSON.stringify(x.map((x) => x.value)),
+						httpAcceptedStatusCodes: x.map((i) => i.value),
 					});
 				}}
 			/>
@@ -99,19 +102,17 @@ export default function HttpForm({
 			<Input
 				type="number"
 				id="httpMaxRedirects"
-				value={data.httpMaxRedirects}
+				value={data.httpMaxRedirects ?? ""}
 				placeholder="10"
 				className="col-span-3"
-				onChange={(e) =>
-					setData({ ...data, httpMaxRedirects: Number(e.target.value) })
-				}
+				onChange={(e) => setData({ ...data, httpMaxRedirects: e.target.value })}
 			/>
 
 			<Select
 				onValueChange={(httpRequestMethod: string) =>
 					setData({ ...data, httpRequestMethod })
 				}
-				value={data.httpRequestMethod}
+				value={data.httpRequestMethod ?? undefined}
 				defaultValue="GET"
 			>
 				<Label htmlFor="name" className="text-right">
@@ -135,7 +136,7 @@ export default function HttpForm({
 				onValueChange={(httpBodyEncoding: string) =>
 					setData({ ...data, httpBodyEncoding })
 				}
-				value={data.httpBodyEncoding}
+				value={data.httpBodyEncoding ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Body Encoding
@@ -158,20 +159,20 @@ export default function HttpForm({
 			</Label>
 			<Textarea
 				id="httpBodyText"
-				value={data.httpBodyText || ''}
+				value={data.httpBody || ""}
 				placeholder=""
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, httpBodyText: e.target.value })}
+				onChange={(e) => setData({ ...data, httpBody: e.target.value })}
 			/>
 			<Label htmlFor="httpHeaderText" className="text-right">
 				Header Text
 			</Label>
 			<Textarea
 				id="httpHeaderText"
-				value={data.httpHeaderText || ''}
+				value={data.httpHeaders || ""}
 				placeholder=""
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, httpHeaderText: e.target.value })}
+				onChange={(e) => setData({ ...data, httpHeaders: e.target.value })}
 			/>
 
 			<Select
@@ -179,10 +180,10 @@ export default function HttpForm({
 					setData({
 						...data,
 						httpAuthentication:
-							httpAuthentication == '' ? undefined : httpAuthentication,
+							httpAuthentication === "" ? null : httpAuthentication,
 					})
 				}
-				value={data.httpAuthentication}
+				value={data.httpAuthentication ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Authentication Method
@@ -202,8 +203,8 @@ export default function HttpForm({
 				</SelectContent>
 			</Select>
 
-			{(data.httpAuthentication === 'basic' ||
-				data.httpAuthentication === 'ntlm') && (
+			{(data.httpAuthentication === "basic" ||
+				data.httpAuthentication === "ntlm") && (
 				<>
 					<Label htmlFor="httpUsername" className="text-right">
 						Username
@@ -211,7 +212,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpUsername"
-						value={data.httpUsername || ''}
+						value={data.httpUsername || ""}
 						placeholder="john-smith"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpUsername: e.target.value })}
@@ -222,7 +223,7 @@ export default function HttpForm({
 					<Input
 						type="password"
 						id="httpPassword"
-						value={data.httpPassword || ''}
+						value={data.httpPassword || ""}
 						placeholder="123"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpPassword: e.target.value })}
@@ -230,7 +231,7 @@ export default function HttpForm({
 				</>
 			)}
 
-			{data.httpAuthentication === 'ntlm' && (
+			{data.httpAuthentication === "ntlm" && (
 				<>
 					<Label htmlFor="httpDomain" className="text-right">
 						Domain
@@ -238,7 +239,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpDomain"
-						value={data.httpDomain || ''}
+						value={data.httpDomain || ""}
 						placeholder="WORKGROUP"
 						className="col-span-3"
 						onChange={(e) => setData({ ...data, httpDomain: e.target.value })}
@@ -249,7 +250,7 @@ export default function HttpForm({
 					<Input
 						type="text"
 						id="httpWorkstation"
-						value={data.httpWorkstation || ''}
+						value={data.httpWorkstation || ""}
 						placeholder="ws103"
 						className="col-span-3"
 						onChange={(e) =>

@@ -1,8 +1,8 @@
-import { Monitor, monitorError, updateMonitor } from '~/models/monitor.server';
+import { Monitor, monitorError, updateMonitor } from "~/models/monitor.server";
 
-import Notifier from '~/notifications/notifier';
-import tcpp from 'tcp-ping';
-import util from 'node:util';
+import Notifier from "~/notifications/notifier";
+import tcpp from "tcp-ping";
+import util from "node:util";
 const tcpping = util.promisify(tcpp.ping);
 
 export async function TcpCheck({
@@ -19,13 +19,15 @@ export default async function TcpMonitor({ monitor }: { monitor: Monitor }) {
 	// most thanks to https://github.com/louislam/uptime-kuma/blob/de8386362710973d00b8bbc41374753d3500219c/server/model/monitor.js#L1015
 
 	const { host, port } = monitor;
-
+	if (!host || !port) {
+		throw new Error("Host and port are required");
+	}
 	let startTime = Date.now();
 
 	try {
 		await TcpCheck({
-			address: host,
-			port,
+			address: host!,
+			port: Number(port!),
 		});
 
 		const ping = Date.now() - startTime;
@@ -46,7 +48,7 @@ export default async function TcpMonitor({ monitor }: { monitor: Monitor }) {
 		try {
 			message = JSON.stringify(e);
 			// don't return nothing
-			if (message === '{}') {
+			if (message === "{}") {
 				message = e.toString();
 			}
 		} catch (e) {}

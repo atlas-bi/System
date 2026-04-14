@@ -1,24 +1,26 @@
-import { Monitor, setMonitorHttpCertSentAt } from '~/models/monitor.server';
-import type { Notification } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { render } from '@react-email/render';
+import { setMonitorHttpCertSentAt } from "~/models/monitor.server";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import type { NotificationMeta } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { render } from "@react-email/render";
 import {
 	InvalidEmail,
 	SuccessEmail,
 	ErrorEmail,
-} from '~/notifications/email/monitors/httpCert';
+} from "~/notifications/email/monitors/httpCert";
 
 export default async function httpCertNotifier({
 	monitor,
 }: {
-	monitor: Monitor & { httpCertNotifyTypes: Notification[] };
+	monitor: MonitorWithRelations;
 }) {
 	// don't notify if disabled.
 	if (
 		!monitor.httpCertNotify ||
-		monitor.type !== 'http' ||
-		!monitor.httpUrl.startsWith('https')
+		monitor.type !== "http" ||
+		!monitor.httpUrl ||
+		!monitor.httpUrl.startsWith("https")
 	) {
 		return setMonitorHttpCertSentAt({
 			id: monitor.id,
@@ -34,8 +36,8 @@ export default async function httpCertNotifier({
 	if (monitor.certValid === false || monitor.certDays == null) {
 		const snippet =
 			monitor.certDays == null
-				? 'Certificate could not be determined'
-				: 'Certificate is invalid';
+				? "Certificate could not be determined"
+				: "Certificate is invalid";
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] ${snippet}.`;
@@ -50,7 +52,7 @@ export default async function httpCertNotifier({
 			},
 		);
 		message = `${snippet}.`;
-	} else if (monitor.certDays <= 21) {
+	} else if (Number(monitor.certDays) <= 21) {
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] Certificate expires in ${monitor.certDays}.`;
@@ -80,8 +82,9 @@ export default async function httpCertNotifier({
 		);
 		message = subject;
 
-		monitor.httpCertNotifyTypes.map(async (notification: Notification) => {
+		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
+				if (!subject || !html) return;
 				return await sendNotification({
 					notification,
 					subject,
@@ -90,7 +93,7 @@ export default async function httpCertNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 				});
 			}
@@ -117,24 +120,26 @@ export default async function httpCertNotifier({
 	}
 
 	if (resend && subject && html) {
-		monitor.httpCertNotifyTypes.map(async (notification: Notification) => {
+		const subjectToSend = subject;
+		const htmlToSend = html;
+		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
 				return await sendNotification({
 					notification,
-					subject,
-					message: html,
+					subject: subjectToSend,
+					message: htmlToSend,
 				});
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 				});
 			}
 		});
 		await Logger({
-			message: message || '',
-			type: 'error',
+			message: message || "",
+			type: "error",
 			monitor,
 		});
 		return setMonitorHttpCertSentAt({

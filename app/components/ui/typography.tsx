@@ -1,14 +1,16 @@
-import { cn } from '@/lib/utils';
-import * as React from 'react';
+import { cn } from "@/lib/utils";
+import * as React from "react";
 
-export interface HProps extends React.HTMLAttributes<HTMLElement> {}
+export interface H1Props extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface H2Props extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface H3Props extends React.HTMLAttributes<HTMLHeadingElement> {}
 
-const H1 = React.forwardRef<HTMLElement, HProps>(
+const H1 = React.forwardRef<HTMLHeadingElement, H1Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h1
 				className={cn(
-					'first:mt-2 mb-4  scroll-m-20 text-3xl font-medium tracking-normal lg:text-4xl',
+					"first:mt-2 mb-4  scroll-m-20 text-3xl font-medium tracking-normal lg:text-4xl",
 					className,
 				)}
 				ref={ref}
@@ -18,14 +20,14 @@ const H1 = React.forwardRef<HTMLElement, HProps>(
 	},
 );
 
-H1.displayName = 'H1';
+H1.displayName = "H1";
 
-const H2 = React.forwardRef<HTMLElement, HProps>(
+const H2 = React.forwardRef<HTMLHeadingElement, H2Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h2
 				className={cn(
-					'scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0',
+					"scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0",
 					className,
 				)}
 				ref={ref}
@@ -35,14 +37,14 @@ const H2 = React.forwardRef<HTMLElement, HProps>(
 	},
 );
 
-H2.displayName = 'H2';
+H2.displayName = "H2";
 
-const H3 = React.forwardRef<HTMLElement, HProps>(
+const H3 = React.forwardRef<HTMLHeadingElement, H3Props>(
 	({ className, ...props }, ref) => {
 		return (
 			<h3
 				className={cn(
-					'scroll-m-20 text-xl font-semibold tracking-tight',
+					"scroll-m-20 text-xl font-semibold tracking-tight",
 					className,
 				)}
 				ref={ref}
@@ -52,5 +54,5 @@ const H3 = React.forwardRef<HTMLElement, HProps>(
 	},
 );
 
-H3.displayName = 'H3';
+H3.displayName = "H3";
 export { H1, H2, H3 };

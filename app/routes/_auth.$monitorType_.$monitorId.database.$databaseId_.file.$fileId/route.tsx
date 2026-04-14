@@ -1,22 +1,22 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { getDatabaseFile } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
-import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
-import { H1 } from '~/components/ui/typography';
-import { BellRing, MoveLeft, MoveRight, Settings } from 'lucide-react';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import bytes from 'bytes';
-import { useEffect, useState } from 'react';
-import { LogTable } from '~/components/logTable/table';
-import { Button } from '~/components/ui/button';
-import File from '~/components/fileForms/base';
-import { Badge } from '~/components/ui/badge';
-import { FileChart } from '~/components/charts/fileChart';
-import invariant from 'tiny-invariant';
-import { Skeleton } from '~/components/ui/skeleton';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { getDatabaseFile } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
+import { Link, useFetcher, useLoaderData, useParams } from "@remix-run/react";
+import { H1 } from "~/components/ui/typography";
+import { BellRing, MoveLeft, MoveRight, Settings } from "lucide-react";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import bytes from "bytes";
+import { useEffect, useState } from "react";
+import { LogTable } from "~/components/logTable/table";
+import { Button } from "~/components/ui/button";
+import File from "~/components/fileForms/base";
+import { Badge } from "~/components/ui/badge";
+import { FileChart } from "~/components/charts/fileChart";
+import invariant from "tiny-invariant";
+import { Skeleton } from "~/components/ui/skeleton";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -37,17 +37,16 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function Index() {
 	const { fileData } = useLoaderData<typeof loader>();
 	let { monitorId, monitorType, databaseId } = useParams();
-	const usageFetcher = useFetcher();
-	const dataFetcher = useFetcher();
+	const usageFetcher = useFetcher<{ usage?: any }>();
+	const dataFetcher = useFetcher<typeof loader>();
 
 	const [file, setFile] = useState(fileData);
 
-	// Get fresh header data every 30 seconds.
-	useEffect(() => setFile(file), [file]);
+	useEffect(() => setFile(fileData), [fileData]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (document.visibilityState === 'visible') {
+			if (document.visibilityState === "visible") {
 				dataFetcher.load(window.location.pathname);
 				usageFetcher.load(
 					`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}/usage-latest`,
@@ -58,18 +57,25 @@ export default function Index() {
 	}, []);
 
 	useEffect(() => {
-		if (dataFetcher.data?.file) {
-			setFile(dataFetcher.data.file);
+		if (dataFetcher.data?.fileData) {
+			setFile(dataFetcher.data.fileData as any);
 		}
 	}, [dataFetcher.data]);
 
 	useEffect(() => {
-		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (usageFetcher.state === "idle" && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${monitorType}/${monitorId}/database/${databaseId}/file/${file.id}/usage-latest`,
 			);
 		}
-	}, [usageFetcher]);
+	}, [
+		usageFetcher.state,
+		usageFetcher.data,
+		monitorType,
+		monitorId,
+		databaseId,
+		file.id,
+	]);
 
 	return (
 		<>
@@ -88,7 +94,7 @@ export default function Index() {
 					File
 				</Badge>
 				<div className="flex divide-x">
-					<File file={file} setter={setFile}>
+					<File file={file as any} setter={setFile as any}>
 						<Button variant="link" className="text-slate-700 h-6 ">
 							<Settings size={16} />
 						</Button>
@@ -132,9 +138,9 @@ export default function Index() {
 								<TableCell className="py-1 font-medium">Status</TableCell>
 								<TableCell
 									className={`py-1 ${
-										file.state !== 'ONLINE'
-											? 'text-orange-700'
-											: 'text-slate-700 '
+										file.state !== "ONLINE"
+											? "text-orange-700"
+											: "text-slate-700 "
 									}`}
 								>
 									{file.state}
@@ -143,17 +149,17 @@ export default function Index() {
 							<TableRow>
 								<TableCell className="py-1 font-medium">Auto Growth</TableCell>
 								<TableCell className="py-1 text-slate-700">
-									{Number(file.growth) > 1 && file.isPercentGrowth !== 'true'
+									{Number(file.growth) > 1 && file.isPercentGrowth !== "true"
 										? bytes(Number(file.growth))
 										: file.growth}
-									{file.isPercentGrowth == 'true' && '%'}
+									{file.isPercentGrowth == "true" && "%"}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="py-1 font-medium">Data Size</TableCell>
 								<TableCell className="py-1 text-slate-700">
 									{usageFetcher.data ? (
-										bytes(Number(usageFetcher?.data?.usage?.usedSize)) || '-1'
+										bytes(Number(usageFetcher?.data?.usage?.usedSize)) || "-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}
@@ -164,7 +170,7 @@ export default function Index() {
 								<TableCell className="py-1 text-slate-700">
 									{usageFetcher.data ? (
 										bytes(Number(usageFetcher?.data?.usage?.currentSize)) ||
-										'-1'
+										"-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}
@@ -174,7 +180,7 @@ export default function Index() {
 								<TableCell className="py-1 font-medium">Max Size</TableCell>
 								<TableCell className="py-1 text-slate-700">
 									{usageFetcher.data ? (
-										bytes(Number(usageFetcher?.data?.usage?.maxSize)) || '-1'
+										bytes(Number(usageFetcher?.data?.usage?.maxSize)) || "-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}

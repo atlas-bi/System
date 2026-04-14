@@ -1,33 +1,47 @@
-import * as React from 'react';
-import { DialogProps } from '@radix-ui/react-alert-dialog';
-import { cn } from '@/lib/utils';
-import { Button } from '~/components/ui/button';
+import * as React from "react";
+import type { DialogProps } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
+import { Button } from "~/components/ui/button";
 import {
 	CommandDialogDynamic,
 	CommandEmpty,
 	CommandInput,
 	CommandItem,
 	CommandList,
-} from '~/components/ui/command';
+} from "~/components/ui/command";
 
-import { useFetcher, useNavigate } from '@remix-run/react';
-import { Activity, AlertTriangle, Loader2, ToggleLeft } from 'lucide-react';
-import { Badge } from '../ui/badge';
+import { useFetcher, useNavigate } from "@remix-run/react";
+import { Activity, AlertTriangle, Loader2, ToggleLeft } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 export function Search({ ...props }: DialogProps) {
 	const [open, setOpen] = React.useState(false);
-	const fetcher = useFetcher();
+	type SearchHit = {
+		url: string;
+		enabled?: boolean;
+		hasError?: boolean;
+		name?: string | null;
+		title?: string | null;
+		httpUrl?: string | null;
+		tags?: string[] | null;
+	};
+	type SearchFetcherData = {
+		results?: {
+			hits?: SearchHit[];
+		};
+	};
+	const fetcher = useFetcher<SearchFetcherData>();
 
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
-			if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+			if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
 				e.preventDefault();
 				setOpen((open) => !open);
 			}
 		};
 
-		document.addEventListener('keydown', down);
-		return () => document.removeEventListener('keydown', down);
+		document.addEventListener("keydown", down);
+		return () => document.removeEventListener("keydown", down);
 	}, []);
 
 	const runCommand = React.useCallback((command: () => unknown) => {
@@ -35,12 +49,12 @@ export function Search({ ...props }: DialogProps) {
 		command();
 	}, []);
 
-	const [search, setSearch] = React.useState('');
+	const [search, setSearch] = React.useState("");
 	const navigate = useNavigate();
 
 	React.useEffect(() => {
 		if (search) {
-			fetcher.submit({ search }, { method: 'get', action: '/search?index' });
+			fetcher.submit({ search }, { method: "get", action: "/search?index" });
 		}
 	}, [search]);
 
@@ -49,7 +63,7 @@ export function Search({ ...props }: DialogProps) {
 			<Button
 				variant="outline"
 				className={cn(
-					'relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64',
+					"relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64",
 				)}
 				onClick={() => setOpen(true)}
 				{...props}
@@ -68,13 +82,13 @@ export function Search({ ...props }: DialogProps) {
 				<CommandList>
 					{search && (
 						<CommandEmpty>
-							{fetcher.state === 'submitting' || fetcher.state === 'loading' ? (
+							{fetcher.state === "submitting" || fetcher.state === "loading" ? (
 								<Loader2
 									className="ml-3 animate-spin text-muted-foreground"
 									size={14}
 								/>
 							) : (
-								'No results found.'
+								"No results found."
 							)}
 						</CommandEmpty>
 					)}
@@ -100,7 +114,7 @@ export function Search({ ...props }: DialogProps) {
 										)}
 
 										<strong>{h.name || h.title}</strong>
-										<span>{h.httpUrl || h.name ? h.title : ''}</span>
+										<span>{h.httpUrl || h.name ? h.title : ""}</span>
 									</div>
 									<div className="flex">
 										{h.tags?.map((t) => (

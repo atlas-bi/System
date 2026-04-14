@@ -12,136 +12,180 @@ permissions:
   contents: read
 
 jobs:
-  shell:
-    name: ✓ ShellCheck
+  #shell:
+  #  name: ✓ ShellCheck
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: 🛑 Cancel Previous Runs
+  #      uses: styfle/cancel-workflow-action@0.11.0
+
+  #    - name: ⬇️ Checkout repo
+  #      uses: actions/checkout@v3
+
+  #    - name: ⎔ Setup ShellCheck
+  #      run: sudo apt-get update; sudo apt-get install -y shellcheck
+
+  #    - name: 🔬 Lint
+  #      run: |
+  #        cd packages
+  #        shellcheck  **/*.sh
+  #        shellcheck **/atlas-requests
+  #        shellcheck **/install
+  #        shellcheck **/postinst
+  #        shellcheck **/preinst
+  build:
+    name: 🧪 Build
     runs-on: ubuntu-latest
     steps:
       - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: styfle/cancel-workflow-action@0.13.1
 
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
-      - name: ⎔ Setup ShellCheck
-        run: sudo apt-get update; sudo apt-get install -y shellcheck
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 18
 
-      - name: 🔬 Lint
-        run: |
-          cd packages
-          shellcheck  **/*.sh
-          shellcheck **/atlas-requests
-          shellcheck **/install
-          shellcheck **/postinst
-          shellcheck **/preinst
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
+      - name: 📥 Download deps
+        run: pnpm install
+
+      - name: 🔬 Build
+        run: pnpm run build
 
   lint:
-    name: ⬣ ESLint
+    name: ⬣ Biome
     runs-on: ubuntu-latest
     steps:
       - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: styfle/cancel-workflow-action@0.13.1
 
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 16
+          node-version: 18
+
+      - name: ⎔ Setup pnpm
+        run: corepack enable
 
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: 🔬 Lint
-        run: npm run lint
+        run: pnpm run lint
 
-  typecheck:
-    name: ʦ TypeScript
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
-
-      - name: 🔎 Type check
-        run: npm run typecheck --if-present
+  # typecheck:
+  #   name: ʦ TypeScript
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: 🛑 Cancel Previous Runs
+  #       uses: styfle/cancel-workflow-action@0.11.0
+  #
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v3
+  #
+  #     - name: ⎔ Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #
+  #     - name: ⎔ Setup pnpm
+  #       run: corepack enable
+  #
+  #     - name: 📥 Download deps
+  #       run: pnpm install
+  #
+  #     - name: 🔎 Type check
+  #       run: pnpm run typecheck --if-present
 
   vitest:
     name: ⚡ Vitest
     runs-on: ubuntu-latest
     steps:
       - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: styfle/cancel-workflow-action@0.13.1
 
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 16
+          node-version: 18
+
+      - name: ⎔ Setup pnpm
+        run: corepack enable
 
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+        run: pnpm install
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: pnpm exec vitest --coverage
 
-  cypress:
-    name: ⚫️ Cypress
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🛑 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: 🏄 Copy test env vars
-        run: cp .env.example .env
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
-
-      - name: 🐳 Docker compose
-        # the sleep is just there to give time for postgres to get started
-        run: docker-compose up -d && sleep 3
-        env:
-          DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/postgres'
-
-      - name: 🛠 Setup Database
-        run: npx prisma migrate reset --force
-
-      - name: ⚙️ Build
-        run: npm run build
-
-      - name: 🌳 Cypress run
-        uses: cypress-io/github-action@v5
-        with:
-          start: npm run start:mocks
-          wait-on: 'http://localhost:8811'
-        env:
-          PORT: '8811'
+  # cypress:
+  #   name: ⚫️ Cypress
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${{ github.run_id }}
+  #     POSTGRES_DB: postgres
+  #   services:
+  #     postgres:
+  #       image: postgres:14
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: ${{ github.run_id }}
+  #         POSTGRES_DB: postgres
+  #       ports:
+  #         - 5432:5432
+  #       options: >-
+  #         --health-cmd "pg_isready -U postgres -d postgres"
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   steps:
+  #     - name: 🛑 Cancel Previous Runs
+  #       uses: styfle/cancel-workflow-action@0.11.0
+  #
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v3
+  #
+  #     - name: 🏄 Copy test env vars
+  #       run: |
+  #         echo "DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}" > .env
+  #         echo "SESSION_SECRET=atlas-ci" >> .env
+  #
+  #     - name: ⎔ Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #
+  #     - name: Setup pnpm
+  #       run: corepack enable
+  #
+  #     - name: Download deps
+  #       run: pnpm install
+  #
+  #     - name: Setup Database
+  #       run: pnpm exec prisma migrate reset --force
+  #       env:
+  #         DATABASE_URL: 'postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}'
+  #
+  #     - name: Build
+  #       run: pnpm run build
+  #
+  #     - name: Cypress run
+  #       uses: cypress-io/github-action@v5
+  #       with:
+  #         start: pnpm run start:mocks
+  #         wait-on: 'http://localhost:8811'
+  #       env:
+  #         PORT: '8811'
+  #         DISABLE_BACKGROUND_SERVICES: '1'

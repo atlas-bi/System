@@ -1,6 +1,6 @@
-import { Form, useFetcher, useNavigate, useSubmit } from '@remix-run/react';
-import { ReactNode, useEffect, useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { Form, useFetcher, useNavigate, useSubmit } from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -9,9 +9,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -19,27 +19,33 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '~/components/ui/select';
+} from "~/components/ui/select";
 
-import { notificationTypes } from '~/models/notification';
-import { SmtpForm } from '~/components/notificationForms/smpt';
-import { TelegramForm } from '~/components/notificationForms/telegram';
-import { Loader2 } from 'lucide-react';
-import type { Notification } from '~/models/notification.server';
+import { notificationTypes } from "~/models/notification";
+import { SmtpForm } from "~/components/notificationForms/smpt";
+import { TelegramForm } from "~/components/notificationForms/telegram";
+import { Loader2 } from "lucide-react";
+import type { Notification } from "~/models/notification.server";
 
 export default function Notification({
 	notification,
 	children,
 }: {
-	notification: Notification;
+	notification: Partial<Notification>;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	type NotificationFetcherData = {
+		notification?: Notification;
+		form?: { error?: string };
+		error?: { code?: string };
+		success?: string;
+	};
+	const fetcher = useFetcher<NotificationFetcherData>();
 	const deleteSubmit = useSubmit();
-	const testFetcher = useFetcher();
+	const testFetcher = useFetcher<NotificationFetcherData>();
 
-	const [data, setData] = useState<Notification>(notification);
+	const [data, setData] = useState<Partial<Notification>>(notification);
 
 	useEffect(() => {
 		if (!notification.id || notification.id !== data.id) {
@@ -48,7 +54,7 @@ export default function Notification({
 	}, [notification]);
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.notification != null) {
+		if (fetcher.state === "idle" && fetcher.data?.notification != null) {
 			setOpen(false);
 		}
 	}, [fetcher]);
@@ -59,7 +65,7 @@ export default function Notification({
 			<DialogContent className="sm:min-w-[425px] sm:max-w-fit">
 				<DialogHeader>
 					<DialogTitle>
-						{notification.name ? `${notification.name}` : 'Add Notification'}
+						{notification.name ? `${notification.name}` : "Add Notification"}
 					</DialogTitle>
 					<DialogDescription>
 						{notification.name
@@ -67,7 +73,7 @@ export default function Notification({
 							: `Add a new way to recieve notifications`}
 					</DialogDescription>
 				</DialogHeader>
-				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
+				{fetcher.state !== "submitting" && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
 				{fetcher.data?.error?.code ? (
@@ -77,7 +83,7 @@ export default function Notification({
 				) : (
 					<></>
 				)}
-				{testFetcher.state !== 'submitting' && testFetcher.data?.form?.error ? (
+				{testFetcher.state !== "submitting" && testFetcher.data?.form?.error ? (
 					<small className="text-red-700">{testFetcher.data.form.error}</small>
 				) : null}
 				{testFetcher.data?.error?.code ? (
@@ -89,7 +95,7 @@ export default function Notification({
 				) : (
 					<></>
 				)}
-				{testFetcher.state !== 'submitting' && testFetcher.data?.success ? (
+				{testFetcher.state !== "submitting" && testFetcher.data?.success ? (
 					<small className="text-green-700">{testFetcher.data.success}</small>
 				) : null}
 				<Form method="post" action="/servers/new">
@@ -101,7 +107,7 @@ export default function Notification({
 							<Input
 								type="text"
 								id="name"
-								value={data.name || ''}
+								value={data.name || ""}
 								placeholder="Notification 1"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, name: e.target.value })}
@@ -126,11 +132,11 @@ export default function Notification({
 									</SelectGroup>
 								</SelectContent>
 							</Select>
-							{data?.type === 'smtp' && (
+							{data?.type === "smtp" && (
 								<SmtpForm data={data} setData={setData} />
 							)}
 
-							{data?.type === 'telegram' && (
+							{data?.type === "telegram" && (
 								<TelegramForm data={data} setData={setData} />
 							)}
 						</div>
@@ -142,9 +148,11 @@ export default function Notification({
 								variant="outline"
 								onClick={(e) => {
 									e.preventDefault();
+									const id = data.id;
+									if (!id) return;
 									deleteSubmit(
-										{ _action: 'delete', id: data.id },
-										{ method: 'post', action: '/admin/notifications/new' },
+										{ _action: "delete", id },
+										{ method: "post", action: "/admin/notifications/new" },
 									);
 									setOpen(false);
 								}}
@@ -158,16 +166,16 @@ export default function Notification({
 							onClick={(e) => {
 								testFetcher.submit(
 									{
-										_action: 'test',
+										_action: "test",
 										...JSON.parse(
 											JSON.stringify(data, (_k, v) => v ?? undefined),
 										),
 									},
-									{ method: 'post', action: '/admin/notifications/new' },
+									{ method: "post", action: "/admin/notifications/new" },
 								);
 							}}
 						>
-							{testFetcher.state !== 'submitting' ? (
+							{testFetcher.state !== "submitting" ? (
 								<>Test</>
 							) : (
 								<>
@@ -181,12 +189,12 @@ export default function Notification({
 								// ugly json parse to remove null/blank/undefined
 								fetcher.submit(
 									{
-										_action: 'new',
+										_action: "new",
 										...JSON.parse(
 											JSON.stringify(data, (_k, v) => v ?? undefined),
 										),
 									},
-									{ method: 'post', action: '/admin/notifications/new' },
+									{ method: "post", action: "/admin/notifications/new" },
 								);
 							}}
 						>

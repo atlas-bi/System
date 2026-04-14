@@ -1,12 +1,12 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { Outlet, useLoaderData, useNavigate } from '@remix-run/react';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import type {
 	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
 	VisibilityState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -16,10 +16,10 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from '@tanstack/react-table';
-import React from 'react';
-import { DataTablePagination } from '~/components/table/data-table-pagination';
-import { DataTableToolbar } from '~/components/table/data-table-toolbar';
+} from "@tanstack/react-table";
+import React from "react";
+import { DataTablePagination } from "~/components/table/data-table-pagination";
+import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 
 import {
 	Table,
@@ -28,21 +28,21 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '~/components/ui/table';
-import { getMonitors } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
+} from "~/components/ui/table";
+import { getMonitors } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
 
-import { columnsSsh, columnsPing } from './table_columns';
-import invariant from 'tiny-invariant';
+import { columnsSsh, columnsPing } from "./table_columns";
+import invariant from "tiny-invariant";
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
 	});
 
-	invariant(params.monitorType, 'Monitor type is required.');
+	invariant(params.monitorType, "Monitor type is required.");
 	const monitors = await getMonitors({ type: params.monitorType });
 	return json({ monitors, type: params.monitorType });
 };
@@ -63,12 +63,12 @@ export default function Index() {
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'title', desc: false },
+		{ id: "title", desc: false },
 	]);
 
 	const table = useReactTable({
 		data: monitors,
-		columns: type == 'windows' || type == 'ubuntu' ? columnsSsh : columnsPing,
+		columns: type == "windows" || type == "ubuntu" ? columnsSsh : columnsPing,
 		state: {
 			sorting,
 			columnVisibility,
@@ -111,7 +111,7 @@ export default function Index() {
 													: flexRender(
 															header.column.columnDef.header,
 															header.getContext(),
-													  )}
+														)}
 											</TableHead>
 										);
 									})}
@@ -124,9 +124,9 @@ export default function Index() {
 									<TableRow
 										key={row.id}
 										className={`cursor-pointer group ${
-											row.original.enabled ? '' : 'bg-slate-100/40'
+											row.original.enabled ? "" : "bg-slate-100/40"
 										}`}
-										data-state={row.getIsSelected() ? 'selected' : null}
+										data-state={row.getIsSelected() ? "selected" : null}
 										onClick={() =>
 											navigate(`/${row.original.type}/${row.original.id}`)
 										}
@@ -145,7 +145,7 @@ export default function Index() {
 								<TableRow>
 									<TableCell
 										colSpan={
-											(type == 'windows' || type == 'ubuntu'
+											(type == "windows" || type == "ubuntu"
 												? columnsSsh
 												: columnsPing
 											).length

@@ -1,17 +1,29 @@
-import { useFetcher, useLocation, useSearchParams } from '@remix-run/react';
-import { format, formatDistance } from 'date-fns';
-import { useEffect } from 'react';
-import { CpuChart } from '~/components/charts/cpuChart';
-import { MemoryChart } from '~/components/charts/memoryChart';
-import { PingChart } from '~/components/charts/pingChart';
-import { Badge } from '~/components/ui/badge';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { SqlDatabaseTable } from './sqlDatabaseTable';
-import { columns } from './sqlDatabaseColumns';
+import { useFetcher, useLocation, useSearchParams } from "@remix-run/react";
+import { format, formatDistance } from "date-fns";
+import { useEffect } from "react";
+import { CpuChart } from "~/components/charts/cpuChart";
+import { MemoryChart } from "~/components/charts/memoryChart";
+import { PingChart } from "~/components/charts/pingChart";
+import { Badge } from "~/components/ui/badge";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { SqlDatabaseTable } from "./sqlDatabaseTable";
+import { columns } from "./sqlDatabaseColumns";
 
-export const SqlSystem = ({ monitor }: { monitor: Monitor }) => {
+type MonitorLike = {
+	type: string;
+	id: string;
+	name?: string | null;
+	model?: string | null;
+	manufacturer?: string | null;
+	version?: string | null;
+	os?: string | null;
+	osVersion?: string | null;
+	lastBootTime?: string | Date | null;
+};
+
+export const SqlSystem = ({ monitor }: { monitor: MonitorLike }) => {
 	return (
 		<div className="space-y-2 flex-grow">
 			<Table>
@@ -52,10 +64,10 @@ export const SqlSystem = ({ monitor }: { monitor: Monitor }) => {
 						<TableRow>
 							<TableCell className="py-1 font-medium">Last Restart</TableCell>
 							<TableCell className="py-1 text-slate-700">
-								{formatDistance(new Date(monitor.lastBootTime), new Date())}{' '}
-								ago.{' '}
+								{formatDistance(new Date(monitor.lastBootTime), new Date())}{" "}
+								ago.{" "}
 								<Badge className="bg-slate-200 hover:bg-slate-300 hover:cursor-default text-slate-900">
-									{format(new Date(monitor.lastBootTime), 'MMM dd, yyyy k:mm')}
+									{format(new Date(monitor.lastBootTime), "MMM dd, yyyy k:mm")}
 								</Badge>
 							</TableCell>
 						</TableRow>
@@ -66,13 +78,13 @@ export const SqlSystem = ({ monitor }: { monitor: Monitor }) => {
 	);
 };
 
-export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
-	const databasesFetcher = useFetcher();
+export const SqlStats = ({ monitor }: { monitor: MonitorLike }) => {
+	const databasesFetcher = useFetcher<{ databases?: any[] }>();
 	const location = useLocation();
 
 	// if we redirect to another monitor we need to reload databases
 	useEffect(() => {
-		if (databasesFetcher.state === 'idle' && databasesFetcher.data == null) {
+		if (databasesFetcher.state === "idle" && databasesFetcher.data == null) {
 			databasesFetcher.load(`/${monitor.type}/${monitor.id}/databases`);
 		}
 	}, [location]);
@@ -80,14 +92,14 @@ export const SqlStats = ({ monitor }: { monitor: Monitor }) => {
 	const [searchParams] = useSearchParams();
 
 	useEffect(() => {
-		if (databasesFetcher.state === 'idle' && databasesFetcher.data == null) {
+		if (databasesFetcher.state === "idle" && databasesFetcher.data == null) {
 			databasesFetcher.load(`/${monitor.type}/${monitor.id}/databases`);
 		}
-	}, [databasesFetcher, monitor]);
+	}, [databasesFetcher.state, databasesFetcher.data, monitor.type, monitor.id]);
 
 	return (
 		<Tabs
-			defaultValue={`${searchParams.get('tab') || 'ping'}`}
+			defaultValue={`${searchParams.get("tab") || "ping"}`}
 			className="w-full"
 		>
 			<TabsList className="grid max-w-[400px] grid-cols-4">

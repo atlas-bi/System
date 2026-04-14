@@ -1,11 +1,11 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { differenceInDays, startOfDay, startOfHour } from 'date-fns';
-import invariant from 'tiny-invariant';
-import { dateOptions } from '~/models/dates';
-import { getDriveUsage } from '~/models/drive.server';
-import { authenticator } from '~/services/auth.server';
-import { dateRange } from '~/utils';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { differenceInDays, startOfDay, startOfHour } from "date-fns";
+import invariant from "tiny-invariant";
+import { dateOptions } from "~/models/dates";
+import { getDriveUsage } from "~/models/drive.server";
+import { authenticator } from "~/services/auth.server";
+import { dateRange } from "~/utils";
 
 function calcGrowth({
 	usage,
@@ -39,7 +39,7 @@ function calcGrowth({
 	return { daysTillFull, growthRate };
 }
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -51,21 +51,21 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 		startDate,
 		endDate,
 	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get('range') || 'last_24_hours',
+		url.searchParams.get("range") || "last_24_hours",
 	);
 
 	invariant(params.driveId);
 	const drive = await getDriveUsage({ id: params.driveId, startDate, endDate });
 
 	if (!drive) {
-		throw new Response('Not Found', { status: 404 });
+		throw new Response("Not Found", { status: 404 });
 	}
 
 	const groupSize = dateOptions.filter(
-		(x) => x.value == url.searchParams.get('range'),
+		(x) => x.value == url.searchParams.get("range"),
 	)?.[0]?.unit;
 
-	if (url.searchParams.get('range') === 'all_time') {
+	if (url.searchParams.get("range") === "all_time") {
 		startDate = undefined;
 		endDate = undefined;
 	}
@@ -87,12 +87,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 	};
 
 	switch (groupSize) {
-		case 'minute':
+		case "minute":
 			// minute is db default
 			return json({
 				drive: { ...drive, daysTillFull, growthRate, startDate, endDate },
 			});
-		case 'hour':
+		case "hour":
 			grouped = drive.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfHour(e.createdAt).toISOString()]) {
 					a[startOfHour(e.createdAt).toISOString()] = [];
@@ -104,7 +104,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 				return a;
 			}, {});
 			break;
-		case 'day':
+		case "day":
 		default:
 			grouped = drive.usage.reduce((a: aType, e: eType) => {
 				if (!a[startOfDay(e.createdAt).toISOString()]) {

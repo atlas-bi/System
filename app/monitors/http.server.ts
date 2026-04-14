@@ -3,36 +3,36 @@ import {
 	monitorError,
 	updateMonitor,
 	setFeedError,
-} from '~/models/monitor.server';
-import https from 'https';
+} from "~/models/monitor.server";
+import https from "https";
 
-import Notifier from '~/notifications/notifier';
-import { decrypt } from '@/lib/utils';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { NtlmClient, NtlmCredentials } from 'axios-ntlm';
-import { jsonParser } from '~/utils';
-import { differenceInDays } from 'date-fns';
-import { checkCertificate } from './helpers.server';
+import Notifier from "~/notifications/notifier";
+import { decrypt } from "@/lib/utils";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { NtlmClient, NtlmCredentials } from "axios-ntlm";
+import { jsonParser } from "~/utils";
+import { differenceInDays } from "date-fns";
+import { checkCertificate } from "./helpers.server";
 
 const checkStatusCode = (
 	status: number,
 	codes: number | string | string[] | undefined,
 ) => {
 	// any code is ok
-	if (!codes || (typeof codes == 'object' && codes.length === 0)) {
+	if (!codes || (typeof codes == "object" && codes.length === 0)) {
 		return true;
 	}
 
 	const check = (status: number, code: string) => {
-		if (code === '100s') {
+		if (code === "100s") {
 			return 100 <= status && status <= 199;
-		} else if (code === '200s') {
+		} else if (code === "200s") {
 			return 200 <= status && status <= 299;
-		} else if (code === '300s') {
+		} else if (code === "300s") {
 			return 300 <= status && status <= 399;
-		} else if (code === '400s') {
+		} else if (code === "400s") {
 			return 400 <= status && status <= 499;
-		} else if (code === '500s') {
+		} else if (code === "500s") {
 			return 500 <= status && status <= 599;
 		} else if (Number(code) === status) {
 			return true;
@@ -40,7 +40,7 @@ const checkStatusCode = (
 		return false;
 	};
 
-	if (typeof codes === 'string' || typeof codes === 'number') {
+	if (typeof codes === "string" || typeof codes === "number") {
 		return check(status, codes.toString());
 	}
 
@@ -49,7 +49,7 @@ const checkStatusCode = (
 };
 
 const encodeBase64 = (user: string | undefined, pass: string) => {
-	return Buffer.from(user + ':' + pass).toString('base64');
+	return Buffer.from(user + ":" + pass).toString("base64");
 };
 
 export async function HttpCheck({
@@ -90,11 +90,11 @@ export async function HttpCheck({
 	// HTTP basic auth
 	let basicAuthHeader = {};
 
-	if (httpAuthentication === 'basic') {
+	if (httpAuthentication === "basic") {
 		basicAuthHeader = {
 			Authorization:
-				'Basic ' +
-				encodeBase64(httpUsername, httpPassword ? decrypt(httpPassword) : ''),
+				"Basic " +
+				encodeBase64(httpUsername, httpPassword ? decrypt(httpPassword) : ""),
 		};
 	}
 
@@ -107,29 +107,29 @@ export async function HttpCheck({
 	let bodyValue = null;
 
 	if (httpBody && httpBody.trim().length > 0) {
-		if (!httpBodyEncoding || httpBodyEncoding === 'json') {
+		if (!httpBodyEncoding || httpBodyEncoding === "json") {
 			try {
 				bodyValue = JSON.parse(httpBody);
-				contentType = 'application/json';
+				contentType = "application/json";
 			} catch (e) {
-				throw new Error('JSON body is invalid. ' + e.message);
+				throw new Error("JSON body is invalid. " + e.message);
 			}
-		} else if (httpBodyEncoding === 'xml') {
+		} else if (httpBodyEncoding === "xml") {
 			bodyValue = httpBody;
-			contentType = 'text/xml; charset=utf-8';
+			contentType = "text/xml; charset=utf-8";
 		}
 	}
 
 	// Axios Options
 	const options: AxiosRequestConfig = {
 		url: httpUrl,
-		method: httpMethod ? httpMethod.toLowerCase() : 'get',
+		method: httpMethod ? httpMethod.toLowerCase() : "get",
 		timeout: 3 * 1000,
 		headers: {
 			Accept:
-				'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-			'User-Agent': 'Atlas-System/',
-			...(contentType ? { 'Content-Type': contentType } : {}),
+				"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+			"User-Agent": "Atlas-System/",
+			...(contentType ? { "Content-Type": contentType } : {}),
 			...basicAuthHeader,
 			...(httpHeaders ? JSON.parse(httpHeaders) : {}),
 		},
@@ -151,13 +151,13 @@ export async function HttpCheck({
 	let certValid, certDays;
 
 	try {
-		if (httpAuthentication === 'ntlm') {
+		if (httpAuthentication === "ntlm") {
 			options.httpsAgent.keepAlive = true;
 
 			let credentials: NtlmCredentials = {
-				username: httpUsername || '',
-				password: httpPassword ? decrypt(httpPassword) : '',
-				domain: httpDomain || '',
+				username: httpUsername || "",
+				password: httpPassword ? decrypt(httpPassword) : "",
+				domain: httpDomain || "",
 				workstation: httpWorkstation ? httpWorkstation : undefined,
 			};
 
@@ -168,7 +168,7 @@ export async function HttpCheck({
 			res = await axios.request(options);
 		}
 
-		if (httpCheckCert && httpUrl?.startsWith('https')) {
+		if (httpCheckCert && httpUrl?.startsWith("https")) {
 			try {
 				let tlsInfoObject = checkCertificate(res);
 				certValid = tlsInfoObject?.valid;
@@ -211,7 +211,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		httpCheckCert,
 		httpBodyEncoding,
 		httpUrl,
-		httpMethod,
+		httpRequestMethod,
 		httpHeaders,
 		httpMaxRedirects,
 		httpAcceptedStatusCodes,
@@ -221,28 +221,28 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 
 	let startTime = Date.now();
 	try {
-		let error, certValid, certDays;
+		let error: string | undefined, certValid, certDays;
 		try {
 			const data = await HttpCheck({
-				httpBody,
-				httpAuthentication,
-				httpUsername,
-				httpPassword,
-				httpIgnoreSsl,
-				httpCheckCert,
-				httpBodyEncoding,
-				httpUrl,
-				httpMethod,
-				httpHeaders,
-				httpMaxRedirects,
-				httpAcceptedStatusCodes,
-				httpDomain,
-				httpWorkstation,
+				httpBody: httpBody ?? undefined,
+				httpAuthentication: httpAuthentication ?? undefined,
+				httpUsername: httpUsername ?? undefined,
+				httpPassword: httpPassword ?? undefined,
+				httpIgnoreSsl: httpIgnoreSsl ?? undefined,
+				httpCheckCert: httpCheckCert ?? undefined,
+				httpBodyEncoding: httpBodyEncoding ?? undefined,
+				httpUrl: httpUrl ?? undefined,
+				httpMethod: httpRequestMethod ?? undefined,
+				httpHeaders: httpHeaders ?? undefined,
+				httpMaxRedirects: httpMaxRedirects ?? undefined,
+				httpAcceptedStatusCodes: httpAcceptedStatusCodes ?? undefined,
+				httpDomain: httpDomain ?? undefined,
+				httpWorkstation: httpWorkstation ?? undefined,
 			});
 			certValid = data.certValid;
 			certDays = data.certDays;
 		} catch (e) {
-			error = e.message;
+			error = (e as any)?.message ?? String(e);
 		}
 
 		const ping = Date.now() - startTime;
@@ -259,15 +259,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		});
 
 		if (error) {
-			// update feed to be an error
-			if (data?.feeds) {
-				await setFeedError({
-					id: data?.feeds?.[0]?.id,
-					hasError: true,
-					message: error.message || error,
-				});
-			}
-			throw Error(error.message || error);
+			throw new Error(error);
 		}
 
 		await Notifier({ job: monitor.id });
@@ -279,7 +271,7 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 		try {
 			message = JSON.stringify(e);
 			// don't return nothing
-			if (message === '{}') {
+			if (message === "{}") {
 				message = e.toString();
 			}
 		} catch (e) {}

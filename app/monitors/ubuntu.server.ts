@@ -4,15 +4,16 @@ import {
 	getMonitorDisabledDrives,
 	monitorError,
 	updateMonitor,
-} from '~/models/monitor.server';
+	UpdateMonitorResult,
+} from "~/models/monitor.server";
 
-import { setDriveOnline } from '~/models/drive.server';
-import Notifier from '~/notifications/notifier';
-import { disposeSsh } from './helpers.server';
-import { NodeSSH } from 'node-ssh';
-import { decrypt } from '@/lib/utils';
+import { setDriveOnline } from "~/models/drive.server";
+import Notifier from "~/notifications/notifier";
+import { disposeSsh } from "./helpers.server";
+import { NodeSSH } from "node-ssh";
+import { decrypt } from "@/lib/utils";
 
-async function getStdout(ssh, command) {
+async function getStdout(ssh: any, command: string) {
 	const out = await ssh.execCommand(command);
 	if (out.code !== 0) {
 		throw { out };
@@ -33,20 +34,20 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			privateKey: privateKey ? decrypt(privateKey) : undefined,
 		});
 
-		const name = await getStdout(ssh, 'cat /etc/hostname');
-		const domain = await getStdout(ssh, 'hostname -d');
+		const name = await getStdout(ssh, "cat /etc/hostname");
+		const domain = await getStdout(ssh, "hostname -d");
 		const manufacturer = await getStdout(
 			ssh,
-			'cat /sys/devices/virtual/dmi/id/sys_vendor',
+			"cat /sys/devices/virtual/dmi/id/sys_vendor",
 		);
 		const model = await getStdout(
 			ssh,
-			'cat /sys/devices/virtual/dmi/id/product_version',
+			"cat /sys/devices/virtual/dmi/id/product_version",
 		);
-		const os = await getStdout(ssh, 'lsb_release -ds');
-		const osVersion = await getStdout(ssh, 'lsb_release -rs');
-		const lastBoot = await getStdout(ssh, 'uptime -s');
-		const cpuInfo = JSON.parse(await getStdout(ssh, 'lscpu --json')).lscpu;
+		const os = await getStdout(ssh, "lsb_release -ds");
+		const osVersion = await getStdout(ssh, "lsb_release -rs");
+		const lastBoot = await getStdout(ssh, "uptime -s");
+		const cpuInfo = JSON.parse(await getStdout(ssh, "lscpu --json")).lscpu;
 		// escape the back slashes!
 		const cpuLoad = await getStdout(
 			ssh,
@@ -54,7 +55,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		);
 		const allCpuLoad = await getStdout(
 			ssh,
-			'top -bn1 -1 -w512 | grep \'%Cpu\' | sed "s/.\\(%Cpu[0-9]*.*\\)/\\n\\1/" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'',
+			"top -bn1 -1 -w512 | grep '%Cpu' | sed \"s/.\\(%Cpu[0-9]*.*\\)/\\n\\1/\" | sed \"s/.*, *\\([0-9.]*\\)%* id.*/\\1/\" | awk '{print 100 - $1}'",
 		);
 		const memoryTotal = await getStdout(
 			ssh,
@@ -67,7 +68,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		const drives = JSON.parse(
 			await getStdout(
 				ssh,
-				'df -P | awk \'BEGIN {printf"{\\"discarray\\":["}{if($1=="Filesystem")next;if(a)printf",";printf"{\\"filesystem\\":\\""$1"\\",\\"mount\\":\\""$6"\\",\\"size\\":\\""$2"\\",\\"used\\":\\""$3"\\",\\"avail\\":\\""$4"\\",\\"use%\\":\\""$5"\\"}";a++;}END{print"]}";}\'',
+				'df -P | awk \'BEGIN {printf"{\\"discarray\\":["}{if($1=="Filesystem")next;if(a)printf",";printf"{\\"filesystem\\":\\""$1"\\",\\"mount\\":\\""$6"\\",\\"size\\":\\""$2"\\",\\"used\\":\\""$3"\\",\\"avail\\":\\""$4"\\",\\"use%\\":\\""$5"\\"}";a++;}END{print"]});}\'',
 			),
 		);
 
@@ -79,7 +80,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			arr.reduce((p: number, c: number): number => p + c, 0) / arr.length;
 		function getCpuMaxSpeed(cpuSpeed: string) {
 			const matches = cpuSpeed.matchAll(/^cpu MHz\s*:\s*(\d+(?:.\d+)?)/gms);
-			return average([...matches].map((x) => Number(x?.[1] || '0')));
+			return average([...matches].map((x) => Number(x?.[1] || "0")));
 		}
 
 		let lastBootTime = null;
@@ -112,7 +113,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			size: string;
 			used: string;
 			avail: string;
-			'use%': string;
+			"use%": string;
 		};
 
 		// only update drives that are enabled and not tmpfs
@@ -120,12 +121,12 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			const l =
 				disabledDrives.filter(
 					(d) => d.name == drive.filesystem && d.root == drive.mount,
-				).length == 0 && drive.filesystem !== 'tmpfs';
+				).length == 0 && drive.filesystem !== "tmpfs";
 
 			return l;
 		});
-		const oldMonitor = await getMonitor({ id: monitor.id });
-		const data = await updateMonitor({
+		const oldMonitor = (await getMonitor({ id: monitor.id })) ?? undefined;
+		const data: UpdateMonitorResult = await updateMonitor({
 			id: monitor.id,
 			data: {
 				name,
@@ -138,16 +139,16 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 				lastBootTime,
 				cpuManufacturer:
 					cpuInfo.filter(
-						(x: { field: string; data: string }) => x.field === 'Vendor ID:',
+						(x: { field: string; data: string }) => x.field === "Vendor ID:",
 					)?.[0]?.data || null,
 				cpuModel:
 					cpuInfo.filter(
-						(x: { field: string; data: string }) => x.field === 'Model name:',
+						(x: { field: string; data: string }) => x.field === "Model name:",
 					)?.[0]?.data || null,
 				cpuCores: null,
 				cpuProcessors:
 					cpuInfo.filter(
-						(x: { field: string; data: string }) => x.field === 'CPU(s):',
+						(x: { field: string; data: string }) => x.field === "CPU(s):",
 					)?.[0]?.data || null,
 				cpuMaxSpeed: null,
 			},
@@ -181,22 +182,14 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		});
 
 		// online/offline
-		data.drives?.map(
-			async (drive: {
-				size: string;
-				usage: string | any[];
-				id: any;
-				name: string;
-			}) => {
-				await setDriveOnline({
-					id: drive.id,
-					online:
-						updateableDrives.filter(
-							(x: { mount: string }) => x.mount == drive.name,
-						).length > 0,
-				});
-			},
-		);
+		data.drives?.map(async (drive) => {
+			await setDriveOnline({
+				id: drive.id,
+				online:
+					updateableDrives.filter((x: Drive) => x.mount == drive.root).length >
+					0,
+			});
+		});
 
 		disposeSsh(ssh);
 
@@ -209,7 +202,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		try {
 			message = JSON.stringify(e);
 			// don't return nothing
-			if (message === '{}') {
+			if (message === "{}") {
 				message = e.toString();
 			}
 		} catch (e) {}

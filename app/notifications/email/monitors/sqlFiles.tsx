@@ -1,17 +1,17 @@
-import { Button } from '@react-email/button';
-import { Html } from '@react-email/html';
-import { Head } from '@react-email/head';
-import { Preview } from '@react-email/preview';
-import { Link } from '@react-email/link';
-import { Tailwind } from '@react-email/tailwind';
-import { Text } from '@react-email/text';
-import { Database, DatabaseFile, Monitor } from '~/models/monitor.server';
-import { Body } from '@react-email/body';
-import { Container } from '@react-email/container';
-import { Section } from '@react-email/section';
-import { Heading } from '@react-email/heading';
-import { Hr } from '@react-email/hr';
-import { Header } from '../helpers';
+import { Button } from "@react-email/button";
+import { Html } from "@react-email/html";
+import { Head } from "@react-email/head";
+import { Preview } from "@react-email/preview";
+import { Link } from "@react-email/link";
+import { Tailwind } from "@react-email/tailwind";
+import { Text } from "@react-email/text";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Section } from "@react-email/section";
+import { Heading } from "@react-email/heading";
+import { Hr } from "@react-email/hr";
+import { Header } from "../helpers";
 
 export const SuccessEmail = ({
 	hostname,
@@ -22,9 +22,9 @@ export const SuccessEmail = ({
 }: {
 	hostname?: string;
 	subject: string;
-	monitor: Monitor;
-	database: Database;
-	file: DatabaseFile;
+	monitor: MonitorWithRelations;
+	database: MonitorWithRelations["databases"][number];
+	file: MonitorWithRelations["databases"][number]["files"][number];
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
@@ -38,17 +38,15 @@ export const SuccessEmail = ({
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Percentage of free space now below limit on{' '}
+							Percentage of free space now below limit on{" "}
 							<strong>
 								{monitor.name}.{database.name}
-							</strong>{' '}
+							</strong>{" "}
 							file <strong>{file.fileName}</strong>
 						</Heading>
 
 						<Section className="text-center mt-[32px] mb-[32px]">
 							<Button
-								pX={20}
-								pY={12}
 								className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
 								href={`${hostname}/${monitor.type}/${monitor.id}`}
 							>
@@ -81,28 +79,28 @@ export const ErrorEmail = ({
 	message,
 }: {
 	hostname?: string;
-	monitor: Monitor;
-	database: Database;
-	file: DatabaseFile;
+	monitor: MonitorWithRelations;
+	database: MonitorWithRelations["databases"][number];
+	file: MonitorWithRelations["databases"][number]["files"][number];
 	message: string;
 }) => {
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
-				<title>{message || 'Free space limit exceeded.'}</title>
+				<title>{message || "Free space limit exceeded."}</title>
 			</Head>
 
 			<Tailwind>
 				<Body className="bg-white my-auto mx-auto font-sans">
-					<Preview>{message || 'Free space limit exceeded.'}</Preview>
+					<Preview>{message || "Free space limit exceeded."}</Preview>
 					<Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
 						<Header hostname={hostname} />
 
 						<Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-							Percentage of free space limit exceeded on{' '}
+							Percentage of free space limit exceeded on{" "}
 							<strong>
 								{monitor.name}.{database.name}
-							</strong>{' '}
+							</strong>{" "}
 							file <strong>{file.fileName}</strong>
 						</Heading>
 						{message && (
@@ -119,8 +117,6 @@ export const ErrorEmail = ({
 
 						<Section className="text-center mt-[32px] mb-[32px]">
 							<Button
-								pX={20}
-								pY={12}
 								className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
 								href={`${hostname}/${monitor.type}/${monitor.id}`}
 							>

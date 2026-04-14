@@ -1,10 +1,10 @@
-import { ActionArgs, redirect } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { namedAction } from 'remix-utils';
-import { editDrive, getDriveMonitor, deleteDrive } from '~/models/drive.server';
-import { authenticator } from '~/services/auth.server';
+import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { namedAction } from "~/utils";
+import { editDrive, getDriveMonitor, deleteDrive } from "~/models/drive.server";
+import { authenticator } from "~/services/auth.server";
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -12,26 +12,24 @@ export async function action({ request }: ActionArgs) {
 	});
 
 	return namedAction(request, {
-		async edit() {
-			const formData = await request.formData();
+		async edit(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const drive = await editDrive({
 				id: values.id.toString(),
 				title:
-					values.title && values.title.toString() !== 'null'
+					values.title && values.title.toString() !== "null"
 						? values.title.toString()
 						: null,
-				enabled: values.enabled.toString() == 'true',
+				enabled: values.enabled.toString() == "true",
 				description:
-					values.description && values.description.toString() != 'null'
+					values.description && values.description.toString() != "null"
 						? values.description.toString()
 						: null,
 			});
 			return json({ drive });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const drive = await getDriveMonitor({
@@ -42,7 +40,7 @@ export async function action({ request }: ActionArgs) {
 				id: values.id.toString(),
 			});
 			if (!drive) {
-				return redirect('/');
+				return redirect("/");
 			}
 			return redirect(`/${drive.monitor.type}/${drive.monitor.id}`);
 		},

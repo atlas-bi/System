@@ -1,6 +1,6 @@
-import { Form, useFetcher } from '@remix-run/react';
-import { ReactNode, useEffect, useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { Form, useFetcher } from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -9,14 +9,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
-import { Textarea } from '~/components/ui/textarea';
+import { Textarea } from "~/components/ui/textarea";
 
-import type { Drive } from '~/models/drive.server';
-import { Switch } from '../ui/switch';
+import type { Drive } from "~/models/drive.server";
+import { Switch } from "../ui/switch";
 
 export default function Drive({
 	drive,
@@ -26,14 +26,18 @@ export default function Drive({
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	type DriveFetcherData = {
+		drive?: Drive;
+		form?: { error?: string };
+	};
+	const fetcher = useFetcher<DriveFetcherData>();
 
 	const [data, setData] = useState<Drive>(drive);
 
 	useEffect(() => setData(drive), [drive]);
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.drive != null) {
+		if (fetcher.state === "idle" && fetcher.data?.drive != null) {
 			setOpen(false);
 		}
 	}, [fetcher]);
@@ -46,7 +50,7 @@ export default function Drive({
 					<DialogTitle>{drive.name}</DialogTitle>
 					<DialogDescription>Editing drive.</DialogDescription>
 				</DialogHeader>
-				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
+				{fetcher.state !== "submitting" && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
 				<Form method="post" action="/drive/edit">
@@ -66,7 +70,7 @@ export default function Drive({
 							<Input
 								type="text"
 								id="name"
-								value={data.title || ''}
+								value={data.title || ""}
 								placeholder="Logs drive"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, title: e.target.value })}
@@ -77,7 +81,7 @@ export default function Drive({
 							<Textarea
 								id="description"
 								className="col-span-3"
-								value={data.description || ''}
+								value={data.description || ""}
 								onChange={(e) =>
 									setData({ ...data, description: e.target.value })
 								}
@@ -89,10 +93,16 @@ export default function Drive({
 							<Button
 								type="button"
 								onClick={(e) => {
-									fetcher.submit(
-										{ _action: 'edit', ...data },
-										{ method: 'post', action: '/drive/edit' },
-									);
+									const formData = new FormData();
+									formData.set("_action", "edit");
+									formData.set("id", data.id);
+									formData.set("enabled", data.enabled ? "true" : "false");
+									formData.set("title", data.title ?? "");
+									formData.set("description", data.description ?? "");
+									fetcher.submit(formData, {
+										method: "post",
+										action: "/drive/edit",
+									});
 								}}
 							>
 								Save
@@ -104,10 +114,13 @@ export default function Drive({
 								variant="outline"
 								className="border-red-300"
 								onClick={(e) => {
-									fetcher.submit(
-										{ _action: 'delete', id: data.id },
-										{ method: 'post', action: '/drive/edit' },
-									);
+									const formData = new FormData();
+									formData.set("_action", "delete");
+									formData.set("id", data.id);
+									fetcher.submit(formData, {
+										method: "post",
+										action: "/drive/edit",
+									});
 								}}
 							>
 								Delete

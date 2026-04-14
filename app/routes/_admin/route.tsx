@@ -1,11 +1,11 @@
-import type { LoaderArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { Outlet } from '@remix-run/react';
-import Nav from '~/components/nav/Nav';
-import { authenticator } from '~/services/auth.server';
-import { commitSession, getSession } from '~/services/session.server';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Outlet } from "@remix-run/react";
+import Nav from "~/components/nav/Nav";
+import { authenticator } from "~/services/auth.server";
+import { commitSession, getSession } from "~/services/session.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const user = await authenticator.isAuthenticated(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderArgs) {
 
 	return json({
 		headers: {
-			'Set-Cookie': await commitSession(session),
+			"Set-Cookie": await commitSession(session),
 		},
 		user,
 	});

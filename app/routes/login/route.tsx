@@ -1,21 +1,20 @@
 import {
-	type ActionArgs,
-	type LoaderArgs,
-	type V2_MetaFunction,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+	type MetaFunction,
 	json,
-} from '@remix-run/node';
-import { useSearchParams } from '@remix-run/react';
-import { safeRedirect } from 'remix-utils';
-import { authenticator } from '~/services/auth.server';
-import { commitSession, getSession } from '~/services/session.server';
-import { validateEmail } from '~/utils';
+} from "@remix-run/node";
+import { useSearchParams } from "@remix-run/react";
+import { authenticator } from "~/services/auth.server";
+import { commitSession, getSession } from "~/services/session.server";
+import { safeRedirect, validateEmail } from "~/utils";
 
-import { UserAuthForm } from './LoginForm';
+import { UserAuthForm } from "./LoginForm";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	// If the user is already authenticated redirect to /dashboard directly
 	await authenticator.isAuthenticated(request, {
-		successRedirect: '/',
+		successRedirect: "/",
 	});
 	const session = await getSession(request);
 	const error = session.get(authenticator.sessionErrorKey);
@@ -25,30 +24,30 @@ export async function loader({ request }: LoaderArgs) {
 		{ error },
 		{
 			headers: {
-				'Set-Cookie': await commitSession(session),
+				"Set-Cookie": await commitSession(session),
 			},
 		},
 	);
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	// remove session error messages
 	const session = await getSession(request);
 	session.unset(authenticator.sessionErrorKey);
 
 	// validate the form before trying to login
-	const formData = await request.formData();
-	const email = formData.get('email') as string;
-	const password = formData.get('password');
+	const formData = await request.clone().formData();
+	const email = formData.get("email") as string;
+	const password = formData.get("password");
 
 	let message = undefined;
 
-	if (typeof password !== 'string' || password.length === 0) {
-		message = 'Password is required';
+	if (typeof password !== "string" || password.length === 0) {
+		message = "Password is required";
 	}
 
 	if (!validateEmail(email)) {
-		message = 'Email is invalid';
+		message = "Email is invalid";
 	}
 
 	if (message) {
@@ -57,33 +56,33 @@ export async function action({ request }: ActionArgs) {
 			{
 				status: 400,
 				headers: {
-					'Set-Cookie': await commitSession(session),
+					"Set-Cookie": await commitSession(session),
 				},
 			},
 		);
 	}
 
 	const url = new URL(request.url);
-	const returnTo = safeRedirect(url.searchParams.get('returnTo') || '/');
+	const returnTo = safeRedirect(url.searchParams.get("returnTo") || "/");
 
-	return authenticator.authenticate('ldap', request, {
+	return authenticator.authenticate("ldap", request, {
 		successRedirect: returnTo,
-		failureRedirect: '/login',
+		failureRedirect: "/login",
 		context: { formData },
 	});
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
 	return [
 		{
-			title: 'Login',
+			title: "Login",
 		},
 	];
 };
 
 export default function Login() {
 	const [searchParams] = useSearchParams();
-	const returnTo = searchParams.get('returnTo') || '/';
+	const returnTo = searchParams.get("returnTo") || "/";
 
 	return (
 		<div

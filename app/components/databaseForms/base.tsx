@@ -1,6 +1,6 @@
-import { Form, useFetcher } from '@remix-run/react';
-import { Dispatch, ReactNode, useEffect, useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { Form, useFetcher } from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -9,14 +9,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
-import { Textarea } from '~/components/ui/textarea';
+import { Textarea } from "~/components/ui/textarea";
 
-import type { Database } from '~/models/monitor.server';
-import { Switch } from '../ui/switch';
+import type { Database } from "~/models/monitor.server";
+import { Switch } from "../ui/switch";
 
 export default function Database({
 	database,
@@ -24,21 +24,26 @@ export default function Database({
 	children,
 }: {
 	database: Database;
-	setter: Dispatch<Database>;
+	setter: (next: Database) => void;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
-	const fetcher = useFetcher();
+	const fetcher = useFetcher<{
+		database?: Database;
+		form?: {
+			error?: string;
+		};
+	}>();
 
 	const [data, setData] = useState<Database>(database);
 
 	useEffect(() => setData(database), [database]);
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.database != null) {
+		if (fetcher.state === "idle" && fetcher.data?.database != null) {
 			setOpen(false);
 		}
-	}, [fetcher]);
+	}, [fetcher.state, fetcher.data]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -48,7 +53,7 @@ export default function Database({
 					<DialogTitle>{database.name}</DialogTitle>
 					<DialogDescription>Editing database.</DialogDescription>
 				</DialogHeader>
-				{fetcher.state !== 'submitting' && fetcher.data?.form?.error ? (
+				{fetcher.state !== "submitting" && fetcher.data?.form?.error ? (
 					<small className="text-red-700">{fetcher.data.form.error}</small>
 				) : null}
 				<Form method="post" action="/monitor/new">
@@ -68,7 +73,7 @@ export default function Database({
 							<Input
 								type="text"
 								id="name"
-								value={data.title || ''}
+								value={data.title || ""}
 								placeholder="Logs database"
 								className="col-span-3"
 								onChange={(e) => setData({ ...data, title: e.target.value })}
@@ -79,7 +84,7 @@ export default function Database({
 							<Textarea
 								id="description"
 								className="col-span-3"
-								value={data.description || ''}
+								value={data.description || ""}
 								onChange={(e) =>
 									setData({ ...data, description: e.target.value })
 								}
@@ -93,12 +98,12 @@ export default function Database({
 								onClick={(e) => {
 									fetcher.submit(
 										{
-											_action: 'edit',
+											_action: "edit",
 											...JSON.parse(
 												JSON.stringify(data, (k, v) => v ?? undefined),
 											),
 										},
-										{ method: 'post', action: '/database/edit' },
+										{ method: "post", action: "/database/edit" },
 									);
 									setter(data);
 								}}

@@ -1,5 +1,6 @@
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from "@remix-run/react";
 import {
+	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
 	VisibilityState,
@@ -11,10 +12,10 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
-} from '@tanstack/react-table';
-import React from 'react';
-import { DataTablePagination } from '~/components/table/data-table-pagination';
-import { DataTableToolbar } from '~/components/table/data-table-toolbar';
+} from "@tanstack/react-table";
+import React from "react";
+import { DataTablePagination } from "~/components/table/data-table-pagination";
+import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 import {
 	Table,
 	TableBody,
@@ -22,16 +23,16 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '~/components/ui/table';
-import { Database, Monitor } from '~/models/monitor.server';
+} from "~/components/ui/table";
 
 export const SqlDatabaseTable = ({
 	monitor,
 	databases,
 	columns,
 }: {
-	monitor: Monitor;
-	databases: Database[];
+	monitor: any;
+	databases: any[];
+	columns: ColumnDef<any>[];
 }) => {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
@@ -47,7 +48,7 @@ export const SqlDatabaseTable = ({
 	);
 
 	const [sorting, setSorting] = React.useState<SortingState>([
-		{ id: 'name', desc: false },
+		{ id: "name", desc: false },
 	]);
 
 	const table = useReactTable({
@@ -89,7 +90,7 @@ export const SqlDatabaseTable = ({
 												: flexRender(
 														header.column.columnDef.header,
 														header.getContext(),
-												  )}
+													)}
 										</TableHead>
 									);
 								})}
@@ -102,9 +103,9 @@ export const SqlDatabaseTable = ({
 								<TableRow
 									key={row.id}
 									className={`cursor-pointer group ${
-										row.original.enabled ? '' : 'bg-slate-100/40'
+										row.original.enabled ? "" : "bg-slate-100/40"
 									}`}
-									data-state={row.getIsSelected() ? 'selected' : null}
+									data-state={row.getIsSelected() ? "selected" : null}
 									onClick={() =>
 										navigate(
 											`/${monitor.type}/${monitor.id}/database/${row.original.id}`,

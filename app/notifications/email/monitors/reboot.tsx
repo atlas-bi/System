@@ -1,24 +1,24 @@
-import { Button } from '@react-email/button';
-import { Html } from '@react-email/html';
-import { Head } from '@react-email/head';
-import { Preview } from '@react-email/preview';
-import { Link } from '@react-email/link';
-import { Tailwind } from '@react-email/tailwind';
-import { Text } from '@react-email/text';
-import { Monitor } from '~/models/monitor.server';
-import { Body } from '@react-email/body';
-import { Container } from '@react-email/container';
-import { Section } from '@react-email/section';
-import { Heading } from '@react-email/heading';
-import { Hr } from '@react-email/hr';
-import { Header } from '../helpers';
+import { Button } from "@react-email/button";
+import { Html } from "@react-email/html";
+import { Head } from "@react-email/head";
+import { Preview } from "@react-email/preview";
+import { Link } from "@react-email/link";
+import { Tailwind } from "@react-email/tailwind";
+import { Text } from "@react-email/text";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Section } from "@react-email/section";
+import { Heading } from "@react-email/heading";
+import { Hr } from "@react-email/hr";
+import { Header } from "../helpers";
 
 export const SuccessEmail = ({
 	hostname,
 	monitor,
 }: {
 	hostname?: string;
-	monitor: Monitor;
+	monitor: MonitorWithRelations;
 }) => {
 	const title = `${monitor.name || monitor.title} reboot time changed.`;
 	return (
@@ -40,8 +40,6 @@ export const SuccessEmail = ({
 
 						<Section className="text-center mt-[32px] mb-[32px]">
 							<Button
-								pX={20}
-								pY={12}
 								className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
 								href={`${hostname}/${monitor.type}/${monitor.id}`}
 							>

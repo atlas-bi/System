@@ -1,5 +1,5 @@
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -7,19 +7,19 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '~/components/ui/select';
+} from "~/components/ui/select";
 
-import { Checkbox } from '~/components/ui/checkbox';
-import { Notification } from '~/models/notification.server';
+import { Checkbox } from "~/components/ui/checkbox";
+import { Notification } from "~/models/notification.server";
 
-import { Dispatch } from 'react';
+import { Dispatch } from "react";
 
 export function SmtpForm({
 	data,
 	setData,
 }: {
-	data: Notification;
-	setData: Dispatch<Notification>;
+	data: Partial<Notification>;
+	setData: Dispatch<Partial<Notification>>;
 }) {
 	return (
 		<>
@@ -29,7 +29,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="host"
-				value={data.smtpHost || ''}
+				value={data.smtpHost || ""}
 				placeholder="smpt.example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpHost: e.target.value })}
@@ -39,18 +39,18 @@ export function SmtpForm({
 			</Label>
 			<Input
 				type="number"
-				value={data.smtpPort}
+				value={data.smtpPort ?? ""}
 				id="port"
 				placeholder="22"
 				className="col-span-3"
-				onChange={(e) => setData({ ...data, smtpPort: Number(e.target.value) })}
+				onChange={(e) => setData({ ...data, smtpPort: e.target.value })}
 			/>
 
 			<Select
 				onValueChange={(smtpSecurity: string) =>
 					setData({ ...data, smtpSecurity })
 				}
-				defaultValue={data.smtpSecurity}
+				defaultValue={data.smtpSecurity ?? undefined}
 			>
 				<Label htmlFor="name" className="text-right">
 					Security*
@@ -73,7 +73,7 @@ export function SmtpForm({
 					id="ssl_errors"
 					defaultChecked={data.ignoreSSLErrors || false}
 					onCheckedChange={(checked) =>
-						setData({ ...data, ignoreSSLErrors: checked })
+						setData({ ...data, ignoreSSLErrors: checked === true })
 					}
 				/>
 				<label
@@ -90,7 +90,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="search_username"
-				value={data.smtpUsername || ''}
+				value={data.smtpUsername || ""}
 				placeholder="username"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpUsername: e.target.value })}
@@ -101,7 +101,7 @@ export function SmtpForm({
 			<Input
 				type="password"
 				id="search_password"
-				value={data.smtpPassword || ''}
+				value={data.smtpPassword || ""}
 				placeholder="123"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpPassword: e.target.value })}
@@ -112,7 +112,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="fromName"
-				value={data.smtpFromName || ''}
+				value={data.smtpFromName || ""}
 				placeholder="Analytics Dept."
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpFromName: e.target.value })}
@@ -123,7 +123,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="fromEmail"
-				value={data.smtpFromEmail || ''}
+				value={data.smtpFromEmail || ""}
 				placeholder="me@example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpFromEmail: e.target.value })}
@@ -134,7 +134,7 @@ export function SmtpForm({
 			<Input
 				type="text"
 				id="toEmail"
-				value={data.smtpToEmail || ''}
+				value={data.smtpToEmail || ""}
 				placeholder="you@example.com"
 				className="col-span-3"
 				onChange={(e) => setData({ ...data, smtpToEmail: e.target.value })}

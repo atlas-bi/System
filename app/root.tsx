@@ -1,6 +1,6 @@
-import { cssBundleHref } from '@remix-run/css-bundle';
-import stylesheet from '@/styles/globals.css';
-import { LinksFunction, V2_MetaFunction } from '@remix-run/node';
+import { cssBundleHref } from "@remix-run/css-bundle";
+import stylesheet from "@/styles/globals.css";
+import { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
 	Link,
 	Links,
@@ -11,18 +11,18 @@ import {
 	ScrollRestoration,
 	isRouteErrorResponse,
 	useRouteError,
-} from '@remix-run/react';
+} from "@remix-run/react";
 
-import remixImageStyles from 'remix-image/remix-image.css';
-import { H1 } from './components/ui/typography';
-import { ArrowLeft, MoveLeft } from 'lucide-react';
+// import remixImageStyles from 'remix-image/remix-image.css';
+import { H1 } from "./components/ui/typography";
+import { ArrowLeft, MoveLeft } from "lucide-react";
 
 export const links: LinksFunction = () => [
-	{ rel: 'stylesheet', href: stylesheet },
-	...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+	{ rel: "stylesheet", href: stylesheet },
+	...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export const meta: V2_MetaFunction = () => [{ title: 'Atlas System' }];
+export const meta: MetaFunction = () => [{ title: "Atlas System" }];
 
 export default function App() {
 	return (
@@ -61,7 +61,7 @@ export function ErrorBoundary() {
 			<div className="space-y-4">
 				<div className="flex space-x-2">
 					<MoveLeft size={16} className="my-auto" />
-					<Link href="javascript.history.back()">Go back</Link>
+					<a href="javascript:history.back()">Go back</a>
 				</div>
 				<H1>Error</H1>
 				<p className="text-sm">{error.message}</p>

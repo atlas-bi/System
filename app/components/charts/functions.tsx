@@ -1,31 +1,31 @@
-import { ChartArea } from 'chart.js';
+import { ChartArea } from "chart.js";
 
 export const lightGradient = [
-	'#bae6fd', //200
-	'#7dd3fc', //300
-	'#38bdf8', //400
-	'#0ea5e9', //500
+	"#bae6fd", //200
+	"#7dd3fc", //300
+	"#38bdf8", //400
+	"#0ea5e9", //500
 ];
 
 export const darkGradient = [
-	'#7dd3fc', //300
-	'#38bdf8', //400
-	'#0ea5e9', //500
-	'#0284c7', //600
+	"#7dd3fc", //300
+	"#38bdf8", //400
+	"#0ea5e9", //500
+	"#0284c7", //600
 ];
 
 export const lightErrorGradient = [
-	'#fecaca', //200
-	'#fca5a5', //300
-	'#f87171', //400
-	'#ef4444', //500
+	"#fecaca", //200
+	"#fca5a5", //300
+	"#f87171", //400
+	"#ef4444", //500
 ];
 
 export const darkErrorGradient = [
-	'#fca5a5', //300
-	'#f87171', //400
-	'#ef4444', //500
-	'#dc2626', //600
+	"#fca5a5", //300
+	"#f87171", //400
+	"#ef4444", //500
+	"#dc2626", //600
 ];
 
 // let width: number, height: number, gradient: any;
