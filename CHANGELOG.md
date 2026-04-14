@@ -1,3 +1,9 @@
+## <small>1.44.3 (2026-04-14)</small>
+
+* Merge pull request #68 from atlas-bi/dev ([004e093](https://github.com/atlas-bi/System/commit/004e093)), closes [#68](https://github.com/atlas-bi/System/issues/68)
+* Merge pull request #69 from atlas-bi/alpha ([95efb9a](https://github.com/atlas-bi/System/commit/95efb9a)), closes [#69](https://github.com/atlas-bi/System/issues/69)
+* fix(startup): fixed startup script ([a48689f](https://github.com/atlas-bi/System/commit/a48689f))
+
 ## <small>1.44.2 (2026-04-14)</small>
 
 * Merge pull request #66 from atlas-bi/dev ([b28a5ac](https://github.com/atlas-bi/System/commit/b28a5ac)), closes [#66](https://github.com/atlas-bi/System/issues/66)
