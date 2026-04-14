@@ -1,7 +1,7 @@
-import type { LoaderFunctionArgs } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
-import { getMonitorTypes } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { getMonitorTypes } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {

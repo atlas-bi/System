@@ -1,30 +1,30 @@
-import { Queue } from 'quirrel/remix';
-import { getMonitor } from '~/models/monitor.server';
-import WindowsMonitor from '~/monitors/windows.server';
-import UbuntuMonitor from '~/monitors/ubuntu.server';
-import HttpMonitor from '~/monitors/http.server';
-import SqlServerMonitor from '~/monitors/sqlServer.server';
-import TcpMonitor from '~/monitors/tcp.server';
+import { Queue } from "quirrel/remix";
+import { getMonitor } from "~/models/monitor.server";
+import WindowsMonitor from "~/monitors/windows.server";
+import UbuntuMonitor from "~/monitors/ubuntu.server";
+import HttpMonitor from "~/monitors/http.server";
+import SqlServerMonitor from "~/monitors/sqlServer.server";
+import TcpMonitor from "~/monitors/tcp.server";
 
-export default Queue('queues/monitor', async (job: string, meta) => {
+export default Queue("queues/monitor", async (job: string, meta) => {
 	const monitor = await getMonitor({ id: job });
 
 	if (!monitor) {
 		return;
 	}
-	if (monitor.type == 'windows') {
+	if (monitor.type == "windows") {
 		return await WindowsMonitor({ monitor: monitor as any });
 	}
-	if (monitor.type == 'ubuntu') {
+	if (monitor.type == "ubuntu") {
 		return await UbuntuMonitor({ monitor: monitor as any });
 	}
-	if (monitor.type == 'http') {
+	if (monitor.type == "http") {
 		return await HttpMonitor({ monitor: monitor as any });
 	}
-	if (monitor.type == 'sqlServer') {
+	if (monitor.type == "sqlServer") {
 		return await SqlServerMonitor({ monitor: monitor as any });
 	}
-	if (monitor.type == 'tcp') {
+	if (monitor.type == "tcp") {
 		return await TcpMonitor({ monitor: monitor as any });
 	}
 });

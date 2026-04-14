@@ -1,12 +1,12 @@
-import { Link, useFetcher, useLocation } from '@remix-run/react';
-import bytes from 'bytes';
-import { AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react';
-import { Dispatch, useEffect } from 'react';
-import { DoughnutChart } from '~/components/charts/driveDoughnut';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { H3 } from '~/components/ui/typography';
- 
+import { Link, useFetcher, useLocation } from "@remix-run/react";
+import bytes from "bytes";
+import { AlertTriangle, ToggleLeft, ToggleRight } from "lucide-react";
+import { Dispatch, useEffect } from "react";
+import { DoughnutChart } from "~/components/charts/driveDoughnut";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import { H3 } from "~/components/ui/typography";
+
 type MonitorLike = {
 	type: string;
 	id: string;
@@ -41,7 +41,7 @@ export const MiniDrive = ({
 
 	// if we redirect to another monitor we need to reload drives
 	useEffect(() => {
-		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (usageFetcher.state === "idle" && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${monitor.type}/${monitor.id}/drive/${drive.id}/usage`,
 			);
@@ -49,12 +49,18 @@ export const MiniDrive = ({
 	}, [location]);
 
 	useEffect(() => {
-		if (usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (usageFetcher.state === "idle" && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${monitor.type}/${monitor.id}/drive/${drive.id}/usage`,
 			);
 		}
-	}, [usageFetcher.state, usageFetcher.data, monitor.type, monitor.id, drive.id]);
+	}, [
+		usageFetcher.state,
+		usageFetcher.data,
+		monitor.type,
+		monitor.id,
+		drive.id,
+	]);
 
 	return (
 		<Link
@@ -62,7 +68,7 @@ export const MiniDrive = ({
 			prefetch="intent"
 			key={drive.id}
 			className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200 ${
-				!drive.enabled || !drive.online ? 'opacity-50 hover:opacity-100' : ''
+				!drive.enabled || !drive.online ? "opacity-50 hover:opacity-100" : ""
 			}`}
 		>
 			<div>
@@ -86,16 +92,12 @@ export const MiniDrive = ({
 								className="w-36 h-36"
 								data={{
 									labels: [
-										`Used ${bytes(
-											Number([...usage]?.pop()?.used),
-										)}`,
-										`Free ${bytes(
-											Number([...usage]?.pop()?.free),
-										)}`,
+										`Used ${bytes(Number([...usage]?.pop()?.used))}`,
+										`Free ${bytes(Number([...usage]?.pop()?.free))}`,
 									],
 									datasets: [
 										{
-											label: 'Drive Usage',
+											label: "Drive Usage",
 											data: [
 												Number([...usage]?.pop()?.used),
 												Number([...usage]?.pop()?.used) +
@@ -122,7 +124,7 @@ export const MiniDrive = ({
 							<span>{drive.title}</span>
 							<span>({drive.root})</span>
 						</>
-					) : monitor.type == 'ubuntu' && drive.name ? (
+					) : monitor.type == "ubuntu" && drive.name ? (
 						<span>
 							{drive.root} ({drive.name})
 						</span>
@@ -146,11 +148,10 @@ export const MiniDrive = ({
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(
-										Number([
-											...(usageFetcher.data?.drive?.usage ?? []),
-										].pop()?.used),
-									) ||
-									'-1'
+										Number(
+											[...(usageFetcher.data?.drive?.usage ?? [])].pop()?.used,
+										),
+									) || "-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
@@ -161,11 +162,10 @@ export const MiniDrive = ({
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
 									bytes(
-										Number([
-											...(usageFetcher.data?.drive?.usage ?? []),
-										].pop()?.free),
-									) ||
-									'-1'
+										Number(
+											[...(usageFetcher.data?.drive?.usage ?? [])].pop()?.free,
+										),
+									) || "-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
@@ -187,7 +187,7 @@ export const MiniDrive = ({
 								{usageFetcher.data ? (
 									<>
 										{bytes(Number(usageFetcher?.data?.drive?.growthRate)) ||
-											'-1'}
+											"-1"}
 										/day
 									</>
 								) : (

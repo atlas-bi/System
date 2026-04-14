@@ -1,14 +1,14 @@
-import { setMonitorHttpCertSentAt } from '~/models/monitor.server';
-import type { MonitorWithRelations } from '~/models/monitor.server';
-import type { NotificationMeta } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { render } from '@react-email/render';
+import { setMonitorHttpCertSentAt } from "~/models/monitor.server";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import type { NotificationMeta } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { render } from "@react-email/render";
 import {
 	InvalidEmail,
 	SuccessEmail,
 	ErrorEmail,
-} from '~/notifications/email/monitors/httpCert';
+} from "~/notifications/email/monitors/httpCert";
 
 export default async function httpCertNotifier({
 	monitor,
@@ -18,9 +18,9 @@ export default async function httpCertNotifier({
 	// don't notify if disabled.
 	if (
 		!monitor.httpCertNotify ||
-		monitor.type !== 'http' ||
+		monitor.type !== "http" ||
 		!monitor.httpUrl ||
-		!monitor.httpUrl.startsWith('https')
+		!monitor.httpUrl.startsWith("https")
 	) {
 		return setMonitorHttpCertSentAt({
 			id: monitor.id,
@@ -36,8 +36,8 @@ export default async function httpCertNotifier({
 	if (monitor.certValid === false || monitor.certDays == null) {
 		const snippet =
 			monitor.certDays == null
-				? 'Certificate could not be determined'
-				: 'Certificate is invalid';
+				? "Certificate could not be determined"
+				: "Certificate is invalid";
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] ${snippet}.`;
@@ -93,7 +93,7 @@ export default async function httpCertNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 				});
 			}
@@ -132,14 +132,14 @@ export default async function httpCertNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 				});
 			}
 		});
 		await Logger({
-			message: message || '',
-			type: 'error',
+			message: message || "",
+			type: "error",
 			monitor,
 		});
 		return setMonitorHttpCertSentAt({

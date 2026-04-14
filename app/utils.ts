@@ -1,7 +1,7 @@
 // import { useMatches } from "@remix-run/react";
 // import { useMemo } from "react";
 
-import { redirect } from '@remix-run/node';
+import { redirect } from "@remix-run/node";
 import {
 	endOfDay,
 	endOfToday,
@@ -14,11 +14,11 @@ import {
 	subDays,
 	subHours,
 	subYears,
-} from 'date-fns';
+} from "date-fns";
 
 // import type { User } from "~/models/user.server";
 
-const DEFAULT_REDIRECT = '/';
+const DEFAULT_REDIRECT = "/";
 
 /**
  * This should be used any time the redirect path is user-provided
@@ -31,11 +31,11 @@ export function safeRedirect(
 	to: FormDataEntryValue | string | null | undefined,
 	defaultRedirect: string = DEFAULT_REDIRECT,
 ) {
-	if (!to || typeof to !== 'string') {
+	if (!to || typeof to !== "string") {
 		return defaultRedirect;
 	}
 
-	if (!to.startsWith('/') || to.startsWith('//')) {
+	if (!to.startsWith("/") || to.startsWith("//")) {
 		return defaultRedirect;
 	}
 
@@ -47,15 +47,18 @@ export async function namedAction(
 	actions: Record<string, (formData: FormData) => Promise<Response> | Response>,
 ) {
 	const formData = await request.formData();
-	const action = formData.get('_action');
-	if (typeof action !== 'string' || !(action in actions)) {
-		throw new Response('Invalid action', { status: 400 });
+	const action = formData.get("_action");
+	if (typeof action !== "string" || !(action in actions)) {
+		throw new Response("Invalid action", { status: 400 });
 	}
 	return await actions[action]!(formData);
 }
 
-export function redirectBack(request: Request, { fallback }: { fallback: string }) {
-	const referer = request.headers.get('Referer');
+export function redirectBack(
+	request: Request,
+	{ fallback }: { fallback: string },
+) {
+	const referer = request.headers.get("Referer");
 	if (referer) {
 		return redirect(referer);
 	}
@@ -110,44 +113,44 @@ export const jsonParser = (str: any) => {
 };
 
 export function validateEmail(email: unknown): email is string {
-	return typeof email === 'string' && email.length > 3 && email.includes('@');
+	return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
-export function dateRange(key: string | null = 'last_24_hours') {
+export function dateRange(key: string | null = "last_24_hours") {
 	const today = new Date();
 	switch (key) {
-		case 'today':
+		case "today":
 			return { startDate: startOfToday(), endDate: endOfToday() };
 			break;
-		case 'last_24_hours':
+		case "last_24_hours":
 		default:
 			return { startDate: subHours(today, 24), endDate: today };
 			break;
-		case 'yesterday':
+		case "yesterday":
 			return {
 				startDate: startOfDay(subDays(today, 1)),
 				endDate: endOfDay(subDays(today, 1)),
 			};
 			break;
-		case 'this_week':
+		case "this_week":
 			return { startDate: startOfWeek(today), endDate: endOfWeek(today) };
 			break;
-		case 'last_7_days':
+		case "last_7_days":
 			return { startDate: subDays(today, 7), endDate: endOfToday() };
 			break;
-		case 'this_month':
+		case "this_month":
 			return { startDate: startOfMonth(today), endDate: endOfToday() };
 			break;
-		case 'last_30_days':
+		case "last_30_days":
 			return { startDate: subDays(today, 30), endDate: endOfToday() };
 			break;
-		case 'last_90_days':
+		case "last_90_days":
 			return { startDate: subDays(today, 90), endDate: endOfToday() };
 			break;
-		case 'this_year':
+		case "this_year":
 			return { startDate: startOfYear(today), endDate: endOfToday() };
 			break;
-		case 'all_time':
+		case "all_time":
 			return { startDate: subYears(today, 50), endDate: endOfToday() };
 			break;
 	}

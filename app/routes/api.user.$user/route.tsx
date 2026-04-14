@@ -1,7 +1,7 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import invariant from 'tiny-invariant';
-import { getUserBySlug } from '~/models/user.server';
-import { authenticator } from '~/services/auth.server';
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import invariant from "tiny-invariant";
+import { getUserBySlug } from "~/models/user.server";
+import { authenticator } from "~/services/auth.server";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	let user = await authenticator.isAuthenticated(request);

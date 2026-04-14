@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { getDriveMeta } from '~/models/drive.server';
-import { authenticator } from '~/services/auth.server';
-import { Link, useFetcher, useLoaderData, useParams } from '@remix-run/react';
-import { DriveChart } from '~/components/charts/driveChart';
-import { H1 } from '~/components/ui/typography';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { getDriveMeta } from "~/models/drive.server";
+import { authenticator } from "~/services/auth.server";
+import { Link, useFetcher, useLoaderData, useParams } from "@remix-run/react";
+import { DriveChart } from "~/components/charts/driveChart";
+import { H1 } from "~/components/ui/typography";
 import {
 	Activity,
 	AlertTriangle,
@@ -12,18 +12,18 @@ import {
 	Settings,
 	BellRing,
 	MoveRight,
-} from 'lucide-react';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import bytes from 'bytes';
-import { useEffect, useState } from 'react';
+} from "lucide-react";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import bytes from "bytes";
+import { useEffect, useState } from "react";
 
-import { LogTable } from '~/components/logTable/table';
-import { Button } from '~/components/ui/button';
-import Drive from '~/components/driveForms/base';
-import { Badge } from '~/components/ui/badge';
-import { PingStat } from '../_auth.$monitorType_.$monitorId._index/responseTime';
-import invariant from 'tiny-invariant';
-import { Skeleton } from '~/components/ui/skeleton';
+import { LogTable } from "~/components/logTable/table";
+import { Button } from "~/components/ui/button";
+import Drive from "~/components/driveForms/base";
+import { Badge } from "~/components/ui/badge";
+import { PingStat } from "../_auth.$monitorType_.$monitorId._index/responseTime";
+import invariant from "tiny-invariant";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -52,7 +52,7 @@ export default function Index() {
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (document.visibilityState === 'visible') {
+			if (document.visibilityState === "visible") {
 				dataFetcher.load(window.location.pathname);
 			}
 		}, 30 * 1000);
@@ -66,7 +66,7 @@ export default function Index() {
 	}, [dataFetcher.data]);
 
 	useEffect(() => {
-		if (drive && usageFetcher.state === 'idle' && usageFetcher.data == null) {
+		if (drive && usageFetcher.state === "idle" && usageFetcher.data == null) {
 			usageFetcher.load(
 				`/${drive.monitor.type}/${drive.monitor.id}/drive/${drive.id}/usage`,
 			);
@@ -154,7 +154,7 @@ export default function Index() {
 									{usageFetcher.data ? (
 										bytes(
 											Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
-										) || '-1'
+										) || "-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}
@@ -166,7 +166,7 @@ export default function Index() {
 									{usageFetcher.data ? (
 										bytes(
 											Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
-										) || '-1'
+										) || "-1"
 									) : (
 										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 									)}

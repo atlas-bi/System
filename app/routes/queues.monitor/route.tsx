@@ -1,3 +1,3 @@
-import monitorServer from '~/queues/monitor.server';
+import monitorServer from "~/queues/monitor.server";
 
 export const action = monitorServer;

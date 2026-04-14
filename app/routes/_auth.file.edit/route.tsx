@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { namedAction } from '~/utils';
-import { editFile } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { namedAction } from "~/utils";
+import { editFile } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
 
 export async function action({ request }: ActionFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
@@ -17,7 +17,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			const file = await editFile({
 				id: values.id.toString(),
-				enabled: values.enabled.toString() == 'true',
+				enabled: values.enabled.toString() == "true",
 			});
 			return json({ file });
 		},

@@ -1,8 +1,8 @@
-import type { LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import invariant from 'tiny-invariant';
-import { getMonitorLatestFeeds, getPing } from '~/models/monitor.server';
-import { authenticator } from '~/services/auth.server';
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import invariant from "tiny-invariant";
+import { getMonitorLatestFeeds, getPing } from "~/models/monitor.server";
+import { authenticator } from "~/services/auth.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	await authenticator.isAuthenticated(request, {
@@ -11,7 +11,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		)}`,
 	});
 
-	invariant(params.monitorId, 'Monitor ID is required.');
+	invariant(params.monitorId, "Monitor ID is required.");
 	const feeds = await getMonitorLatestFeeds({
 		id: params.monitorId,
 	});

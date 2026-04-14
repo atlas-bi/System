@@ -1,17 +1,17 @@
 import {
 	setMonitorConnectionRetried,
 	setMonitorConnectionSentAt,
-} from '~/models/monitor.server';
-import type { MonitorWithRelations } from '~/models/monitor.server';
-import type { NotificationMeta } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { render } from '@react-email/render';
+} from "~/models/monitor.server";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import type { NotificationMeta } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { render } from "@react-email/render";
 
 import {
 	ErrorEmail,
 	SuccessEmail,
-} from '~/notifications/email/monitors/collection';
+} from "~/notifications/email/monitors/collection";
 
 export default async function collectionNotifier({
 	monitor,
@@ -37,15 +37,15 @@ export default async function collectionNotifier({
 
 	let name = monitor.title;
 
-	if (monitor.type === 'windows' || monitor.type === 'ubuntu') {
+	if (monitor.type === "windows" || monitor.type === "ubuntu") {
 		name = `${monitor.title} (${monitor.host})`;
 	}
 
-	if (monitor.type === 'http') {
+	if (monitor.type === "http") {
 		name = `${monitor.title} (${monitor.httpUrl})`;
 	}
 
-	if (monitor.type === 'sqlServer') {
+	if (monitor.type === "sqlServer") {
 		name = `${monitor.title} (${monitor.name})`;
 	}
 
@@ -64,24 +64,26 @@ export default async function collectionNotifier({
 				},
 			);
 
-			monitor.connectionNotifyTypes.map(async (notification: NotificationMeta) => {
-				try {
-					return await sendNotification({
-						notification,
-						subject,
-						message: html,
-					});
-				} catch (e) {
-					return Logger({
-						message: `Failed to send ${notification.name}: ${e}`,
-						type: 'error',
-						monitor,
-					});
-				}
-			});
+			monitor.connectionNotifyTypes.map(
+				async (notification: NotificationMeta) => {
+					try {
+						return await sendNotification({
+							notification,
+							subject,
+							message: html,
+						});
+					} catch (e) {
+						return Logger({
+							message: `Failed to send ${notification.name}: ${e}`,
+							type: "error",
+							monitor,
+						});
+					}
+				},
+			);
 			return Logger({
 				message: `Data collection restored.`,
-				type: 'success',
+				type: "success",
 				monitor,
 			});
 		}
@@ -92,7 +94,7 @@ export default async function collectionNotifier({
 		});
 	}
 
-	await Logger({ message, type: 'error', monitor });
+	await Logger({ message, type: "error", monitor });
 
 	let resend = !monitor.connectionNotifySentAt;
 
@@ -131,21 +133,23 @@ export default async function collectionNotifier({
 			},
 		);
 
-		monitor.connectionNotifyTypes.map(async (notification: NotificationMeta) => {
-			try {
-				return await sendNotification({
-					notification,
-					subject,
-					message: html,
-				});
-			} catch (e) {
-				return Logger({
-					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
-					monitor,
-				});
-			}
-		});
+		monitor.connectionNotifyTypes.map(
+			async (notification: NotificationMeta) => {
+				try {
+					return await sendNotification({
+						notification,
+						subject,
+						message: html,
+					});
+				} catch (e) {
+					return Logger({
+						message: `Failed to send ${notification.name}: ${e}`,
+						type: "error",
+						monitor,
+					});
+				}
+			},
+		);
 
 		return setMonitorConnectionSentAt({
 			id: monitor.id,
@@ -154,7 +158,10 @@ export default async function collectionNotifier({
 	}
 
 	// increment try value only if we are still checking it.
-	if ((monitor.connectionNotifyRetried || 0) <= (monitor.connectionNotifyRetries || 0)) {
+	if (
+		(monitor.connectionNotifyRetried || 0) <=
+		(monitor.connectionNotifyRetries || 0)
+	) {
 		return setMonitorConnectionRetried({
 			id: monitor.id,
 			connectionNotifyRetried: (monitor.connectionNotifyRetried || 0) + 1,

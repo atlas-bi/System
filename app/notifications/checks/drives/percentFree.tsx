@@ -1,21 +1,15 @@
-import { setDrivePercFreeSentAt } from '~/models/drive.server';
-import type { Notification } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { render } from '@react-email/render';
+import { setDrivePercFreeSentAt } from "~/models/drive.server";
+import type { Notification } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { render } from "@react-email/render";
 
 import {
 	ErrorEmail,
 	SuccessEmail,
-} from '~/notifications/email/drives/percentFree';
+} from "~/notifications/email/drives/percentFree";
 
-async function allClear({
-	monitor,
-	drive,
-}: {
-	monitor: any;
-	drive: any;
-}) {
+async function allClear({ monitor, drive }: { monitor: any; drive: any }) {
 	if (drive.percFreeNotifySentAt) {
 		// send an all clear alert
 		const subject = `💚 [${monitor.host} ${drive.name} drive] Free space now below limit.`;
@@ -32,22 +26,28 @@ async function allClear({
 			},
 		);
 
-		(drive.percFreeNotifyTypes ?? []).map(async (notification: Notification) => {
-			try {
-				return await sendNotification({ notification, subject, message: html });
-			} catch (e) {
-				return Logger({
-					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
-					monitor,
-					drive,
-				});
-			}
-		});
+		(drive.percFreeNotifyTypes ?? []).map(
+			async (notification: Notification) => {
+				try {
+					return await sendNotification({
+						notification,
+						subject,
+						message: html,
+					});
+				} catch (e) {
+					return Logger({
+						message: `Failed to send ${notification.name}: ${e}`,
+						type: "error",
+						monitor,
+						drive,
+					});
+				}
+			},
+		);
 
 		return Logger({
 			message: `Free space now below limit of ${drive.percFreeValue}%`,
-			type: 'success',
+			type: "success",
 			monitor,
 			drive,
 		});
@@ -88,7 +88,7 @@ export default async function percentFreeNotifier({
 
 	await Logger({
 		message,
-		type: 'error',
+		type: "error",
 		monitor,
 		drive,
 	});
@@ -129,7 +129,7 @@ export default async function percentFreeNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 					drive,
 				});

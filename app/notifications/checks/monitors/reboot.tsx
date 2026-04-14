@@ -1,10 +1,10 @@
-import { setMonitorRebootSentAt } from '~/models/monitor.server';
-import type { MonitorWithRelations } from '~/models/monitor.server';
-import type { NotificationMeta } from '~/models/notification.server';
-import { Logger } from '~/notifications/logger';
-import { sendNotification } from '~/notifications/notifier';
-import { SuccessEmail } from '~/notifications/email/monitors/reboot';
-import { render } from '@react-email/render';
+import { setMonitorRebootSentAt } from "~/models/monitor.server";
+import type { MonitorWithRelations } from "~/models/monitor.server";
+import type { NotificationMeta } from "~/models/notification.server";
+import { Logger } from "~/notifications/logger";
+import { sendNotification } from "~/notifications/notifier";
+import { SuccessEmail } from "~/notifications/email/monitors/reboot";
+import { render } from "@react-email/render";
 
 export default async function rebootNotifier({
 	monitor,
@@ -33,7 +33,7 @@ export default async function rebootNotifier({
 			} catch (e) {
 				return Logger({
 					message: `Failed to send ${notification.name}: ${e}`,
-					type: 'error',
+					type: "error",
 					monitor,
 				});
 			}
@@ -41,7 +41,7 @@ export default async function rebootNotifier({
 
 		await Logger({
 			message,
-			type: 'warning',
+			type: "warning",
 			monitor,
 		});
 

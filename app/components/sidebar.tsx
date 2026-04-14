@@ -1,12 +1,16 @@
-import { cn } from '@/lib/utils';
-import { Link, useLocation, useMatches } from '@remix-run/react';
-import { Fragment, forwardRef } from 'react';
-import { buttonVariants } from '~/components/ui/button';
+import { cn } from "@/lib/utils";
+import { Link, useLocation, useMatches } from "@remix-run/react";
+import { Fragment, forwardRef } from "react";
+import { buttonVariants } from "~/components/ui/button";
 
-import { monitorTypes as typeDict } from '~/models/monitor';
-import { Badge } from './ui/badge';
+import { monitorTypes as typeDict } from "~/models/monitor";
+import { Badge } from "./ui/badge";
 
-type SidebarMonitorType = { value: string; type: string; _count: { type: string } };
+type SidebarMonitorType = {
+	value: string;
+	type: string;
+	_count: { type: string };
+};
 
 export const SidebarNav = forwardRef<
 	HTMLDivElement,
@@ -14,7 +18,7 @@ export const SidebarNav = forwardRef<
 >(({ className, ...props }, ref) => {
 	const { pathname } = useLocation();
 	const matches = useMatches();
-	const authMatch = matches.find((x) => x.id === 'routes/_auth');
+	const authMatch = matches.find((x) => x.id === "routes/_auth");
 	const monitorTypes =
 		(authMatch?.data as { monitorTypes?: SidebarMonitorType[] } | undefined)
 			?.monitorTypes ?? [];
@@ -22,7 +26,7 @@ export const SidebarNav = forwardRef<
 	return (
 		<nav
 			className={cn(
-				'flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1',
+				"flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
 				className,
 			)}
 			{...props}
@@ -36,11 +40,11 @@ export const SidebarNav = forwardRef<
 								key={x.value}
 								to={`/${x.value}`}
 								className={cn(
-									buttonVariants({ variant: 'ghost' }),
-									pathname.startsWith('/' + x.value)
-										? 'bg-muted hover:bg-muted'
-										: 'hover:bg-transparent hover:underline',
-									'justify-between space-x-2',
+									buttonVariants({ variant: "ghost" }),
+									pathname.startsWith("/" + x.value)
+										? "bg-muted hover:bg-muted"
+										: "hover:bg-transparent hover:underline",
+									"justify-between space-x-2",
 								)}
 							>
 								<div className="justify-start flex space-x-2">

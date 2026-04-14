@@ -1,10 +1,10 @@
-import { encrypt } from '@/lib/utils';
-import { prisma } from '~/db.server';
+import { encrypt } from "@/lib/utils";
+import { prisma } from "~/db.server";
 
-import type { Notification } from '@prisma/client';
-export type { Notification } from '@prisma/client';
+import type { Notification } from "@prisma/client";
+export type { Notification } from "@prisma/client";
 
-export type NotificationMeta = Pick<Notification, 'id' | 'type' | 'name'>;
+export type NotificationMeta = Pick<Notification, "id" | "type" | "name">;
 
 export function getNotifications() {
 	return prisma.notification.findMany({
@@ -40,13 +40,13 @@ export function getNotificationsDetail() {
 	});
 }
 
-export function deleteNotification({ id }: Pick<Notification, 'id'>) {
+export function deleteNotification({ id }: Pick<Notification, "id">) {
 	return prisma.notification.deleteMany({
 		where: { id },
 	});
 }
 
-export function getNotificationConnection({ id }: Pick<Notification, 'id'>) {
+export function getNotificationConnection({ id }: Pick<Notification, "id">) {
 	return prisma.notification.findUnique({
 		where: { id },
 	});
@@ -72,23 +72,23 @@ export function editNotification({
 	tgProtectMessage,
 }: Pick<
 	Notification,
-	| 'id'
-	| 'name'
-	| 'type'
-	| 'smtpPort'
-	| 'smtpUsername'
-	| 'smtpHost'
-	| 'smtpPassword'
-	| 'smtpSecurity'
-	| 'ignoreSSLErrors'
-	| 'smtpFromName'
-	| 'smtpFromEmail'
-	| 'smtpToEmail'
-	| 'tgBotToken'
-	| 'tgChatId'
-	| 'tgThreadId'
-	| 'tgSendSilently'
-	| 'tgProtectMessage'
+	| "id"
+	| "name"
+	| "type"
+	| "smtpPort"
+	| "smtpUsername"
+	| "smtpHost"
+	| "smtpPassword"
+	| "smtpSecurity"
+	| "ignoreSSLErrors"
+	| "smtpFromName"
+	| "smtpFromEmail"
+	| "smtpToEmail"
+	| "tgBotToken"
+	| "tgChatId"
+	| "tgThreadId"
+	| "tgSendSilently"
+	| "tgProtectMessage"
 >) {
 	return prisma.notification.update({
 		where: { id },
@@ -131,22 +131,22 @@ export function createNotification({
 	tgProtectMessage,
 }: Pick<
 	Notification,
-	| 'name'
-	| 'type'
-	| 'smtpPort'
-	| 'smtpUsername'
-	| 'smtpHost'
-	| 'smtpPassword'
-	| 'smtpSecurity'
-	| 'ignoreSSLErrors'
-	| 'smtpFromName'
-	| 'smtpFromEmail'
-	| 'smtpToEmail'
-	| 'tgBotToken'
-	| 'tgChatId'
-	| 'tgThreadId'
-	| 'tgSendSilently'
-	| 'tgProtectMessage'
+	| "name"
+	| "type"
+	| "smtpPort"
+	| "smtpUsername"
+	| "smtpHost"
+	| "smtpPassword"
+	| "smtpSecurity"
+	| "ignoreSSLErrors"
+	| "smtpFromName"
+	| "smtpFromEmail"
+	| "smtpToEmail"
+	| "tgBotToken"
+	| "tgChatId"
+	| "tgThreadId"
+	| "tgSendSilently"
+	| "tgProtectMessage"
 >) {
 	return prisma.notification.create({
 		data: {

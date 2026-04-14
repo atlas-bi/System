@@ -1,11 +1,11 @@
 /* eslint-disable remix/node-server-imports */
-import { createRequestHandler } from '@remix-run/express';
-import compression from 'compression';
-import express from 'express';
-import morgan from 'morgan';
-import path from 'path';
-import { ChildProcess, spawnSync } from 'child_process';
-import { symmetric } from 'secure-webhooks';
+import { createRequestHandler } from "@remix-run/express";
+import compression from "compression";
+import express from "express";
+import morgan from "morgan";
+import path from "path";
+import { ChildProcess, spawnSync } from "child_process";
+import { symmetric } from "secure-webhooks";
 /*
 
 1. start quirrel
@@ -22,21 +22,21 @@ kill -9 <<PID>>
 const port = process.env.PORT || process.env.WEB_PORT || 3000;
 
 if (!process.env.QUIRREL_PORT) {
-	process.env.QUIRREL_PORT = '9891';
+	process.env.QUIRREL_PORT = "9891";
 }
 if (!process.env.MEILI_PORT) {
-	process.env.MEILI_PORT = '7700';
+	process.env.MEILI_PORT = "7700";
 }
 
 process.env.SESSION_SECRET = `atlas-${port}`;
 
 const MODE = process.env.NODE_ENV;
-const BUILD_DIR = path.join(process.cwd(), 'build');
+const BUILD_DIR = path.join(process.cwd(), "build");
 
 const DISABLE_BACKGROUND_SERVICES =
-	process.env.DISABLE_BACKGROUND_SERVICES === 'true' ||
-	process.env.DISABLE_BACKGROUND_SERVICES === '1' ||
-	process.env.CI === 'true';
+	process.env.DISABLE_BACKGROUND_SERVICES === "true" ||
+	process.env.DISABLE_BACKGROUND_SERVICES === "1" ||
+	process.env.CI === "true";
 
 let child: ChildProcess | undefined;
 let search: ChildProcess | undefined;
@@ -51,7 +51,7 @@ type FetchWithRetries = (
 	options: {
 		[x: string]: any;
 		method?: string;
-		headers?: { Authorization?: string; 'x-quirrel-signature'?: string };
+		headers?: { Authorization?: string; "x-quirrel-signature"?: string };
 		maxRetries: any;
 	},
 	retryCount?: number,
@@ -83,16 +83,16 @@ const fetchWithRetries: FetchWithRetries = async (
 			await sleep(5000);
 			return fetchWithRetries(url, options, retryCount + 1);
 		}
-		console.log('Failed to connect to quirrel: max retries exceeded');
+		console.log("Failed to connect to quirrel: max retries exceeded");
 		// max retries exceeded
-		child?.kill('SIGINT');
-		search?.kill('SIGINT');
+		child?.kill("SIGINT");
+		search?.kill("SIGINT");
 		throw error;
 	}
 };
 
 (async () => {
-	if (MODE === 'production') {
+	if (MODE === "production") {
 		process.env.MEILISEARCH_URL = `http://127.0.0.1:${process.env.MEILI_PORT}`;
 		process.env.MEILI_MASTER_KEY = `atlas-meili-${process.env.MEILI_PORT}`;
 		process.env.QUIRREL_API_URL = `http://127.0.0.1:${process.env.QUIRREL_PORT}`;
@@ -113,13 +113,13 @@ const fetchWithRetries: FetchWithRetries = async (
 	});
 	app.use((req, res, next) => {
 		// helpful headers:
-		res.set('x-fly-region', process.env.FLY_REGION ?? 'unknown');
-		res.set('Strict-Transport-Security', `max-age=${60 * 60 * 24 * 365 * 100}`);
+		res.set("x-fly-region", process.env.FLY_REGION ?? "unknown");
+		res.set("Strict-Transport-Security", `max-age=${60 * 60 * 24 * 365 * 100}`);
 
 		// /clean-urls/ -> /clean-urls
-		if (req.path.endsWith('/') && req.path.length > 1) {
+		if (req.path.endsWith("/") && req.path.length > 1) {
 			const query = req.url.slice(req.path.length);
-			const safepath = req.path.slice(0, -1).replace(/\/+/g, '/');
+			const safepath = req.path.slice(0, -1).replace(/\/+/g, "/");
 			res.redirect(301, safepath + query);
 			return;
 		}
@@ -130,11 +130,11 @@ const fetchWithRetries: FetchWithRetries = async (
 	// non-GET/HEAD/OPTIONS requests hit the primary region rather than read-only
 	// Postgres DBs.
 	// learn more: https://fly.io/docs/getting-started/multi-region-databases/#replay-the-request
-	app.all('*', function getReplayResponse(req, res, next) {
+	app.all("*", function getReplayResponse(req, res, next) {
 		const { method, path: pathname } = req;
 		const { PRIMARY_REGION, FLY_REGION } = process.env;
 
-		const isMethodReplayable = !['GET', 'OPTIONS', 'HEAD'].includes(method);
+		const isMethodReplayable = !["GET", "OPTIONS", "HEAD"].includes(method);
 		const isReadOnlyRegion =
 			FLY_REGION && PRIMARY_REGION && FLY_REGION !== PRIMARY_REGION;
 
@@ -149,30 +149,30 @@ const fetchWithRetries: FetchWithRetries = async (
 			FLY_REGION,
 		};
 		console.info(`Replaying:`, logInfo);
-		res.set('fly-replay', `region=${PRIMARY_REGION}`);
+		res.set("fly-replay", `region=${PRIMARY_REGION}`);
 		return res.sendStatus(409);
 	});
 
 	app.use(compression());
 
 	// http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
-	app.disable('x-powered-by');
+	app.disable("x-powered-by");
 
 	// Remix fingerprints its assets so we can cache forever.
 	app.use(
-		'/build',
-		express.static('public/build', { immutable: true, maxAge: '1y' }),
+		"/build",
+		express.static("public/build", { immutable: true, maxAge: "1y" }),
 	);
 
 	// Everything else (like favicon.ico) is cached for an hour. You may want to be
 	// more aggressive with this caching.
-	app.use(express.static('public', { maxAge: '1h' }));
+	app.use(express.static("public", { maxAge: "1h" }));
 
-	app.use(morgan('tiny'));
+	app.use(morgan("tiny"));
 
 	app.all(
-		'*',
-		MODE === 'production'
+		"*",
+		MODE === "production"
 			? createRequestHandler({ build: require(BUILD_DIR) })
 			: (...args) => {
 					purgeRequireCache();
@@ -181,42 +181,45 @@ const fetchWithRetries: FetchWithRetries = async (
 						mode: MODE,
 					});
 					return requestHandler(...args);
-			  },
+				},
 	);
 
 	// call search loader for an initial load
 	if (!DISABLE_BACKGROUND_SERVICES) {
 		await fetchWithRetries(`http://127.0.0.1:${port}/queues/searchService`, {
-			body: '',
-			method: 'POST',
+			body: "",
+			method: "POST",
 			headers: {
-				'x-quirrel-signature': symmetric.sign('', process.env.QUIRREL_TOKEN || ''),
+				"x-quirrel-signature": symmetric.sign(
+					"",
+					process.env.QUIRREL_TOKEN || "",
+				),
 			},
 			maxRetries: 5,
 		});
-		console.log('🔍 Triggered search load');
+		console.log("🔍 Triggered search load");
 	}
 })();
 
 async function startQuirrel() {
-	const { execa } = await import('execa');
+	const { execa } = await import("execa");
 	const child: ChildProcess = execa(
-		'node',
+		"node",
 		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
 		{
 			env: {
 				...process.env,
 				PORT: process.env.QUIRREL_PORT,
 				PASSPHRASES: `atlas`,
-				DISABLE_TELEMETRY: '1',
+				DISABLE_TELEMETRY: "1",
 			},
-			stdio: 'inherit',
+			stdio: "inherit",
 		},
 	);
 
-	child.on('exit', function (code, signal) {
+	child.on("exit", function (code, signal) {
 		throw Error(
-			'child process exited with ' + `code ${code} and signal ${signal}`,
+			"child process exited with " + `code ${code} and signal ${signal}`,
 		);
 	});
 
@@ -224,19 +227,19 @@ async function startQuirrel() {
 }
 
 async function startMeili() {
-	const { execa } = await import('execa');
-	const child: ChildProcess = execa('./etc/meilisearch', {
+	const { execa } = await import("execa");
+	const child: ChildProcess = execa("./etc/meilisearch", {
 		env: {
 			...process.env,
 			MEILI_HTTP_ADDR: `127.0.0.1:${process.env.MEILI_PORT}`,
-			MEILI_NO_ANALYTICS: 'true',
+			MEILI_NO_ANALYTICS: "true",
 		},
-		stdio: 'inherit',
+		stdio: "inherit",
 	});
 
-	child.on('exit', function (code, signal) {
+	child.on("exit", function (code, signal) {
 		throw Error(
-			'child process exited with ' + `code ${code} and signal ${signal}`,
+			"child process exited with " + `code ${code} and signal ${signal}`,
 		);
 	});
 
@@ -259,14 +262,14 @@ function purgeRequireCache() {
 
 async function getQuirrelToken() {
 	//curl --user ignored:atlas-quirrel-9891 -X PUT http://127.0.0.1:9891/tokens/prod
-	console.log('Quirrel: getting token...');
+	console.log("Quirrel: getting token...");
 
 	const response = await fetchWithRetries(
 		`http://127.0.0.1:${process.env.QUIRREL_PORT}/tokens/prod`,
 		{
-			method: 'PUT',
+			method: "PUT",
 			headers: {
-				Authorization: 'Basic ' + btoa('ignored:atlas'),
+				Authorization: "Basic " + btoa("ignored:atlas"),
 			},
 			maxRetries: 5,
 		},
@@ -274,23 +277,23 @@ async function getQuirrelToken() {
 	process.env.QUIRREL_TOKEN = await response.text();
 
 	// load cron jobs
-	console.log('Quirrel: loading cron jobs');
+	console.log("Quirrel: loading cron jobs");
 	try {
 		const ci = spawnSync(
-			'node',
-			[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/cli/index.js`, 'ci'],
+			"node",
+			[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/cli/index.js`, "ci"],
 			{
 				env: {
 					...process.env,
 					PORT: process.env.QUIRREL_PORT,
 				},
-				stdio: 'inherit',
-				encoding: 'utf-8',
+				stdio: "inherit",
+				encoding: "utf-8",
 			},
 		);
 	} catch (error) {
-		child?.kill('SIGINT');
-		search?.kill('SIGINT');
+		child?.kill("SIGINT");
+		search?.kill("SIGINT");
 		throw error;
 	}
 }
