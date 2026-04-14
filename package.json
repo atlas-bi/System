@@ -19,13 +19,11 @@
 		"dev:search": "./node_modules/.bin/dotenv meilisearch",
 		"dev:server": "cross-env NODE_ENV=development node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
 		"prod:server": "cross-env NODE_ENV=production node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
-		"format": "prettier --write .",
 		"quirrel": "./node_modules/.bin/dotenv quirrel",
 		"quirrel:browser": "open-cli http://localhost:9181 --background",
 		"quirrel:ci": "./node_modules/.bin/dotenv quirrel ci",
 		"saml:cert": "openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout test/saml-idp/idp-private-key.pem -out test/saml-idp/idp-public-cert.pem -days 7300",
 		"saml:setup": "git submodule update --init --rebase --remote; cd test/saml-idp/; npm install",
-		"format:repo": "pnpm run format && pnpm run lint -- --write",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"setup": "prisma generate && prisma migrate deploy && prisma db seed",
@@ -39,13 +37,6 @@
 		"validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
 		"commit": "git add . && pnpm run pre-commit && git add . && cz --no-verify",
 		"pre-commit": "lint-staged"
-	},
-	"prettier": {
-		"printWidth": 80,
-		"tabWidth": 2,
-		"trailingComma": "all",
-		"singleQuote": true,
-		"semi": true
 	},
 	"dependencies": {
 		"@authenio/samlify-node-xmllint": "^2.0.0",
@@ -134,7 +125,8 @@
 		"tcp-ping": "^0.1.1",
 		"tiny-invariant": "^1.3.1",
 		"zod": "^3.22.2",
-		"autoprefixer": "^10.4.15"
+		"autoprefixer": "^10.4.15",
+		"prisma": "^5.2.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
@@ -169,9 +161,6 @@
 		"npm-run-all2": "^5.0.0",
 		"open-cli": "^7.2.0",
 		"postcss": "^8.4.28",
-		"prettier": "^3.0.2",
-		"prettier-plugin-tailwindcss": "^0.7.0",
-		"prisma": "^5.2.0",
 		"react-email": "1.10.1",
 		"semantic-release": "^21.1.1",
 		"start-server-and-test": "^2.0.0",
@@ -189,8 +178,8 @@
 		"seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
 	},
 	"lint-staged": {
-		"**/*.{ts,css,less,scss,js,json,md,yaml,html}": [
-			"pnpm run format"
+		"*": [
+			"biome check --write"
 		]
 	},
 	"version": "1.44.1"
