@@ -1,3 +1,10 @@
+## <small>1.44.4 (2026-04-15)</small>
+
+* Merge pull request #71 from atlas-bi/chore/deploy-fixes ([065883f](https://github.com/atlas-bi/System/commit/065883f)), closes [#71](https://github.com/atlas-bi/System/issues/71)
+* Merge pull request #72 from atlas-bi/dev ([fa19559](https://github.com/atlas-bi/System/commit/fa19559)), closes [#72](https://github.com/atlas-bi/System/issues/72)
+* Merge pull request #73 from atlas-bi/alpha ([2c1f80c](https://github.com/atlas-bi/System/commit/2c1f80c)), closes [#73](https://github.com/atlas-bi/System/issues/73)
+* fix: clean pnpm deploy and prisma build flow ([4d6d6ab](https://github.com/atlas-bi/System/commit/4d6d6ab))
+
 ## <small>1.44.3 (2026-04-14)</small>
 
 * Merge pull request #68 from atlas-bi/dev ([004e093](https://github.com/atlas-bi/System/commit/004e093)), closes [#68](https://github.com/atlas-bi/System/issues/68)
