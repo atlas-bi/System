@@ -1,3 +1,10 @@
+## <small>1.44.5 (2026-04-15)</small>
+
+* Merge pull request #74 from atlas-bi/runtime_deps ([66a3da8](https://github.com/atlas-bi/System/commit/66a3da8)), closes [#74](https://github.com/atlas-bi/System/issues/74)
+* Merge pull request #75 from atlas-bi/dev ([c694bfa](https://github.com/atlas-bi/System/commit/c694bfa)), closes [#75](https://github.com/atlas-bi/System/issues/75)
+* Merge pull request #76 from atlas-bi/alpha ([0068886](https://github.com/atlas-bi/System/commit/0068886)), closes [#76](https://github.com/atlas-bi/System/issues/76)
+* fix: add deps to avoid module not found ([f563003](https://github.com/atlas-bi/System/commit/f563003))
+
 ## <small>1.44.4 (2026-04-15)</small>
 
 * Merge pull request #71 from atlas-bi/chore/deploy-fixes ([065883f](https://github.com/atlas-bi/System/commit/065883f)), closes [#71](https://github.com/atlas-bi/System/issues/71)
