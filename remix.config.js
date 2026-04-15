@@ -2,7 +2,13 @@
 module.exports = {
 	cacheDirectory: "./node_modules/.cache/remix",
 	ignoredRouteFiles: ["**/.*", "**/*.test.{js,jsx,ts,tsx}"],
-	serverDependenciesToBundle: ["axios", "chartjs-adapter-date-fns"],
+	serverDependenciesToBundle: [
+		"axios",
+		"follow-redirects",
+		"form-data",
+		"proxy-from-env",
+		"chartjs-adapter-date-fns",
+	],
 	serverModuleFormat: "cjs",
 	tailwind: true,
 	postcss: true,
