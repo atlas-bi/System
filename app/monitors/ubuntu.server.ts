@@ -68,7 +68,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		const drives = JSON.parse(
 			await getStdout(
 				ssh,
-				'df -P | awk \'BEGIN {printf"{\\"discarray\\":["}{if($1=="Filesystem")next;if(a)printf",";printf"{\\"filesystem\\":\\""$1"\\",\\"mount\\":\\""$6"\\",\\"size\\":\\""$2"\\",\\"used\\":\\""$3"\\",\\"avail\\":\\""$4"\\",\\"use%\\":\\""$5"\\"}";a++;}END{print"]});}\'',
+				String.raw`df -P | awk 'BEGIN { printf "{\"discarray\":[" } $1 != "Filesystem" { if (a) printf ","; printf "%s", "{\"filesystem\":\"" $1 "\",\"mount\":\"" $6 "\",\"size\":\"" $2 "\",\"used\":\"" $3 "\",\"avail\":\"" $4 "\",\"use%\":\"" $5 "\"}"; a++ } END { print "]}" }'`,
 			),
 		);
 
