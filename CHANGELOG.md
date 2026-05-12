@@ -1,3 +1,20 @@
+## <small>1.44.7 (2026-05-12)</small>
+
+* fix(deps) Update dependency date-fns to v4 ([d7a5fbc](https://github.com/atlas-bi/System/commit/d7a5fbc))
+* fix(deps) Update dependency date-fns-tz to v3 ([f85074c](https://github.com/atlas-bi/System/commit/f85074c))
+* fix(deps) Update dependency dotenv to v17 ([8f6fbc5](https://github.com/atlas-bi/System/commit/8f6fbc5))
+* Merge branch 'alpha' into dev ([1eab84e](https://github.com/atlas-bi/System/commit/1eab84e))
+* Merge branch 'master' into alpha ([56a4190](https://github.com/atlas-bi/System/commit/56a4190))
+* Merge pull request #85 from atlas-bi/renovate/date-fns-4.x ([d3d8e31](https://github.com/atlas-bi/System/commit/d3d8e31)), closes [#85](https://github.com/atlas-bi/System/issues/85)
+* Merge pull request #87 from atlas-bi/renovate/dotenv-17.x ([77ff460](https://github.com/atlas-bi/System/commit/77ff460)), closes [#87](https://github.com/atlas-bi/System/issues/87)
+* Merge pull request #93 from atlas-bi/dev ([cbdd254](https://github.com/atlas-bi/System/commit/cbdd254)), closes [#93](https://github.com/atlas-bi/System/issues/93)
+* Merge pull request #94 from atlas-bi/renovate/date-fns-3.x-and-tz-3.x ([287878c](https://github.com/atlas-bi/System/commit/287878c)), closes [#94](https://github.com/atlas-bi/System/issues/94)
+* Merge pull request #95 from atlas-bi/fix/monitor-drive-offline-smtp-sql ([c8d5a73](https://github.com/atlas-bi/System/commit/c8d5a73)), closes [#95](https://github.com/atlas-bi/System/issues/95)
+* Merge pull request #96 from atlas-bi/alpha ([d29203b](https://github.com/atlas-bi/System/commit/d29203b)), closes [#96](https://github.com/atlas-bi/System/issues/96)
+* lint: format smtp error log ([ad4499a](https://github.com/atlas-bi/System/commit/ad4499a))
+* fix(deps): update date-fns and date-fns-tz to v3 together ([11d4dd8](https://github.com/atlas-bi/System/commit/11d4dd8))
+* fix(monitor): correct ubuntu drive online check, smtp secure/tls flags, and sql connection string pa ([bd7fe6e](https://github.com/atlas-bi/System/commit/bd7fe6e))
+
 ## <small>1.44.6 (2026-05-11)</small>
 
 * fix(deps) Update actions/checkout action to v6 ([c92ec76](https://github.com/atlas-bi/System/commit/c92ec76))
