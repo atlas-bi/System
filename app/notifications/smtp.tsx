@@ -52,7 +52,10 @@ export default async function SMTP({
 			html: message,
 		});
 	} catch (e) {
-		console.error(`SMTP error sending to ${notification.smtpHost}:${notification.smtpPort}:`, e);
+		console.error(
+			`SMTP error sending to ${notification.smtpHost}:${notification.smtpPort}:`,
+			e,
+		);
 		throw e;
 	}
 
