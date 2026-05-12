@@ -170,7 +170,7 @@
 		"cz-conventional-changelog": "3.3.0",
 		"happy-dom": "^20.0.0",
 		"lint-staged": "^17.0.0",
-		"msw": "^1.2.5",
+		"msw": "^2.0.0",
 		"open-cli": "^7.2.0",
 		"postcss": "^8.4.28",
 		"react-email": "1.10.1",
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.28"
+	"version": "2.0.29"
 }
