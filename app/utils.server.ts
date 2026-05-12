@@ -1,5 +1,5 @@
-import { parseSqlConnectionString } from "@tediousjs/connection-string";
+import { parse } from "@tediousjs/connection-string";
 
 export function parseSql(conn: string) {
-	return parseSqlConnectionString(conn, true);
+	return Object.fromEntries(parse(conn));
 }
