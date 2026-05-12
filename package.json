@@ -171,7 +171,7 @@
 		"happy-dom": "^20.0.0",
 		"lint-staged": "^17.0.0",
 		"msw": "^2.0.0",
-		"open-cli": "^7.2.0",
+		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
 		"react-email": "1.10.1",
 		"semantic-release": "^21.1.1",
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.29"
+	"version": "2.0.30"
 }
