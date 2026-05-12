@@ -1,3 +1,20 @@
+## <small>1.44.6 (2026-05-11)</small>
+
+* fix(deps) Update actions/checkout action to v6 ([c92ec76](https://github.com/atlas-bi/System/commit/c92ec76))
+* fix(deps) Update all non-major dependencies (#77) ([8cebf97](https://github.com/atlas-bi/System/commit/8cebf97)), closes [#77](https://github.com/atlas-bi/System/issues/77)
+* fix(deps) Update cycjimmy/semantic-release-action action to v6 ([8d1e0c0](https://github.com/atlas-bi/System/commit/8d1e0c0))
+* fix(deps) Update dependency cypress to v13 (#81) ([aec845f](https://github.com/atlas-bi/System/commit/aec845f)), closes [#81](https://github.com/atlas-bi/System/issues/81)
+* fix(deps) Update dependency cypress to v14 (#82) ([5298c40](https://github.com/atlas-bi/System/commit/5298c40)), closes [#82](https://github.com/atlas-bi/System/issues/82)
+* fix(deps) Update dependency cypress to v15 (#83) ([1cdb827](https://github.com/atlas-bi/System/commit/1cdb827)), closes [#83](https://github.com/atlas-bi/System/issues/83)
+* fix(deps) Update dependency dotenv-cli to v8 ([28db769](https://github.com/atlas-bi/System/commit/28db769))
+* Merge branch 'master' into alpha ([924f50e](https://github.com/atlas-bi/System/commit/924f50e))
+* Merge pull request #79 from atlas-bi/dev ([4878d37](https://github.com/atlas-bi/System/commit/4878d37)), closes [#79](https://github.com/atlas-bi/System/issues/79)
+* Merge pull request #80 from atlas-bi/renovate/actions-checkout-6.x ([44f9298](https://github.com/atlas-bi/System/commit/44f9298)), closes [#80](https://github.com/atlas-bi/System/issues/80)
+* Merge pull request #90 from atlas-bi/renovate/cycjimmy-semantic-release-action-6.x ([3d305c5](https://github.com/atlas-bi/System/commit/3d305c5)), closes [#90](https://github.com/atlas-bi/System/issues/90)
+* Merge pull request #91 from atlas-bi/renovate/dotenv-cli-8.x ([963e73d](https://github.com/atlas-bi/System/commit/963e73d)), closes [#91](https://github.com/atlas-bi/System/issues/91)
+* Merge pull request #92 from atlas-bi/alpha ([37f98c2](https://github.com/atlas-bi/System/commit/37f98c2)), closes [#92](https://github.com/atlas-bi/System/issues/92)
+* fix(monitor): restore ubuntu drive polling JSON command ([0f2238f](https://github.com/atlas-bi/System/commit/0f2238f))
+
 ## <small>1.44.5 (2026-04-15)</small>
 
 * Merge pull request #74 from atlas-bi/runtime_deps ([66a3da8](https://github.com/atlas-bi/System/commit/66a3da8)), closes [#74](https://github.com/atlas-bi/System/issues/74)
