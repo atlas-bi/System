@@ -186,8 +186,8 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 			await setDriveOnline({
 				id: drive.id,
 				online:
-					updateableDrives.filter((x: Drive) => x.mount == drive.root).length >
-					0,
+					updateableDrives.filter((x: Drive) => x.filesystem == drive.root)
+						.length > 0,
 			});
 		});
 

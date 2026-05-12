@@ -24,9 +24,9 @@ export default async function SMTP({
 	const config = {
 		host: notification.smtpHost,
 		port: Number(notification.smtpPort),
-		secure: Boolean(notification.smtpSecurity) || false,
+		secure: notification.smtpSecurity === "SSL",
 		tls: {
-			rejectUnauthorized: Boolean(notification.ignoreSSLErrors) || false,
+			rejectUnauthorized: !notification.ignoreSSLErrors,
 		},
 		auth: notification.smtpUsername
 			? {
@@ -42,14 +42,22 @@ export default async function SMTP({
 
 	let transporter = nodemailer.createTransport(config);
 
-	await transporter.sendMail({
-		from: notification.smtpFromName
-			? `"${notification.smtpFromName}" ${notification.smtpFromEmail}`
-			: notification.smtpFromEmail,
-		to: notification.smtpToEmail,
-		subject: subject,
-		html: message,
-	});
+	try {
+		await transporter.sendMail({
+			from: notification.smtpFromName
+				? `"${notification.smtpFromName}" ${notification.smtpFromEmail}`
+				: notification.smtpFromEmail,
+			to: notification.smtpToEmail,
+			subject: subject,
+			html: message,
+		});
+	} catch (e) {
+		console.error(
+			`SMTP error sending to ${notification.smtpHost}:${notification.smtpPort}:`,
+			e,
+		);
+		throw e;
+	}
 
 	return "Sent Successfully.";
 }
