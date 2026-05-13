@@ -175,7 +175,7 @@
 		"postcss": "^8.4.28",
 		"react-email": "6.1.1",
 		"semantic-release": "^25.0.0",
-		"start-server-and-test": "^2.0.0",
+		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.2.2",
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.32"
+	"version": "2.0.33"
 }
