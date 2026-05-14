@@ -128,7 +128,7 @@
 		"remix-auth": "^3.7.0",
 		"remix-auth-form": "^3.0.0",
 		"remix-auth-saml": "^1.2.0",
-		"remix-utils": "^7.7.0",
+		"remix-utils": "^8.0.0",
 		"secure-webhooks": "^0.3.0",
 		"sharp": "^0.34.0",
 		"slugify": "^1.6.6",
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.40"
+	"version": "2.0.41"
 }
