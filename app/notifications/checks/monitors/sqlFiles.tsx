@@ -60,9 +60,10 @@ async function allClear({
 		);
 
 		return Logger({
-			message: `Free space now below limit of ${monitor.sqlFileSizePercentFreeValue}%`,
+			message: `[${database.name} file ${file.fileName}] Free space now below limit of ${monitor.sqlFileSizePercentFreeValue}%`,
 			type: "success",
 			monitor,
+			database,
 			file,
 		});
 	}
@@ -129,7 +130,7 @@ export default async function sqlFilePercentFreeNotifier({
 				percFree < (monitor.sqlFileSizePercentFreeValue || 0)
 			) {
 				// alert for fixed file size
-				message = `(Growth disabled) Percentage of free space (${Math.round(
+				message = `[${database.name} file ${file.fileName}] (Growth disabled) Percentage of free space (${Math.round(
 					percFree,
 				)}%) is less than the limit of ${
 					monitor.sqlFileSizePercentFreeValue
@@ -140,7 +141,7 @@ export default async function sqlFilePercentFreeNotifier({
 				percFreeMax < (monitor.sqlFileSizePercentFreeValue || 0)
 			) {
 				// alert for max file size
-				message = `(Max file size) Percentage of free space (${Math.round(
+				message = `[${database.name} file ${file.fileName}] (Max file size) Percentage of free space (${Math.round(
 					percFreeMax,
 				)}%) is less than the limit of ${
 					monitor.sqlFileSizePercentFreeValue
