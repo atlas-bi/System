@@ -110,7 +110,7 @@
 		"hasown": "^2.0.2",
 		"isbot": "^5.0.0",
 		"ldap-authentication": "^3.0.3",
-		"lucide-react": "^0.577.0",
+		"lucide-react": "^1.0.0",
 		"meilisearch": "^0.58.0",
 		"mime-types": "^3.0.0",
 		"morgan": "^1.10.0",
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.44"
+	"version": "2.0.45"
 }
