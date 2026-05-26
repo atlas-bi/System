@@ -1,3 +1,12 @@
+## [1.44.10](https://github.com/atlas-bi/System/compare/v1.44.9...v1.44.10) (2026-05-26)
+
+
+### Bug Fixes
+
+* **auth:** fixed auth versions ([a8b8b45](https://github.com/atlas-bi/System/commit/a8b8b45fdb5390d82ca9c7e99613f86cc7efd011))
+* **dep:** force install https-proxy-agent ([07aad34](https://github.com/atlas-bi/System/commit/07aad346d9295db1dcecf41654f460ab8ae1f14d))
+* **server:** fixed server routes for node 24 ([431c99d](https://github.com/atlas-bi/System/commit/431c99d39b14b62a2f0b734d8823cc3b8eb17f2d))
+
 ## [1.44.9](https://github.com/atlas-bi/System/compare/v1.44.8...v1.44.9) (2026-05-26)
 
 
