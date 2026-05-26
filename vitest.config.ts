@@ -20,5 +20,10 @@ module.exports = {
 			".*\\/build\\/.*",
 			".*\\/postgres-data\\/.*",
 		],
+		coverage: {
+			provider: "v8",
+			reporter: ["text", "json-summary", "html", "lcov"],
+			reportsDirectory: "./coverage",
+		},
 	},
 };
