@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@9.15.9",
+	"packageManager": "pnpm@11.2.2",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -194,5 +194,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.46"
+	"version": "2.0.47"
 }
