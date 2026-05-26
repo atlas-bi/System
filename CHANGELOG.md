@@ -1,3 +1,10 @@
+## [1.44.9](https://github.com/atlas-bi/System/compare/v1.44.8...v1.44.9) (2026-05-26)
+
+
+### Bug Fixes
+
+* **release:** added workspace file ([53414b3](https://github.com/atlas-bi/System/commit/53414b318fea38a4d98dcbcc858dcf5749973a92))
+
 ## [1.44.8](https://github.com/atlas-bi/System/compare/v1.44.7...v1.44.8) (2026-05-26)
 
 
