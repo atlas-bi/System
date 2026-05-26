@@ -12,7 +12,7 @@ const config = {
 		[
 			"@semantic-release/release-notes-generator",
 			{
-				config: "./node_modules/cz-conventional-changelog",
+				preset: "conventionalcommits",
 			},
 		],
 		[
