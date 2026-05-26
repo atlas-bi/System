@@ -1,3 +1,11 @@
+## [1.44.8](https://github.com/atlas-bi/System/compare/v1.44.7...v1.44.8) (2026-05-26)
+
+
+### Bug Fixes
+
+* **release:** updated release version ([3544c24](https://github.com/atlas-bi/System/commit/3544c24e6ea6d957160a855ad6abc971373df9e2))
+* show correct storage unit in file chart and include db/file name in logs ([54cefff](https://github.com/atlas-bi/System/commit/54cefffdabfd60903578df8aa8768bf11f7ff6e2))
+
 ## <small>1.44.7 (2026-05-12)</small>
 
 * fix(deps) Update dependency date-fns to v4 ([d7a5fbc](https://github.com/atlas-bi/System/commit/d7a5fbc))
