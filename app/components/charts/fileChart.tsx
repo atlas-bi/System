@@ -180,16 +180,16 @@ export const FileChart = ({ url }: { url: string }) => {
 					a: number,
 					e: {
 						maxSize?: number | null;
-						currentSize?: number | null;
-						usedSize?: number | null;
+						used?: number | null;
+						free?: number | null;
 					},
 				) =>
 					Math.max(
 						Number(a),
 						Math.max(
 							Number(e.maxSize) || 0,
-							Number(e.currentSize) || 0,
-							Number(e.usedSize) || 0,
+							Number(e.used) || 0,
+							(Number(e.used) || 0) + (Number(e.free) || 0),
 						),
 					),
 				0,

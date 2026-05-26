@@ -23,7 +23,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
 
       - name: ⎔ Setup pnpm
         run: corepack enable
@@ -38,10 +38,10 @@ jobs:
 
         id: semantic
         with:
-          semantic_version: 18
+          semantic_version: latest
           extra_plugins: |
             @semantic-release/changelog@6
-            @semantic-release/exec
+            @semantic-release/exec@7
             @semantic-release/git@10
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
