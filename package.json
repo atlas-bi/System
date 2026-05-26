@@ -118,7 +118,7 @@
 		"node-ssh": "^13.1.0",
 		"nodemailer": "^8.0.0",
 		"npm-run-all2": "^8.0.0",
-		"postcss-import": "^15.1.0",
+		"postcss-import": "^16.0.0",
 		"proxy-from-env": "^2.0.0",
 		"quirrel": "^1.13.4",
 		"react": "^19.0.0",
