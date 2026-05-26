@@ -63,32 +63,32 @@ export async function verifyLogin(email: User["email"], password: string) {
 
 		let profilePhoto = null;
 
-		if (
-			process.env.LDAP_PHOTO_FIELD &&
-			ldapUser[process.env.LDAP_PHOTO_FIELD]
-		) {
-			try {
-				//for bytestrings (8 120 99 ...)
-				if (
-					!isNaN(
-						ldapUser[process.env.LDAP_PHOTO_FIELD]
-							.toString()
-							.replace(/\s*/g, ""),
-					)
-				) {
-					profilePhoto = Buffer.from(
-						ldapUser[process.env.LDAP_PHOTO_FIELD]
-							.split(" ")
-							.map((e: string) => parseInt(e)),
-					).toString("base64");
-				} else {
-					// for binary
-					profilePhoto = ldapUser[process.env.LDAP_PHOTO_FIELD];
-				}
-			} catch (e) {
-				console.log(e);
-			}
-		}
+		// if (
+		// 	process.env.LDAP_PHOTO_FIELD &&
+		// 	ldapUser[process.env.LDAP_PHOTO_FIELD]
+		// ) {
+		// 	try {
+		// 		//for bytestrings (8 120 99 ...)
+		// 		if (
+		// 			!isNaN(
+		// 				ldapUser[process.env.LDAP_PHOTO_FIELD]
+		// 					.toString()
+		// 					.replace(/\s*/g, ""),
+		// 			)
+		// 		) {
+		// 			profilePhoto = Buffer.from(
+		// 				ldapUser[process.env.LDAP_PHOTO_FIELD]
+		// 					.split(" ")
+		// 					.map((e: string) => parseInt(e)),
+		// 			).toString("base64");
+		// 		} else {
+		// 			// for binary
+		// 			profilePhoto = ldapUser[process.env.LDAP_PHOTO_FIELD];
+		// 		}
+		// 	} catch (e) {
+		// 		console.log(e);
+		// 	}
+		// }
 
 		type Group = {
 			cn: string;
