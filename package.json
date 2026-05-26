@@ -190,7 +190,7 @@
 		"seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
 	},
 	"lint-staged": {
-		"*": [
+		"*.{js,ts,jsx,tsx,json,jsonc,css}": [
 			"biome check --write"
 		]
 	},
