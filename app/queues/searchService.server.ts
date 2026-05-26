@@ -15,9 +15,9 @@ export default Queue("queues/searchService", async () => {
 			return;
 		}
 
-		const { MeiliSearch } = await import("meilisearch");
+		const { Meilisearch } = await import("meilisearch");
 
-		const client = new MeiliSearch({
+		const client = new Meilisearch({
 			host: normalizeMeiliHost(rawHost),
 			apiKey: process.env.MEILI_MASTER_KEY || undefined,
 		});
