@@ -114,7 +114,7 @@ export default function Index() {
 			<div className="flex flex-wrap justify-between">
 				<H1 className="space-x-2 flex">
 					{drive.enabled === false ? (
-						<span className="!text-slate-400">(Disabled)</span>
+						<span className="text-slate-400!">(Disabled)</span>
 					) : drive.hasError || !drive.online ? (
 						<AlertTriangle className="text-red-500 my-auto" size={18} />
 					) : (
@@ -139,7 +139,7 @@ export default function Index() {
 			</div>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{drive.description}</div>
-				<div className="space-y-2 flex-grow">
+				<div className="space-y-2 grow">
 					<Table>
 						<TableBody>
 							<TableRow>

@@ -113,13 +113,13 @@ export default function Index() {
 
 			<H1 className="space-x-2">
 				{file.enabled === false && (
-					<span className="!text-slate-400">(Disabled)</span>
+					<span className="text-slate-400!">(Disabled)</span>
 				)}
 				<span>{file.fileName}</span>
 			</H1>
 
 			<div className="space-y-4 pb-4">
-				<div className="space-y-2 flex-grow">
+				<div className="space-y-2 grow">
 					<Table>
 						<TableBody>
 							<TableRow>

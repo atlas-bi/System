@@ -154,7 +154,7 @@ export default function Index() {
 									perc ? "" : "opacity-50 text-slate-600"
 								}`}
 							>
-								<div className="flex-grow">
+								<div className="grow">
 									<Label className="text-base">Percentage</Label>
 
 									<div className="text-muted-foreground pb-2">
@@ -210,7 +210,7 @@ export default function Index() {
 										}`}
 									>
 										<div className={`flex justify-between `}>
-											<div className='flex-grow"'>
+											<div className='grow"'>
 												<Label className="text-slate-700">
 													Resend Frequency (Minutes)
 												</Label>

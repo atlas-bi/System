@@ -25,7 +25,7 @@ type MonitorLike = {
 
 export const SqlSystem = ({ monitor }: { monitor: MonitorLike }) => {
 	return (
-		<div className="space-y-2 flex-grow">
+		<div className="space-y-2 grow">
 			<Table>
 				<TableBody>
 					{monitor.name && (

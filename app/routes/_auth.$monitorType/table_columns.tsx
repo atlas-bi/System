@@ -255,7 +255,7 @@ export const columnsPing: ColumnDef<any>[] = [
 													x.hasError
 														? "bg-red-300 border-red-400"
 														: "bg-emerald-600 border-emerald-700"
-												} border-1 rounded h-3 w-3 my-auto`}
+												} border rounded h-3 w-3 my-auto`}
 											></div>
 
 											<strong>{x.ping}ms</strong>
