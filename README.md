@@ -39,6 +39,12 @@ This repository uses commitizen. Commit code changes for pr's with `pnpm run com
 
 Use `pnpm` for the root project and commit `pnpm-lock.yaml`. Do not regenerate a root `package-lock.json`.
 
+## 🧪 Testing
+
+- Run the monitor-focused unit and integration layers with `pnpm run test:monitor`
+- Run full Vitest coverage with `pnpm run test:coverage`
+- Coverage reports are written to `coverage/` as HTML, LCOV, and JSON summary files, and CI uploads the same directory as an artifact
+
 ## 🏆 Credits
 
 Atlas System was originally created and made open source by the Riverside Healthcare Analytics team. See the [credits](https://www.atlas.bi/about/) for more details.
