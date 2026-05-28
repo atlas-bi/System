@@ -4,7 +4,7 @@
 		"includes": [
 			"**",
 			"!!**/node_modules",
-			"!!**/build",	
+			"!!**/build",
 			"!!**/public/build",
 			"!!**/test/saml-idp",
 			"!!**/data.ms",
