@@ -115,7 +115,7 @@ jobs:
           node -e "const summary=require('./coverage/coverage-summary.json').total; const pct=(value)=>typeof value==='number'?value.toFixed(1):value; const lines=pct(summary.lines.pct); const functions=pct(summary.functions.pct); const branches=pct(summary.branches.pct); const statements=pct(summary.statements.pct); const row='| Metric | Coverage |\n| --- | --- |\n| Lines | '+lines+'% |\n| Functions | '+functions+'% |\n| Branches | '+branches+'% |\n| Statements | '+statements+'% |\n'; console.log('## Coverage\n'); console.log(row);" >> "$GITHUB_STEP_SUMMARY"
 
       - name: 📦 Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vitest-coverage
           path: coverage
