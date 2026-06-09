@@ -93,7 +93,7 @@ export function MultiSelect({
 									)}
 									{item.label}
 									<button
-										className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+										className="ml-1 ring-offset-background rounded-full outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
 										onKeyDown={(e) => {
 											if (e.key === "Enter") {
 												handleUnselect(item);
@@ -119,7 +119,7 @@ export function MultiSelect({
 							onBlur={() => setOpen(false)}
 							onFocus={() => setOpen(true)}
 							placeholder={placeholder}
-							className="ml-0 bg-transparent outline-none placeholder:text-muted-foreground flex-1"
+							className="ml-0 bg-transparent outline-hidden placeholder:text-muted-foreground flex-1"
 						/>
 					</div>
 				</div>
@@ -132,7 +132,7 @@ export function MultiSelect({
 					}}
 				>
 					{open && selectables.length > 0 ? (
-						<div className="absolute w-full top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+						<div className="absolute w-full top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden animate-in">
 							{/*<CommandEmpty>No results found.</CommandEmpty>*/}
 							<CommandGroup className="h-full overflow-auto max-h-[400px]">
 								{selectables.map((framework) => {

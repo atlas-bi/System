@@ -39,7 +39,7 @@ export const SshSystem = ({ monitor }: { monitor: MonitorLike }) => {
 		}
 	}, [feedFetcher.state, feedFetcher.data, monitor.type, monitor.id]);
 	return (
-		<div className="space-y-2 flex-grow">
+		<div className="space-y-2 grow">
 			<Table>
 				<TableBody>
 					<TableRow>

@@ -86,7 +86,7 @@ export default function Index() {
 				<div className=" rounded-lg border p-4 max-w-[500px]">
 					<div className="space-y-2">
 						<div className="space-y-2 flex justify-between">
-							<div className="flex-grow">
+							<div className="grow">
 								<H3 className="text-2xl">Free Space</H3>
 								<div className="text-muted-foreground pb-2">
 									Recieve notification when files free space meets certain
