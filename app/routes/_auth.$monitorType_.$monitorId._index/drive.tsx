@@ -67,7 +67,7 @@ export const MiniDrive = ({
 			to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
 			prefetch="intent"
 			key={drive.id}
-			className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow hover:shadow-sky-200 ${
+			className={`transition-colors flex space-x-4 border rounded-md py-2 px-4 cursor-pointer hover:shadow-sm hover:shadow-sky-200 ${
 				!drive.enabled || !drive.online ? "opacity-50 hover:opacity-100" : ""
 			}`}
 		>
@@ -117,8 +117,8 @@ export const MiniDrive = ({
 				)}
 			</div>
 
-			<div className="space-y-2 flex-grow min-w-[1px]">
-				<H3 className="space-x-2 flex-shrink-0">
+			<div className="space-y-2 grow min-w-px">
+				<H3 className="space-x-2 shrink-0">
 					{drive.title ? (
 						<>
 							<span>{drive.title}</span>

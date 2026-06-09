@@ -169,7 +169,7 @@ export default function Index() {
 					<div className=" rounded-lg border p-4 max-w-[500px]">
 						<div className="space-y-2">
 							<div className="space-y-2 flex justify-between">
-								<div className="flex-grow">
+								<div className="grow">
 									<H3 className="text-2xl">Data Collection</H3>
 									<div className="text-muted-foreground pb-2">
 										Recieve notification when data collection fails.
@@ -232,7 +232,7 @@ export default function Index() {
 										}`}
 									>
 										<div className={`flex justify-between `}>
-											<div className='flex-grow"'>
+											<div className='grow"'>
 												<Label className="text-slate-700">
 													Resend Frequency (Minutes)
 												</Label>
@@ -262,7 +262,7 @@ export default function Index() {
 						<div className=" rounded-lg border p-4 max-w-[500px]">
 							<div className="space-y-2">
 								<div className="space-y-2 flex justify-between">
-									<div className="flex-grow">
+									<div className="grow">
 										<H3 className="text-2xl">Reboot</H3>
 										<div className="text-muted-foreground pb-2">
 											Recieve notification when server reboots.
@@ -317,7 +317,7 @@ export default function Index() {
 							<div className=" rounded-lg border p-4 max-w-[500px]">
 								<div className="space-y-2">
 									<div className="space-y-2 flex justify-between">
-										<div className="flex-grow">
+										<div className="grow">
 											<H3 className="text-2xl">Certificate</H3>
 											<div className="text-muted-foreground pb-2">
 												Recieve notification when certificate is invalid or near
@@ -370,7 +370,7 @@ export default function Index() {
 												}`}
 											>
 												<div className={`flex justify-between `}>
-													<div className='flex-grow"'>
+													<div className='grow"'>
 														<Label className="text-slate-700">
 															Resend Frequency (Minutes)
 														</Label>
@@ -415,7 +415,7 @@ export default function Index() {
 										perc ? "" : "opacity-50 text-slate-600"
 									}`}
 								>
-									<div className="flex-grow">
+									<div className="grow">
 										<Label className="text-base">Percentage</Label>
 
 										<div className="text-muted-foreground pb-2">
@@ -474,7 +474,7 @@ export default function Index() {
 											}`}
 										>
 											<div className={`flex justify-between `}>
-												<div className='flex-grow"'>
+												<div className='grow"'>
 													<Label className="text-slate-700">
 														Resend Frequency (Minutes)
 													</Label>

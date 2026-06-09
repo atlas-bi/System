@@ -20,7 +20,7 @@ const config = {
 			"@semantic-release/exec",
 			{
 				prepareCmd:
-					"tar -czvf build.tar.gz pnpm-workspace.yaml package.json pnpm-lock.yaml build app lib prisma public styles .env.example CHANGELOG.md README.md remix.config.js remix.env.d.ts server.ts tailwind.config.ts tsconfig.json postcss.config.js",
+					"tar -czvf build.tar.gz pnpm-workspace.yaml package.json pnpm-lock.yaml build app lib prisma public styles .env.example CHANGELOG.md README.md remix.config.js remix.env.d.ts server.ts tsconfig.json postcss.config.js",
 			},
 		],
 		[

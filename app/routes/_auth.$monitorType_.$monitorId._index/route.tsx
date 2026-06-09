@@ -101,7 +101,7 @@ export default function Index() {
 			<div className="flex flex-wrap justify-between">
 				<H1 className="space-x-2 flex">
 					{monitor.enabled === false ? (
-						<span className="!text-slate-400">(Disabled)</span>
+						<span className="text-slate-400!">(Disabled)</span>
 					) : monitor.hasError ? (
 						<AlertTriangle className="text-red-500 my-auto" size={18} />
 					) : (

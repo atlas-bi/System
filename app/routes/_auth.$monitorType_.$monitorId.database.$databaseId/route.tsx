@@ -116,7 +116,7 @@ export default function Index() {
 
 			<H1 className="space-x-2">
 				{database.enabled === false && (
-					<span className="!text-slate-400">(Disabled)</span>
+					<span className="text-slate-400!">(Disabled)</span>
 				)}
 				{database.title ? (
 					<>
@@ -130,7 +130,7 @@ export default function Index() {
 
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{database.description}</div>
-				<div className="space-y-2 flex-grow">
+				<div className="space-y-2 grow">
 					<Table>
 						<TableBody>
 							<TableRow>

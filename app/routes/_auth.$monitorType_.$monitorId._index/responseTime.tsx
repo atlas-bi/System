@@ -28,14 +28,14 @@ export function PingStat({ url }: { url: string }) {
 
 	return (
 		<div
-			className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse my-auto min-w-[1px]`}
+			className={`transition-colors flex flex-row-reverse space-x-1 space-x-reverse my-auto min-w-px`}
 		>
 			{pingFetcher.data?.feeds?.map((x: any) => (
 				<TooltipProvider key={x.id} delayDuration={20} skipDelayDuration={20}>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div
-								className={`flex-shrink-0 transition-all w-2 h-4 hover:scale-125 rounded ${
+								className={`shrink-0 transition-all w-2 h-4 hover:scale-125 rounded ${
 									x.hasError ? "bg-red-300" : "bg-emerald-600"
 								}`}
 							></div>
@@ -48,7 +48,7 @@ export function PingStat({ url }: { url: string }) {
 											x.hasError
 												? "bg-red-300 border-red-400"
 												: "bg-emerald-600 border-emerald-700"
-										} border-1 rounded h-3 w-3 my-auto`}
+										} border rounded h-3 w-3 my-auto`}
 									></div>
 
 									{x.ping && <strong>{x.ping}ms</strong>}
