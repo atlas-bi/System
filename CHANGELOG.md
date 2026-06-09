@@ -1,3 +1,27 @@
+## [1.44.10](https://github.com/atlas-bi/System/compare/v1.44.9...v1.44.10) (2026-05-26)
+
+
+### Bug Fixes
+
+* **auth:** fixed auth versions ([a8b8b45](https://github.com/atlas-bi/System/commit/a8b8b45fdb5390d82ca9c7e99613f86cc7efd011))
+* **dep:** force install https-proxy-agent ([07aad34](https://github.com/atlas-bi/System/commit/07aad346d9295db1dcecf41654f460ab8ae1f14d))
+* **server:** fixed server routes for node 24 ([431c99d](https://github.com/atlas-bi/System/commit/431c99d39b14b62a2f0b734d8823cc3b8eb17f2d))
+
+## [1.44.9](https://github.com/atlas-bi/System/compare/v1.44.8...v1.44.9) (2026-05-26)
+
+
+### Bug Fixes
+
+* **release:** added workspace file ([53414b3](https://github.com/atlas-bi/System/commit/53414b318fea38a4d98dcbcc858dcf5749973a92))
+
+## [1.44.8](https://github.com/atlas-bi/System/compare/v1.44.7...v1.44.8) (2026-05-26)
+
+
+### Bug Fixes
+
+* **release:** updated release version ([3544c24](https://github.com/atlas-bi/System/commit/3544c24e6ea6d957160a855ad6abc971373df9e2))
+* show correct storage unit in file chart and include db/file name in logs ([54cefff](https://github.com/atlas-bi/System/commit/54cefffdabfd60903578df8aa8768bf11f7ff6e2))
+
 ## <small>1.44.7 (2026-05-12)</small>
 
 * fix(deps) Update dependency date-fns to v4 ([d7a5fbc](https://github.com/atlas-bi/System/commit/d7a5fbc))
