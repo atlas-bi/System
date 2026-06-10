@@ -15,7 +15,7 @@ import {
 
 // import remixImageStyles from 'remix-image/remix-image.css';
 import { H1 } from "./components/ui/typography";
-import { ArrowLeft, MoveLeft } from "lucide-react";
+import { MoveLeft } from "lucide-react";
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: stylesheet },
@@ -61,7 +61,7 @@ export function ErrorBoundary() {
 			<div className="space-y-4">
 				<div className="flex space-x-2">
 					<MoveLeft size={16} className="my-auto" />
-					<a href="javascript:history.back()">Go back</a>
+					<Link to="/">Go back</Link>
 				</div>
 				<H1>Error</H1>
 				<p className="text-sm">{error.message}</p>
