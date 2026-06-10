@@ -180,10 +180,10 @@ export default function HttpForm({
 					setData({
 						...data,
 						httpAuthentication:
-							httpAuthentication === "" ? null : httpAuthentication,
+							httpAuthentication === "none" ? null : httpAuthentication,
 					})
 				}
-				value={data.httpAuthentication ?? undefined}
+				value={data.httpAuthentication ?? "none"}
 			>
 				<Label htmlFor="name" className="text-right">
 					Authentication Method
@@ -193,7 +193,7 @@ export default function HttpForm({
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
-						<SelectItem value="">None</SelectItem>
+						<SelectItem value="none">None</SelectItem>
 						{authTypes.map((type) => (
 							<SelectItem key={type.value} value={type.value}>
 								{type.label}
