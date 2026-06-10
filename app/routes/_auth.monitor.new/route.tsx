@@ -185,13 +185,20 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpBodyEncoding: values.httpBodyEncoding
 						? values.httpBodyEncoding.toString()
 						: null,
-					httpBody: values.httpBodyText ? values.httpBodyText.toString() : null,
-					httpHeaders: values.httpHeaderText
-						? values.httpHeaderText.toString()
-						: null,
-					httpAuthentication: values.httpAuthentication
-						? values.httpAuthentication.toString()
-						: null,
+					httpBody: values.httpBody
+						? values.httpBody.toString()
+						: values.httpBodyText
+							? values.httpBodyText.toString()
+							: null,
+					httpHeaders: values.httpHeaders
+						? values.httpHeaders.toString()
+						: values.httpHeaderText
+							? values.httpHeaderText.toString()
+							: null,
+					httpAuthentication:
+						values.httpAuthentication && values.httpAuthentication !== "none"
+							? values.httpAuthentication.toString()
+							: null,
 					httpUsername: values.httpUsername
 						? values.httpUsername.toString()
 						: null,
@@ -241,13 +248,20 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpBodyEncoding: values.httpBodyEncoding
 						? values.httpBodyEncoding.toString()
 						: null,
-					httpBody: values.httpBodyText ? values.httpBodyText.toString() : null,
-					httpHeaders: values.httpHeaderText
-						? values.httpHeaderText.toString()
-						: null,
-					httpAuthentication: values.httpAuthentication
-						? values.httpAuthentication.toString()
-						: null,
+					httpBody: values.httpBody
+						? values.httpBody.toString()
+						: values.httpBodyText
+							? values.httpBodyText.toString()
+							: null,
+					httpHeaders: values.httpHeaders
+						? values.httpHeaders.toString()
+						: values.httpHeaderText
+							? values.httpHeaderText.toString()
+							: null,
+					httpAuthentication:
+						values.httpAuthentication && values.httpAuthentication !== "none"
+							? values.httpAuthentication.toString()
+							: null,
 					httpUsername: values.httpUsername
 						? values.httpUsername.toString()
 						: null,
@@ -326,7 +340,10 @@ export async function action({ request }: ActionFunctionArgs) {
 				try {
 					const { res } = await HttpCheck({
 						httpBody: values.httpBody?.toString(),
-						httpAuthentication: values.httpAuthentication?.toString(),
+						httpAuthentication:
+							values.httpAuthentication && values.httpAuthentication !== "none"
+								? values.httpAuthentication.toString()
+								: undefined,
 						httpUsername: values.httpUsername?.toString(),
 						httpPassword: values.httpPassword
 							? encrypt(values.httpPassword?.toString())
@@ -334,7 +351,9 @@ export async function action({ request }: ActionFunctionArgs) {
 						httpIgnoreSsl: values.httpIgnoreSsl?.toString() === "true",
 						httpBodyEncoding: values.httpBodyEncoding?.toString(),
 						httpUrl: values.httpUrl?.toString(),
-						httpMethod: values.httpMethod?.toString(),
+						httpMethod:
+							values.httpRequestMethod?.toString() ??
+							values.httpMethod?.toString(),
 						httpHeaders: values.httpHeaders?.toString(),
 						httpMaxRedirects: values.httpMaxRedirects?.toString(),
 						httpAcceptedStatusCodes: jsonParser(values.httpAcceptedStatusCodes),
