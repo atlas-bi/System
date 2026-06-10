@@ -1,3 +1,10 @@
+## [1.44.12](https://github.com/atlas-bi/System/compare/v1.44.11...v1.44.12) (2026-06-10)
+
+
+### Bug Fixes
+
+* pin remix auth dependencies ([f8154d9](https://github.com/atlas-bi/System/commit/f8154d9b38a2240e3fb3c4e3fe609cfe4def51cf))
+
 ## [1.44.11](https://github.com/atlas-bi/System/compare/v1.44.10...v1.44.11) (2026-06-09)
 
 
