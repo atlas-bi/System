@@ -15,11 +15,6 @@
 	"labels": ["maintenance", "renovate"],
 	"packageRules": [
 		{
-			"matchPackageNames": ["remix-auth", "remix-auth-form", "remix-auth-saml"],
-			"enabled": false,
-			"description": "Hold remix-auth on the v3 API until route loaders are migrated off authenticator.isAuthenticated."
-		},
-		{
 			"matchUpdateTypes": ["pin", "digest", "minor", "patch"],
 			"automerge": true
 		},
