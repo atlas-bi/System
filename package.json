@@ -131,7 +131,7 @@
 		"react-chartjs-2": "^5.2.0",
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.45.4",
-		"remix-auth": "3.7.0",
+		"remix-auth": "4.2.0",
 		"remix-auth-form": "1.5.0",
 		"remix-auth-saml": "1.2.0",
 		"remix-utils": "^9.0.0",
@@ -198,5 +198,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.52"
+	"version": "2.0.53"
 }
