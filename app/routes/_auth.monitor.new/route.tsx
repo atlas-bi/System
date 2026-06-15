@@ -7,7 +7,7 @@ import {
 	deleteMonitor,
 	editMonitor,
 } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { HttpCheck } from "~/monitors/http.server";
 import mssql from "mssql";
 import { encrypt } from "@/lib/utils";
@@ -114,7 +114,7 @@ const checkTcp = function ({
 };
 
 export async function action({ request }: ActionFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

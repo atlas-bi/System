@@ -5,11 +5,11 @@ import Nav from "~/components/nav/Nav";
 import { SidebarNav } from "~/components/sidebar";
 import { getMonitorTypes } from "~/models/monitor.server";
 import { SlimUserFields } from "~/models/user.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { commitSession, getSession } from "~/services/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const user: SlimUserFields = await authenticator.isAuthenticated(request, {
+	const user: SlimUserFields = await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

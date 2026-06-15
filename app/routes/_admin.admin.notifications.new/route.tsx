@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { namedAction, redirectBack } from "~/utils";
 
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 
 import SMTP from "~/notifications/smtp";
 import Telegram from "~/notifications/telegram";
@@ -64,7 +64,7 @@ const validateForm = ({ values }: { values: any }) => {
 };
 
 export async function action({ request }: ActionFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
