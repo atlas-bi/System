@@ -1,3 +1,21 @@
+## [1.44.12](https://github.com/atlas-bi/System/compare/v1.44.11...v1.44.12) (2026-06-10)
+
+
+### Bug Fixes
+
+* pin remix auth dependencies ([f8154d9](https://github.com/atlas-bi/System/commit/f8154d9b38a2240e3fb3c4e3fe609cfe4def51cf))
+
+## [1.44.11](https://github.com/atlas-bi/System/compare/v1.44.10...v1.44.11) (2026-06-09)
+
+
+### Bug Fixes
+
+* biome lint config and formatting issues ([c14ee63](https://github.com/atlas-bi/System/commit/c14ee63f8135f8b75a20f27bb1cd59e46ecec8ef))
+* **deps:** update npm-run-all2 to v9 ([c0335c7](https://github.com/atlas-bi/System/commit/c0335c7ecf037b5020ebd5dd24076ee09c93be08))
+* remove spacing ([02788fc](https://github.com/atlas-bi/System/commit/02788fc20baf250c14c91ccd60ddab24ca0a0bd9))
+* remove stale Tailwind config from release artifact inputs ([76fb56d](https://github.com/atlas-bi/System/commit/76fb56df6d82988825522572b365e0ad69ebffb2))
+* replace the backtick template literal with string concatenation ([f0b9140](https://github.com/atlas-bi/System/commit/f0b91402a9c0c22fbe2a21f18163d7ebb41ace78))
+
 ## [1.44.10](https://github.com/atlas-bi/System/compare/v1.44.9...v1.44.10) (2026-05-26)
 
 
