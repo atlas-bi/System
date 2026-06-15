@@ -4,7 +4,7 @@ import { differenceInDays, startOfDay, startOfHour } from "date-fns";
 import invariant from "tiny-invariant";
 import { dateOptions } from "~/models/dates";
 import { DatabaseFile, getFileUsage } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { dateRange } from "~/utils";
 
 type UsagePoint = {
@@ -48,7 +48,7 @@ function calcGrowth({ usage }: { usage: UsagePoint[] }) {
 }
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

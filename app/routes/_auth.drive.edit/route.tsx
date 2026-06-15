@@ -2,10 +2,10 @@ import { redirect, type ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { namedAction } from "~/utils";
 import { editDrive, getDriveMonitor, deleteDrive } from "~/models/drive.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

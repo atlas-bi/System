@@ -12,10 +12,10 @@ import {
 	SuccessEmail as PercentFreeSuccessEmail,
 	ErrorEmail as PercentFreeErrorEmail,
 } from "~/notifications/email/drives/percentFree";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

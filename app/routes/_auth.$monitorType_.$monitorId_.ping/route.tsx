@@ -3,11 +3,11 @@ import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { dateOptions } from "~/models/dates";
 import { getPing } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { dateRange } from "~/utils";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

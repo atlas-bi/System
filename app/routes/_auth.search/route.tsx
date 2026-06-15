@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 
 const normalizeMeiliHost = (host: string) => {
 	if (!host) return "";
@@ -10,7 +10,7 @@ const normalizeMeiliHost = (host: string) => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
