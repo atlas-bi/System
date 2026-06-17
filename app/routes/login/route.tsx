@@ -5,7 +5,11 @@ import {
 	json,
 } from "@remix-run/node";
 import { useSearchParams } from "@remix-run/react";
-import { authenticator } from "~/services/auth.server";
+import {
+	authenticate,
+	authenticateWithLdap,
+	sessionErrorKey,
+} from "~/services/auth.server";
 import { commitSession, getSession } from "~/services/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
 
@@ -13,13 +17,13 @@ import { UserAuthForm } from "./LoginForm";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	// If the user is already authenticated redirect to /dashboard directly
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		successRedirect: "/",
 	});
 	const session = await getSession(request);
-	const error = session.get(authenticator.sessionErrorKey);
+	const error = session.get(sessionErrorKey);
 
-	session.unset(authenticator.sessionErrorKey);
+	session.unset(sessionErrorKey);
 	return json(
 		{ error },
 		{
@@ -33,7 +37,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	// remove session error messages
 	const session = await getSession(request);
-	session.unset(authenticator.sessionErrorKey);
+	session.unset(sessionErrorKey);
 
 	// validate the form before trying to login
 	const formData = await request.clone().formData();
@@ -65,10 +69,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	const url = new URL(request.url);
 	const returnTo = safeRedirect(url.searchParams.get("returnTo") || "/");
 
-	return authenticator.authenticate("ldap", request, {
+	return authenticateWithLdap(request, {
 		successRedirect: returnTo,
 		failureRedirect: "/login",
-		context: { formData },
 	});
 }
 

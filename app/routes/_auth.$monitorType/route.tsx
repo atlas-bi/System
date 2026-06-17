@@ -30,13 +30,13 @@ import {
 	TableRow,
 } from "~/components/ui/table";
 import { getMonitors } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 
 import { columnsSsh, columnsPing } from "./table_columns";
 import invariant from "tiny-invariant";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

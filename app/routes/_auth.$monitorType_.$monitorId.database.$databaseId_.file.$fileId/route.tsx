@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { getDatabaseFile } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { Link, useFetcher, useLoaderData, useParams } from "@remix-run/react";
 import { H1 } from "~/components/ui/typography";
 import { BellRing, MoveLeft, MoveRight, Settings } from "lucide-react";
@@ -17,7 +17,7 @@ import invariant from "tiny-invariant";
 import { Skeleton } from "~/components/ui/skeleton";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

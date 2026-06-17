@@ -18,7 +18,7 @@ import Notification from "~/components/notificationForms/base";
 import React from "react";
 import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 import { getNotificationsDetail } from "~/models/notification.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { columns } from "./table_columns";
 import {
 	Table,
@@ -32,7 +32,7 @@ import { DataTablePagination } from "~/components/table/data-table-pagination";
 import { decrypt } from "@/lib/utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
