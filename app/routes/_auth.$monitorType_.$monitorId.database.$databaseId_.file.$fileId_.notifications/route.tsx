@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { getFileNotifications } from "~/models/monitor.server";
-import { authenticator } from "~/services/auth.server";
+import { authenticate } from "~/services/auth.server";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { H1, H3 } from "~/components/ui/typography";
 import { Loader2, MoveLeft } from "lucide-react";
@@ -14,7 +14,7 @@ import { getNotifications } from "~/models/notification.server";
 import invariant from "tiny-invariant";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,
@@ -33,7 +33,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export async function action({ request, params }: ActionFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
+	await authenticate(request, {
 		failureRedirect: `/auth/?returnTo=${encodeURI(
 			new URL(request.url).pathname,
 		)}`,

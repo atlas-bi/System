@@ -1,5 +1,7 @@
 import * as validator from "@authenio/samlify-node-xmllint";
+import { redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
+import { Strategy } from "remix-auth/strategy";
 import { FormStrategy } from "remix-auth-form";
 import { SamlStrategy } from "remix-auth-saml";
 import fs from "node:fs";
@@ -11,7 +13,157 @@ import { verifyLogin } from "./ldap.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<SlimUserFields>(sessionStorage);
+export const authenticator = new Authenticator<SlimUserFields>();
+
+const sessionKey = "user";
+export const sessionErrorKey = "auth:error";
+const sessionStrategyKey = "strategy";
+
+type AuthenticateOptions = {
+	successRedirect?: string;
+	failureRedirect?: string;
+	headers?: HeadersInit;
+};
+
+export function authenticate(
+	request: Request,
+	options: {
+		failureRedirect: string;
+		successRedirect?: string;
+		headers?: HeadersInit;
+	},
+): Promise<SlimUserFields>;
+export function authenticate(
+	request: Request,
+	options: {
+		successRedirect: string;
+		failureRedirect?: string;
+		headers?: HeadersInit;
+	},
+): Promise<null>;
+export function authenticate(
+	request: Request,
+	options?: AuthenticateOptions,
+): Promise<SlimUserFields | null>;
+export async function authenticate(
+	request: Request,
+	options: AuthenticateOptions = {},
+) {
+	const session = await sessionStorage.getSession(
+		request.headers.get("Cookie"),
+	);
+	const user = session.get(sessionKey) ?? null;
+
+	if (user) {
+		if (options.successRedirect) {
+			throw redirect(options.successRedirect, { headers: options.headers });
+		}
+		return user as SlimUserFields;
+	}
+
+	if (options.failureRedirect) {
+		throw redirect(options.failureRedirect, { headers: options.headers });
+	}
+
+	return null;
+}
+
+async function createUserSession(
+	request: Request,
+	user: SlimUserFields,
+	redirectTo: string,
+	strategy: string,
+) {
+	const session = await sessionStorage.getSession(
+		request.headers.get("Cookie"),
+	);
+	session.set(sessionKey, user);
+	session.set(sessionStrategyKey, strategy);
+	return redirect(redirectTo, {
+		headers: {
+			"Set-Cookie": await sessionStorage.commitSession(session),
+		},
+	});
+}
+
+async function createAuthFailure(
+	request: Request,
+	message: string,
+	redirectTo: string,
+) {
+	const session = await sessionStorage.getSession(
+		request.headers.get("Cookie"),
+	);
+	session.flash(sessionErrorKey, { message });
+	return redirect(redirectTo, {
+		headers: {
+			"Set-Cookie": await sessionStorage.commitSession(session),
+		},
+	});
+}
+
+export async function authenticateWithLdap(
+	request: Request,
+	{
+		successRedirect,
+		failureRedirect,
+	}: {
+		successRedirect: string;
+		failureRedirect: string;
+	},
+) {
+	try {
+		const user = await authenticator.authenticate("ldap", request);
+		return createUserSession(request, user, successRedirect, "ldap");
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "Failed to login";
+		return createAuthFailure(request, message, failureRedirect);
+	}
+}
+
+class SamlStrategyAdapter extends Strategy<SlimUserFields, never> {
+	name: string;
+
+	constructor(private strategy: SamlStrategy<SlimUserFields>) {
+		super(async () => {
+			throw new Error("SAML verification is handled by the wrapped strategy.");
+		});
+		this.name = strategy.name;
+	}
+
+	authenticate(request: Request) {
+		return this.strategy.authenticate(request, sessionStorage, {
+			name: "saml",
+			sessionKey,
+			sessionErrorKey,
+			sessionStrategyKey,
+		});
+	}
+}
+
+let configuredSamlStrategy: SamlStrategy<SlimUserFields> | undefined;
+
+export function hasSamlStrategy() {
+	return configuredSamlStrategy !== undefined;
+}
+
+export async function authenticateWithSaml(
+	request: Request,
+	options: {
+		successRedirect?: string;
+		failureRedirect?: string;
+	} = {},
+) {
+	invariant(configuredSamlStrategy, "SAML strategy is not configured.");
+
+	return configuredSamlStrategy.authenticate(request, sessionStorage, {
+		...options,
+		name: "saml",
+		sessionKey,
+		sessionErrorKey,
+		sessionStrategyKey,
+	});
+}
 
 const host = process.env.HOSTNAME;
 
@@ -88,7 +240,8 @@ if (process.env.SAML_IDP_METADATA) {
 			},
 		);
 
-		authenticator.use(samlStrategy, "saml");
+		configuredSamlStrategy = samlStrategy;
+		authenticator.use(new SamlStrategyAdapter(samlStrategy), "saml");
 		metadata = samlStrategy.metadata();
 	} catch (e) {
 		if (process.env.NODE_ENV === "production") console.log(e);
@@ -106,4 +259,4 @@ const ldapStrategy = new FormStrategy(async ({ form }) => {
 
 authenticator.use(ldapStrategy, "ldap");
 
-export { metadata };
+export { createUserSession, metadata };
