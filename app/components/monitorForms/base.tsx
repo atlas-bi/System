@@ -71,7 +71,7 @@ export default function Monitor({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>{children}</DialogTrigger>
-			<DialogContent className="sm:min-w-[425px] sm:max-w-fit">
+			<DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:min-w-[425px] sm:max-w-fit">
 				<DialogHeader>
 					<DialogTitle>
 						{monitor.title ? `${monitor.title}` : "Add Monitor"}

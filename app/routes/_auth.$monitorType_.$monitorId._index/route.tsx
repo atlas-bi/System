@@ -98,8 +98,8 @@ export default function Index() {
 					</Link>
 				</div>
 			</div>
-			<div className="flex flex-wrap justify-between">
-				<H1 className="space-x-2 flex">
+			<div className="flex flex-wrap items-start justify-between gap-3">
+				<H1 className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
 					{monitor.enabled === false ? (
 						<span className="text-slate-400!">(Disabled)</span>
 					) : monitor.hasError ? (
@@ -107,20 +107,26 @@ export default function Index() {
 					) : (
 						<Activity className="text-emerald-600 my-auto" size={18} />
 					)}
-					<span>{monitor.title}</span>
+					<span className="min-w-0 break-words">{monitor.title}</span>
 					{monitor.type === "http" && monitor.httpUrl ? (
-						<span>({monitor.httpUrl})</span>
+						<span className="min-w-0 break-all">({monitor.httpUrl})</span>
 					) : monitor.type === "sqlServer" ? (
-						<span>({sqlConnectionString?.["data source"]})</span>
+						<span className="min-w-0 break-all">
+							({sqlConnectionString?.["data source"]})
+						</span>
 					) : monitor.type === "tcp" ? (
-						<span>
+						<span className="min-w-0 break-all">
 							({monitor.host}:{monitor.port})
 						</span>
 					) : (
-						monitor.host && <span>({monitor.host})</span>
+						monitor.host && (
+							<span className="min-w-0 break-all">({monitor.host})</span>
+						)
 					)}
 				</H1>
-				<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
+				<div className="shrink-0">
+					<PingStat url={`/${monitor.type}/${monitor.id}/ping-latest`} />
+				</div>
 			</div>
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{monitor.description}</div>

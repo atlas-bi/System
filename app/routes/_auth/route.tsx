@@ -32,13 +32,13 @@ const Authed = () => {
 			<Nav />
 
 			<div className="container pt-4">
-				<div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-					<aside className="-mx-4 md:w-1/5">
+				<div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
+					<aside className="min-w-0">
 						<SidebarNav />
 					</aside>
-					<div className="flex-1">
+					<main className="min-w-0">
 						<Outlet />
-					</div>
+					</main>
 				</div>
 			</div>
 		</>
