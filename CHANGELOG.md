@@ -1,3 +1,10 @@
+## [1.44.13](https://github.com/atlas-bi/System/compare/v1.44.12...v1.44.13) (2026-06-19)
+
+
+### Bug Fixes
+
+* **auth:** migrate remix-auth v4 session checks ([c3619ed](https://github.com/atlas-bi/System/commit/c3619edc3df48c4a66fab4102267fe28145d89a7))
+
 ## [1.44.12](https://github.com/atlas-bi/System/compare/v1.44.11...v1.44.12) (2026-06-10)
 
 
