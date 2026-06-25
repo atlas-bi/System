@@ -2,7 +2,8 @@ import type { UserSerialized } from "~/models/user.server";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { BellRing, Github, LogOut } from "lucide-react";
+import { BellRing, LogOut } from "lucide-react";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -93,7 +94,7 @@ export function UserNav() {
 									className="flex grow"
 									target="_blank"
 								>
-									<Github className="mr-2 h-4 w-4" />
+									<SiGithub className="mr-2 h-4 w-4" />
 									<span>{version}</span>
 								</Link>
 							</DropdownMenuItem>
