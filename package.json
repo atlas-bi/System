@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@11.6.0",
+	"packageManager": "pnpm@11.8.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -122,7 +122,7 @@
 		"morgan": "^1.10.0",
 		"mssql": "^12.0.0",
 		"node-ssh": "^13.1.0",
-		"nodemailer": "^8.0.0",
+		"nodemailer": "^9.0.0",
 		"npm-run-all2": "^9.0.0",
 		"prisma": "^6.0.0",
 		"proxy-from-env": "^2.0.0",
@@ -146,7 +146,7 @@
 		"zod": "^4.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.16",
+		"@biomejs/biome": "2.5.0",
 		"@faker-js/faker": "^10.0.0",
 		"@semantic-release/changelog": "6.0.3",
 		"@semantic-release/commit-analyzer": "^13.0.0",
@@ -177,7 +177,7 @@
 		"msw": "^2.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.6.0",
+		"react-email": "6.6.3",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -198,5 +198,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "1.44.13"
+	"version": "2.0.55"
 }

@@ -2,7 +2,6 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import stylesheet from "@/styles/globals.css";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
-	Link,
 	Links,
 	LiveReload,
 	Meta,
@@ -23,6 +22,25 @@ export const links: LinksFunction = () => [
 ];
 
 export const meta: MetaFunction = () => [{ title: "Atlas System" }];
+
+function ErrorBackButton() {
+	return (
+		<button
+			type="button"
+			className="flex space-x-2"
+			onClick={() => {
+				if (window.history.length > 1) {
+					window.history.back();
+				} else {
+					window.location.assign("/");
+				}
+			}}
+		>
+			<MoveLeft size={16} className="my-auto" />
+			<span>Go back</span>
+		</button>
+	);
+}
 
 export default function App() {
 	return (
@@ -59,10 +77,7 @@ export function ErrorBoundary() {
 	} else if (error instanceof Error) {
 		message = (
 			<div className="space-y-4">
-				<div className="flex space-x-2">
-					<MoveLeft size={16} className="my-auto" />
-					<Link to="/">Go back</Link>
-				</div>
+				<ErrorBackButton />
 				<H1>Error</H1>
 				<p className="text-sm">{error.message}</p>
 				{error.stack && (
