@@ -169,7 +169,7 @@
 		"@types/react-dom": "^19.0.0",
 		"@vitejs/plugin-react": "^6.0.0",
 		"@vitest/coverage-v8": "^4.0.0",
-		"cookie": "^1.0.0",
+		"cookie": "^2.0.0",
 		"cypress": "^15.0.0",
 		"cz-conventional-changelog": "3.3.0",
 		"happy-dom": "^20.0.0",
@@ -198,5 +198,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.56"
+	"version": "2.0.57"
 }
