@@ -177,7 +177,7 @@
 		"msw": "^2.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.6.4",
+		"react-email": "6.6.5",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -198,5 +198,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.57"
+	"version": "2.0.58"
 }
