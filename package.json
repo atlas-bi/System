@@ -68,6 +68,8 @@
 		"@radix-ui/react-tooltip": "^1.0.6",
 		"@react-email/body": "0.3.0",
 		"@react-email/button": "0.2.1",
+		"@react-email/code-block": "0.2.1",
+		"@react-email/code-inline": "0.0.6",
 		"@react-email/container": "0.0.16",
 		"@react-email/head": "0.0.13",
 		"@react-email/heading": "0.0.16",
