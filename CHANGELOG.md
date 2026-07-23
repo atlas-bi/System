@@ -1,3 +1,11 @@
+## [1.44.14](https://github.com/atlas-bi/System/compare/v1.44.13...v1.44.14) (2026-07-23)
+
+
+### Bug Fixes
+
+* **deps:** add react-email code components ([1689015](https://github.com/atlas-bi/System/commit/16890158573b1d1ffcee19c0e506287f1014a9c6))
+* **prisma:** migrate to Prisma 7 config and adapter ([b4c5a35](https://github.com/atlas-bi/System/commit/b4c5a35b59f7a3bdaafa6710d3f992f73f15d078))
+
 ## [1.44.13](https://github.com/atlas-bi/System/compare/v1.44.12...v1.44.13) (2026-06-19)
 
 
