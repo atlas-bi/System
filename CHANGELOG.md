@@ -1,3 +1,10 @@
+## [1.44.15](https://github.com/atlas-bi/System/compare/v1.44.14...v1.44.15) (2026-07-24)
+
+
+### Bug Fixes
+
+* include prisma config in release artifact ([e87f6b5](https://github.com/atlas-bi/System/commit/e87f6b5997c57e869fd4e7c243b144ea87df35bd))
+
 ## [1.44.14](https://github.com/atlas-bi/System/compare/v1.44.13...v1.44.14) (2026-07-23)
 
 
