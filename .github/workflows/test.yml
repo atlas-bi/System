@@ -22,7 +22,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/atlas
     services:
       postgres:
-        image: postgres:14
+        image: postgres:18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
