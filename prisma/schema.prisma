@@ -19,6 +19,13 @@ model User {
   groups    Group[]
 }
 
+model AppSettings {
+  id                   Int      @id @default(1)
+  usageRetentionEnabled Boolean  @default(false)
+  usageRetentionMonths Int?
+  updatedAt            DateTime @updatedAt
+}
+
 model Group {
   id   Int    @id @default(autoincrement())
   name String @unique
@@ -138,6 +145,7 @@ model MonitorFeeds {
   message String?
 
   @@index([monitorId, createdAt])
+  @@index([createdAt])
 }
 
 model MonitorLogs {
@@ -188,6 +196,7 @@ model CpuUsage {
   speed String?
 
   @@index([cpuId, createdAt])
+  @@index([createdAt])
 }
 
 model Database {
@@ -279,6 +288,7 @@ model DatabaseFileUsage {
   maxSize     String?
 
   @@index([databaseFileId, createdAt])
+  @@index([createdAt])
 }
 
 model DatabaseUsage {

@@ -14,7 +14,7 @@ async function allClear({ monitor, drive }: { monitor: any; drive: any }) {
 		// send an all clear alert
 		const subject = `💚 [${monitor.host} ${drive.name} drive] Free space now below limit.`;
 
-		const html = render(
+		const html = await render(
 			<SuccessEmail
 				subject={subject}
 				hostname={process.env.HOSTNAME}
@@ -110,7 +110,7 @@ export default async function percentFreeNotifier({
 
 	if (resend && drive.percFreeNotifyTypes) {
 		const subject = `💔 [${monitor.host} ${drive.name} drive] Alert: free space limit exceeded.`;
-		const html = render(
+		const html = await render(
 			<ErrorEmail
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
