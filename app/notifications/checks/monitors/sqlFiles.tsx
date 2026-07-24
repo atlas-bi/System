@@ -26,7 +26,7 @@ async function allClear({
 		// send an all clear alert
 		const subject = `💚 [${monitor.name}.${database.name} file ${file.fileName}] Free space now below limit.`;
 
-		const html = render(
+		const html = await render(
 			<SuccessEmail
 				subject={subject}
 				hostname={process.env.HOSTNAME}
@@ -175,7 +175,7 @@ export default async function sqlFilePercentFreeNotifier({
 				}
 
 				if (resend && monitor.sqlFileSizePercentFreeNotifyTypes) {
-					const html = render(
+					const html = await render(
 						<ErrorEmail
 							hostname={process.env.HOSTNAME}
 							monitor={monitor}

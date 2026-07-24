@@ -20,7 +20,7 @@ export default async function rebootNotifier({
 	if (monitor.lastBootTime != oldMonitor.lastBootTime) {
 		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
 		const message = `[${monitor.host}] Reboot time changed.`;
-		const html = render(
+		const html = await render(
 			<SuccessEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
 			{
 				pretty: false,
