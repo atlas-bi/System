@@ -2,7 +2,7 @@ import type { UserSerialized } from "~/models/user.server";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { BellRing, Github, LogOut } from "lucide-react";
+import { BellRing, Github, LogOut, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -81,6 +81,16 @@ export function UserNav() {
 								>
 									<BellRing className="mr-2 h-4 w-4" />
 									<span>Notification Methods</span>
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem asChild>
+								<Link
+									to="/admin/settings"
+									prefetch="intent"
+									className="flex grow"
+								>
+									<Settings className="mr-2 h-4 w-4" />
+									<span>Data Retention</span>
 								</Link>
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
