@@ -41,7 +41,7 @@ export default async function httpCertNotifier({
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] ${snippet}.`;
-		html = render(
+		html = await render(
 			<InvalidEmail
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
@@ -56,7 +56,7 @@ export default async function httpCertNotifier({
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] Certificate expires in ${monitor.certDays}.`;
-		html = render(
+		html = await render(
 			<ErrorEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
 			{
 				pretty: false,
@@ -70,7 +70,7 @@ export default async function httpCertNotifier({
 		subject = `🔒 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] Certificate is valid.`;
-		html = render(
+		html = await render(
 			<SuccessEmail
 				subject={subject}
 				hostname={process.env.HOSTNAME}
