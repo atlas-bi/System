@@ -1,3 +1,15 @@
+# [1.45.0](https://github.com/atlas-bi/System/compare/v1.44.15...v1.45.0) (2026-07-24)
+
+
+### Bug Fixes
+
+* await email rendering before sending ([582e275](https://github.com/atlas-bi/System/commit/582e2757d0efad58a89f293415bf98544b192c61))
+
+
+### Features
+
+* add configurable usage data retention ([ec1be0d](https://github.com/atlas-bi/System/commit/ec1be0d694f4e9a831bbcd72e0191b96f64de51e))
+
 ## [1.44.15](https://github.com/atlas-bi/System/compare/v1.44.14...v1.44.15) (2026-07-24)
 
 
