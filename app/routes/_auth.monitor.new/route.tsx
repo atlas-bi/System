@@ -280,15 +280,13 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 			return json({ monitor });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			await deleteMonitor({ id: values.id.toString() });
 			return redirect("/");
 		},
-		async test() {
-			const formData = await request.formData();
+		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			const baseErrors = checkBase({ values });
@@ -371,20 +369,20 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			if (values.type?.toString() === "sqlServer") {
-				let pool;
+				let pool: mssql.ConnectionPool | undefined;
 				try {
 					pool = new mssql.ConnectionPool(
 						values.sqlConnectionString?.toString(),
 					);
 					await pool.connect();
 					await pool.request().query("select @@version");
-					pool.close();
 					return json({ success: "Connection successful." });
 				} catch (e) {
-					if (pool) {
-						pool.close();
-					}
-					return json({ error: { message: e.toString() } });
+					return json({
+						error: { message: e instanceof Error ? e.message : String(e) },
+					});
+				} finally {
+					await pool?.close().catch(() => undefined);
 				}
 			}
 

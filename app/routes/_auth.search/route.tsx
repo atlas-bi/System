@@ -25,13 +25,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		if (!rawHost) {
 			return json({ results: undefined });
 		}
-		const { MeiliSearch } = await import("meilisearch");
-		const client = new MeiliSearch({
+		const { Meilisearch } = await import("meilisearch");
+		const client = new Meilisearch({
 			host: normalizeMeiliHost(rawHost),
 			apiKey: process.env.MEILI_MASTER_KEY || undefined,
 		});
 		results = await client.index("base").search(search);
-	} catch (e) {}
+	} catch (e) {
+		console.error("search failed.", e);
+	}
 
 	return json({ results });
 };

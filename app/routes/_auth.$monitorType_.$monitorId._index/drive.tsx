@@ -87,24 +87,23 @@ export const MiniDrive = ({
 				{usageFetcher.data ? (
 					(() => {
 						const usage = usageFetcher.data?.drive?.usage ?? [];
+						const latest = usage[0];
 						return (
 							<DoughnutChart
 								className="w-36 h-36"
 								data={{
 									labels: [
-										`Used ${bytes(Number([...usage]?.pop()?.used))}`,
-										`Free ${bytes(Number([...usage]?.pop()?.free))}`,
+										`Used ${bytes(Number(latest?.used))}`,
+										`Free ${bytes(Number(latest?.free))}`,
 									],
 									datasets: [
 										{
 											label: "Drive Usage",
 											data: [
-												Number([...usage]?.pop()?.used),
-												Number([...usage]?.pop()?.used) +
-													Number([...usage]?.pop()?.free) ==
-												0
+												Number(latest?.used),
+												Number(latest?.used) + Number(latest?.free) == 0
 													? 100
-													: Number([...usage]?.pop()?.free),
+													: Number(latest?.free),
 											],
 										},
 									],
@@ -147,11 +146,8 @@ export const MiniDrive = ({
 							<TableCell className="py-1">Used</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(
-										Number(
-											[...(usageFetcher.data?.drive?.usage ?? [])].pop()?.used,
-										),
-									) || "-1"
+									bytes(Number(usageFetcher.data?.drive?.usage?.[0]?.used)) ||
+									"-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
@@ -161,11 +157,8 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Free</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(
-										Number(
-											[...(usageFetcher.data?.drive?.usage ?? [])].pop()?.free,
-										),
-									) || "-1"
+									bytes(Number(usageFetcher.data?.drive?.usage?.[0]?.free)) ||
+									"-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
