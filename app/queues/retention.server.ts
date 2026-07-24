@@ -3,12 +3,16 @@ import { prisma } from "~/db.server";
 
 export async function deleteExpiredUsageData(cutoff: Date) {
 	// ponytail: one deleteMany per table; batch deletion can be added if daily volume makes locks too large.
-	await prisma.monitorFeeds.deleteMany({ where: { createdAt: { lt: cutoff } } });
+	await prisma.monitorFeeds.deleteMany({
+		where: { createdAt: { lt: cutoff } },
+	});
 	await prisma.cpuUsage.deleteMany({ where: { createdAt: { lt: cutoff } } });
 	await prisma.databaseFileUsage.deleteMany({
 		where: { createdAt: { lt: cutoff } },
 	});
-	await prisma.databaseUsage.deleteMany({ where: { createdAt: { lt: cutoff } } });
+	await prisma.databaseUsage.deleteMany({
+		where: { createdAt: { lt: cutoff } },
+	});
 	await prisma.driveUsage.deleteMany({ where: { createdAt: { lt: cutoff } } });
 }
 

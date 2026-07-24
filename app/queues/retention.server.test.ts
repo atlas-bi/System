@@ -18,7 +18,8 @@ vi.mock("~/db.server", () => ({
 }));
 
 vi.mock("quirrel/remix", () => ({
-	CronJob: (_path: string, _schedule: string, handler: () => unknown) => handler,
+	CronJob: (_path: string, _schedule: string, handler: () => unknown) =>
+		handler,
 }));
 
 import { deleteExpiredUsageData } from "./retention.server";

@@ -65,14 +65,17 @@ export default function Settings() {
 			<div>
 				<h1 className="text-2xl font-semibold">Data Retention</h1>
 				<p className="text-muted-foreground">
-					Automatically delete collected usage data older than the selected period.
+					Automatically delete collected usage data older than the selected
+					period.
 				</p>
 			</div>
 
 			<Form method="post" className="space-y-4">
 				<div className="flex items-center justify-between rounded-md border p-4">
 					<div className="space-y-1">
-						<Label htmlFor="usageRetentionEnabled">Enable automatic cleanup</Label>
+						<Label htmlFor="usageRetentionEnabled">
+							Enable automatic cleanup
+						</Label>
 						<p className="text-sm text-muted-foreground">
 							Delete old usage data once a day.
 						</p>
