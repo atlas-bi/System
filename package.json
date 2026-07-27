@@ -160,7 +160,7 @@
 		"@semantic-release/npm": "^13.0.0",
 		"@semantic-release/release-notes-generator": "^14.0.0",
 		"@testing-library/cypress": "^10.0.0",
-		"@testing-library/jest-dom": "^6.1.2",
+		"@testing-library/jest-dom": "^7.0.0",
 		"@types/bcryptjs": "^3.0.0",
 		"@types/bytes": "^3.1.1",
 		"@types/compression": "^1.7.2",
@@ -202,5 +202,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.67"
+	"version": "2.0.68"
 }
