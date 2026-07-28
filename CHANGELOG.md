@@ -1,3 +1,14 @@
+## [1.45.1](https://github.com/atlas-bi/System/compare/v1.45.0...v1.45.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* correct monitor tests and latest drive usage ([9b8c5e6](https://github.com/atlas-bi/System/commit/9b8c5e6ffaa0a0abacdde9cb8399ac41d025c177))
+* **http monitor:** fix error with http status codes db field ([313fc8b](https://github.com/atlas-bi/System/commit/313fc8bf4d93ed96449cf410db6f1507288d019c))
+* improve button cursor and retention save state ([fac96eb](https://github.com/atlas-bi/System/commit/fac96ebb2d8ba0ade9f17660bc05585d499e5271))
+* **reboot:** fixed reboot notifications ([5260caa](https://github.com/atlas-bi/System/commit/5260caabb61d86a7fec931fba3e6afd84b0f1485))
+* use current Meilisearch client ([5a57fb0](https://github.com/atlas-bi/System/commit/5a57fb011b98178de336de265024a92a4c7a5b87))
+
 # [1.45.0](https://github.com/atlas-bi/System/compare/v1.44.15...v1.45.0) (2026-07-24)
 
 
