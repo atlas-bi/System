@@ -124,6 +124,10 @@ export async function action({ request }: ActionFunctionArgs) {
 		async new(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
+			const httpAcceptedStatusCodes = formData
+				.getAll("httpAcceptedStatusCodes")
+				.map((v) => v.toString());
+
 			const baseErrors = checkBase({ values });
 			if (baseErrors) {
 				return baseErrors;
@@ -173,9 +177,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
 					httpCheckCert: values.httpCheckCert?.toString() == "true",
-					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
-						? jsonParser(values.httpAcceptedStatusCodes)
-						: [],
+					httpAcceptedStatusCodes,
 					httpMaxRedirects: values.httpMaxRedirects
 						? values.httpMaxRedirects.toString()
 						: null,
@@ -236,9 +238,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
 					httpCheckCert: values.httpCheckCert?.toString() == "true",
-					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
-						? jsonParser(values.httpAcceptedStatusCodes)
-						: [],
+					httpAcceptedStatusCodes,
 					httpMaxRedirects: values.httpMaxRedirects
 						? values.httpMaxRedirects.toString()
 						: null,
@@ -280,16 +280,17 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 			return json({ monitor });
 		},
-		async delete() {
-			const formData = await request.formData();
+		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
 			await deleteMonitor({ id: values.id.toString() });
 			return redirect("/");
 		},
-		async test() {
-			const formData = await request.formData();
+		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
+			const httpAcceptedStatusCodes = formData
+				.getAll("httpAcceptedStatusCodes")
+				.map((v) => v.toString());
 
 			const baseErrors = checkBase({ values });
 			if (baseErrors) {
@@ -360,6 +361,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						httpDomain: values.httpDomain?.toString(),
 						httpWorkstation: values.httpWorkstation?.toString(),
 						httpCheckCert: values.httpCheckCert?.toString() === "true",
+						httpAcceptedStatusCodes,
 					});
 					const ping = Date.now() - startTime;
 					return json({
@@ -371,20 +373,20 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			if (values.type?.toString() === "sqlServer") {
-				let pool;
+				let pool: mssql.ConnectionPool | undefined;
 				try {
 					pool = new mssql.ConnectionPool(
 						values.sqlConnectionString?.toString(),
 					);
 					await pool.connect();
 					await pool.request().query("select @@version");
-					pool.close();
 					return json({ success: "Connection successful." });
 				} catch (e) {
-					if (pool) {
-						pool.close();
-					}
-					return json({ error: { message: e.toString() } });
+					return json({
+						error: { message: e instanceof Error ? e.message : String(e) },
+					});
+				} finally {
+					await pool?.close().catch(() => undefined);
 				}
 			}
 

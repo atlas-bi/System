@@ -140,40 +140,41 @@ export default function Index() {
 			<div className="space-y-4 pb-4">
 				<div className="text-muted-foreground">{drive.description}</div>
 				<div className="space-y-2 grow">
-					<Table>
-						<TableBody>
-							<TableRow>
-								<TableCell className="py-1 font-medium">Size</TableCell>
-								<TableCell className="py-1 text-slate-700">
-									{bytes(Number(drive.size))}
-								</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell className="py-1">Used</TableCell>
-								<TableCell className="py-1">
-									{usageFetcher.data ? (
-										bytes(
-											Number([...usageFetcher.data?.drive?.usage]?.pop()?.used),
-										) || "-1"
-									) : (
-										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
-									)}
-								</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell className="py-1">Free</TableCell>
-								<TableCell className="py-1">
-									{usageFetcher.data ? (
-										bytes(
-											Number([...usageFetcher.data?.drive?.usage]?.pop()?.free),
-										) || "-1"
-									) : (
-										<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
-									)}
-								</TableCell>
-							</TableRow>
-						</TableBody>
-					</Table>
+					{(() => {
+						const latest = usageFetcher.data?.drive?.usage?.[0];
+						return (
+							<Table>
+								<TableBody>
+									<TableRow>
+										<TableCell className="py-1 font-medium">Size</TableCell>
+										<TableCell className="py-1 text-slate-700">
+											{bytes(Number(drive.size))}
+										</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell className="py-1">Used</TableCell>
+										<TableCell className="py-1">
+											{usageFetcher.data ? (
+												bytes(Number(latest?.used)) || "-1"
+											) : (
+												<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+											)}
+										</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell className="py-1">Free</TableCell>
+										<TableCell className="py-1">
+											{usageFetcher.data ? (
+												bytes(Number(latest?.free)) || "-1"
+											) : (
+												<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
+											)}
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						);
+					})()}
 				</div>
 
 				<DriveChart
