@@ -1,3 +1,30 @@
+# [1.45.0](https://github.com/atlas-bi/System/compare/v1.44.15...v1.45.0) (2026-07-24)
+
+
+### Bug Fixes
+
+* await email rendering before sending ([582e275](https://github.com/atlas-bi/System/commit/582e2757d0efad58a89f293415bf98544b192c61))
+
+
+### Features
+
+* add configurable usage data retention ([ec1be0d](https://github.com/atlas-bi/System/commit/ec1be0d694f4e9a831bbcd72e0191b96f64de51e))
+
+## [1.44.15](https://github.com/atlas-bi/System/compare/v1.44.14...v1.44.15) (2026-07-24)
+
+
+### Bug Fixes
+
+* include prisma config in release artifact ([e87f6b5](https://github.com/atlas-bi/System/commit/e87f6b5997c57e869fd4e7c243b144ea87df35bd))
+
+## [1.44.14](https://github.com/atlas-bi/System/compare/v1.44.13...v1.44.14) (2026-07-23)
+
+
+### Bug Fixes
+
+* **deps:** add react-email code components ([1689015](https://github.com/atlas-bi/System/commit/16890158573b1d1ffcee19c0e506287f1014a9c6))
+* **prisma:** migrate to Prisma 7 config and adapter ([b4c5a35](https://github.com/atlas-bi/System/commit/b4c5a35b59f7a3bdaafa6710d3f992f73f15d078))
+
 ## [1.44.13](https://github.com/atlas-bi/System/compare/v1.44.12...v1.44.13) (2026-06-19)
 
 
