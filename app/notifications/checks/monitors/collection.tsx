@@ -53,7 +53,7 @@ export default async function collectionNotifier({
 		if (monitor.connectionNotifySentAt && monitor.connectionNotify) {
 			await reset({ monitor });
 			const subject = `💚 [${name}] Data collection restored.`;
-			const html = render(
+			const html = await render(
 				<SuccessEmail
 					hostname={process.env.HOSTNAME}
 					subject={subject}
@@ -122,7 +122,7 @@ export default async function collectionNotifier({
 			0,
 			20,
 		)}`;
-		const html = render(
+		const html = await render(
 			<ErrorEmail
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
