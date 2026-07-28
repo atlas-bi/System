@@ -124,6 +124,10 @@ export async function action({ request }: ActionFunctionArgs) {
 		async new(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
 
+			const httpAcceptedStatusCodes = formData
+				.getAll("httpAcceptedStatusCodes")
+				.map((v) => v.toString());
+
 			const baseErrors = checkBase({ values });
 			if (baseErrors) {
 				return baseErrors;
@@ -173,9 +177,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
 					httpCheckCert: values.httpCheckCert?.toString() == "true",
-					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
-						? jsonParser(values.httpAcceptedStatusCodes)
-						: [],
+					httpAcceptedStatusCodes,
 					httpMaxRedirects: values.httpMaxRedirects
 						? values.httpMaxRedirects.toString()
 						: null,
@@ -236,9 +238,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					httpUrl: values.httpUrl ? values.httpUrl.toString() : null,
 					httpIgnoreSsl: values.httpIgnoreSsl?.toString() == "true",
 					httpCheckCert: values.httpCheckCert?.toString() == "true",
-					httpAcceptedStatusCodes: values.httpAcceptedStatusCodes
-						? jsonParser(values.httpAcceptedStatusCodes)
-						: [],
+					httpAcceptedStatusCodes,
 					httpMaxRedirects: values.httpMaxRedirects
 						? values.httpMaxRedirects.toString()
 						: null,
@@ -288,6 +288,9 @@ export async function action({ request }: ActionFunctionArgs) {
 		},
 		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
+			const httpAcceptedStatusCodes = formData
+				.getAll("httpAcceptedStatusCodes")
+				.map((v) => v.toString());
 
 			const baseErrors = checkBase({ values });
 			if (baseErrors) {
@@ -358,6 +361,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						httpDomain: values.httpDomain?.toString(),
 						httpWorkstation: values.httpWorkstation?.toString(),
 						httpCheckCert: values.httpCheckCert?.toString() === "true",
+						httpAcceptedStatusCodes,
 					});
 					const ping = Date.now() - startTime;
 					return json({
