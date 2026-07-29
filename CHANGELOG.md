@@ -1,3 +1,10 @@
+## [1.45.3](https://github.com/atlas-bi/System/compare/v1.45.2...v1.45.3) (2026-07-29)
+
+
+### Bug Fixes
+
+* **execa update:** updated code for new version ([f4fdacb](https://github.com/atlas-bi/System/commit/f4fdacbe57221b820683699364068e3b55e68953))
+
 ## [1.45.2](https://github.com/atlas-bi/System/compare/v1.45.1...v1.45.2) (2026-07-29)
 
 
