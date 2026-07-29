@@ -1,3 +1,10 @@
+## [1.45.2](https://github.com/atlas-bi/System/compare/v1.45.1...v1.45.2) (2026-07-29)
+
+
+### Bug Fixes
+
+* **reboot:** fix reboot timestamp from linux ([be2011d](https://github.com/atlas-bi/System/commit/be2011d8246f376deb87325db0b6ce9393787d3c))
+
 ## [1.45.1](https://github.com/atlas-bi/System/compare/v1.45.0...v1.45.1) (2026-07-28)
 
 
