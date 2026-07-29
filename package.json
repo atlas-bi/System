@@ -111,7 +111,7 @@
 		"dotenv-cli": "^11.0.0",
 		"es-set-tostringtag": "^2.1.0",
 		"esbuild": "^0.28.0",
-		"execa": "^9.0.0",
+		"execa": "^10.0.0",
 		"express": "^5.0.0",
 		"follow-redirects": "^1.15.11",
 		"form-data": "^4.0.4",
@@ -202,5 +202,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.69"
+	"version": "2.0.70"
 }
