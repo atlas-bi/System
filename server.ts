@@ -4,7 +4,7 @@ import compression from "compression";
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-import { ChildProcess, spawnSync } from "child_process";
+import { ResultPromise, spawnSync } from "child_process";
 import { symmetric } from "secure-webhooks";
 import "dotenv/config";
 /*
@@ -39,8 +39,8 @@ const DISABLE_BACKGROUND_SERVICES =
 	process.env.DISABLE_BACKGROUND_SERVICES === "1" ||
 	process.env.CI === "true";
 
-let child: ChildProcess | undefined;
-let search: ChildProcess | undefined;
+let child: ResultPromise | undefined;
+let search: ResultPromise | undefined;
 
 const sleep = (ms: number) => {
 	return new Promise((resolve) => {
@@ -86,8 +86,8 @@ const fetchWithRetries: FetchWithRetries = async (
 		}
 		console.log("Failed to connect to quirrel: max retries exceeded");
 		// max retries exceeded
-		child?.kill("SIGINT");
-		search?.kill("SIGINT");
+		child?.nodeChildProcess.kill("SIGINT");
+		search?.nodeChildProcess.kill("SIGINT");
 		throw error;
 	}
 };
@@ -214,32 +214,34 @@ const fetchWithRetries: FetchWithRetries = async (
 
 async function startQuirrel() {
 	const { execa } = await import("execa");
-	const child: ChildProcess = execa(
+
+	const subprocess = execa(
 		"node",
 		[`${process.cwd()}/node_modules/quirrel/dist/cjs/src/api/main.js`],
 		{
 			env: {
 				...process.env,
 				PORT: process.env.QUIRREL_PORT,
-				PASSPHRASES: `atlas`,
+				PASSPHRASES: "atlas",
 				DISABLE_TELEMETRY: "1",
 			},
 			stdio: "inherit",
 		},
 	);
 
-	child.on("exit", function (code, signal) {
-		throw Error(
-			"child process exited with " + `code ${code} and signal ${signal}`,
+	subprocess.nodeChildProcess.on("exit", (code, signal) => {
+		throw new Error(
+			`child process exited with code ${code} and signal ${signal}`,
 		);
 	});
 
-	return child;
+	return subprocess;
 }
 
 async function startMeili() {
 	const { execa } = await import("execa");
-	const child: ChildProcess = execa("./etc/meilisearch", {
+
+	const subprocess = execa("./etc/meilisearch", {
 		env: {
 			...process.env,
 			MEILI_HTTP_ADDR: `127.0.0.1:${process.env.MEILI_PORT}`,
@@ -248,13 +250,13 @@ async function startMeili() {
 		stdio: "inherit",
 	});
 
-	child.on("exit", function (code, signal) {
-		throw Error(
-			"child process exited with " + `code ${code} and signal ${signal}`,
+	subprocess.nodeChildProcess.on("exit", (code, signal) => {
+		throw new Error(
+			`Meilisearch exited with code ${code} and signal ${signal}`,
 		);
 	});
 
-	return child;
+	return subprocess;
 }
 
 function purgeRequireCache() {
