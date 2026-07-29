@@ -46,7 +46,10 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		);
 		const os = await getStdout(ssh, "lsb_release -ds");
 		const osVersion = await getStdout(ssh, "lsb_release -rs");
-		const lastBoot = await getStdout(ssh, "uptime -s");
+		const lastBoot = await getStdout(
+			ssh,
+			"awk '/^btime/ {print $2}' /proc/stat",
+		);
 		const cpuInfo = JSON.parse(await getStdout(ssh, "lscpu --json")).lscpu;
 		// escape the back slashes!
 		const cpuLoad = await getStdout(
@@ -86,7 +89,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 		let lastBootTime = null;
 
 		try {
-			lastBootTime = new Date(lastBoot).toISOString();
+			lastBootTime = new Date(Number(lastBoot) * 1000).toISOString();
 		} catch (e) {}
 
 		/*
