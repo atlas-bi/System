@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@11.18.0",
+	"packageManager": "pnpm@11.20.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -150,7 +150,7 @@
 		"zod": "^4.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.6",
+		"@biomejs/biome": "2.5.7",
 		"@faker-js/faker": "^10.0.0",
 		"@semantic-release/changelog": "7.0.0",
 		"@semantic-release/commit-analyzer": "^13.0.0",
@@ -202,5 +202,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.71"
+	"version": "2.0.72"
 }
