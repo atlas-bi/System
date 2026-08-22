@@ -55,14 +55,14 @@ export default async function httpCertNotifier({
 	} else if (Number(monitor.certDays) <= 21) {
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
-		})] Certificate expires in ${monitor.certDays}.`;
+		})] Certificate expires in ${monitor.certDays} days.`;
 		html = await render(
 			<ErrorEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
 			{
 				pretty: false,
 			},
 		);
-		message = `Certificate expires in ${monitor.certDays}.`;
+		message = `Certificate expires in ${monitor.certDays} days.`;
 	}
 
 	if ((!subject || !html || !message) && monitor.httpCertNotifySentAt) {
