@@ -185,6 +185,7 @@ export default function Notification({
 						</Button>
 						<Button
 							type="button"
+							disabled={fetcher.state === "submitting"}
 							onClick={(e) => {
 								// ugly json parse to remove null/blank/undefined
 								fetcher.submit(
