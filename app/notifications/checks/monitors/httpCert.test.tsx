@@ -30,6 +30,7 @@ describe("httpCertNotifier", () => {
 				title: "Example",
 				name: null,
 				httpUrl: "https://example.com",
+				httpCheckCert: true,
 				httpCertNotify: true,
 				certValid: true,
 				certDays: "10",
@@ -43,6 +44,31 @@ describe("httpCertNotifier", () => {
 			message: "Certificate expires in 10 days.",
 			type: "error",
 			monitor: expect.objectContaining({ id: "http-monitor" }),
+		});
+	});
+
+	it("does not notify when cert checking is disabled", async () => {
+		await httpCertNotifier({
+			monitor: {
+				id: "http-monitor",
+				type: "http",
+				title: "Example",
+				name: null,
+				httpUrl: "https://example.com",
+				httpCheckCert: false,
+				httpCertNotify: true,
+				certValid: false,
+				certDays: "5",
+				httpCertNotifyTypes: [{ id: "n1", type: "smtp", name: "email" }],
+				httpCertNotifySentAt: new Date(),
+				httpCertNotifyResendAfterMinutes: null,
+			} as never,
+		});
+
+		expect(logger).not.toHaveBeenCalled();
+		expect(setMonitorHttpCertSentAt).toHaveBeenCalledWith({
+			id: "http-monitor",
+			httpCertNotifySentAt: null,
 		});
 	});
 });

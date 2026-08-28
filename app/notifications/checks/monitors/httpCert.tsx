@@ -15,8 +15,11 @@ export default async function httpCertNotifier({
 }: {
 	monitor: MonitorWithRelations;
 }) {
-	// don't notify if disabled.
+	// don't notify if disabled. httpCheckCert is the monitor-level switch;
+	// the notifications UI is hidden when it is off, but httpCertNotify can
+	// remain true in the database from a previous configuration.
 	if (
+		!monitor.httpCheckCert ||
 		!monitor.httpCertNotify ||
 		monitor.type !== "http" ||
 		!monitor.httpUrl ||

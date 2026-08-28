@@ -122,4 +122,78 @@ describe("HttpCheck", () => {
 		expect(requestMock).not.toHaveBeenCalled();
 		expect(ntlmClientMock).not.toHaveBeenCalled();
 	});
+
+	it("does not verify TLS when cert checking is disabled", async () => {
+		requestMock.mockResolvedValue({
+			status: 200,
+			data: { ok: true },
+			request: { res: { socket: { getPeerCertificate: vi.fn() } } },
+		});
+
+		const { HttpCheck } = await import("./http.server");
+
+		await HttpCheck({
+			httpUrl: "https://atlas.test/health",
+			httpCheckCert: false,
+			httpIgnoreSsl: false,
+		});
+
+		const options = requestMock.mock.calls[0][0];
+		expect(options.httpsAgent?.options.rejectUnauthorized).toBe(false);
+	});
+
+	it("does not fail the check on TLS errors when cert checking is disabled", async () => {
+		const tlsError = Object.assign(
+			new Error("unable to verify the first certificate"),
+			{
+				code: "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+			},
+		);
+		requestMock.mockRejectedValue(tlsError);
+
+		const { HttpCheck } = await import("./http.server");
+
+		await expect(
+			HttpCheck({
+				httpUrl: "https://atlas.test/health",
+				httpCheckCert: false,
+			}),
+		).resolves.toMatchObject({ certValid: undefined });
+	});
+
+	it("records an invalid cert instead of failing when TLS errors and cert checking is on", async () => {
+		const tlsError = Object.assign(new Error("self-signed certificate"), {
+			code: "DEPTH_ZERO_SELF_SIGNED_CERT",
+		});
+		requestMock.mockRejectedValue(tlsError);
+
+		const { HttpCheck } = await import("./http.server");
+
+		await expect(
+			HttpCheck({
+				httpUrl: "https://atlas.test/health",
+				httpCheckCert: true,
+			}),
+		).resolves.toMatchObject({ certValid: false });
+	});
+
+	it("still fails on HTTP 4xx errors when cert checking is disabled", async () => {
+		const error = Object.assign(
+			new Error("Request failed with status code 400"),
+			{
+				code: "ERR_BAD_REQUEST",
+				response: { status: 400 },
+			},
+		);
+		requestMock.mockRejectedValue(error);
+
+		const { HttpCheck } = await import("./http.server");
+
+		await expect(
+			HttpCheck({
+				httpUrl: "https://atlas.test/health",
+				httpCheckCert: false,
+			}),
+		).rejects.toThrow("Request failed with status code 400");
+	});
 });
