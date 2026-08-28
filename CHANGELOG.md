@@ -1,3 +1,10 @@
+## [1.45.5](https://github.com/atlas-bi/System/compare/v1.45.4...v1.45.5) (2026-08-28)
+
+
+### Bug Fixes
+
+* **cert:** fixed cert check notification disabler ([7ab587a](https://github.com/atlas-bi/System/commit/7ab587aeaf02bcd1a43979362ad7699b1622ef00))
+
 ## [1.45.4](https://github.com/atlas-bi/System/compare/v1.45.3...v1.45.4) (2026-08-28)
 
 
