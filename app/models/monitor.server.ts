@@ -1351,8 +1351,8 @@ export function updateMonitor({
 		cpuProcessors?: string;
 		lastBootTime?: string | null | Date;
 		cpuMaxSpeed?: string | null;
-		certDays?: string;
-		certValid?: boolean;
+		certDays?: string | null;
+		certValid?: boolean | null;
 	};
 	feed?: {
 		memoryFree?: string;
