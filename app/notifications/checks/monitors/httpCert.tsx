@@ -87,7 +87,10 @@ export default async function httpCertNotifier({
 
 		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
-				if (!subject || !html) return;
+				if (!subject || !html) {
+					/* v8 ignore next -- defensive guard; subject/html are set above */
+					return;
+				}
 				return await sendNotification({
 					notification,
 					subject,

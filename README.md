@@ -18,7 +18,7 @@ Atlas System is a simple tool to monitor servers, databases, websites and other 
 
 <p align="center">
 <a href="https://github.com/atlas-bi/System/actions/workflows/test.yml" target="_blank"><img src="https://github.com/atlas-bi/System/actions/workflows/test.yml/badge.svg" /></a>
-<a href="https://codecov.io/gh/atlas-bi/System" target="_blank"><img src="https://codecov.io/gh/atlas-bi/System/branch/dev/graph/badge.svg" /></a>
+<a href="https://codecov.io/gh/atlas-bi/System"><img src="https://codecov.io/gh/atlas-bi/System/graph/badge.svg?token=2tFeXwCzka"/></a>
 <a href="https://discord.gg/hdz2cpygQD"><img alt="discord chat" src="https://badgen.net/discord/online-members/hdz2cpygQD/" /></a>
 <a href="https://github.com/atlas-bi/system/releases"><img alt="latest release" src="https://badgen.net/github/release/atlas-bi/system" /></a>
 </p>
