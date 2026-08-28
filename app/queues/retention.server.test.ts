@@ -2,8 +2,9 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { deleteMany } = vi.hoisted(() => ({
+const { deleteMany, findUnique } = vi.hoisted(() => ({
 	deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
+	findUnique: vi.fn(),
 }));
 
 vi.mock("~/db.server", () => ({
@@ -13,7 +14,7 @@ vi.mock("~/db.server", () => ({
 		databaseFileUsage: { deleteMany },
 		databaseUsage: { deleteMany },
 		driveUsage: { deleteMany },
-		appSettings: { findUnique: vi.fn() },
+		appSettings: { findUnique },
 	},
 }));
 
@@ -39,5 +40,36 @@ describe("deleteExpiredUsageData", () => {
 		expect(deleteMany).toHaveBeenNthCalledWith(5, {
 			where: { createdAt: { lt: cutoff } },
 		});
+	});
+});
+
+describe("retention cron job", () => {
+	beforeEach(() => {
+		deleteMany.mockClear();
+		findUnique.mockReset();
+	});
+
+	it("skips cleanup when retention is disabled", async () => {
+		findUnique.mockResolvedValue({
+			usageRetentionEnabled: false,
+			usageRetentionMonths: 6,
+		});
+		const cronHandler = (await import("./retention.server")).default;
+
+		await cronHandler();
+
+		expect(deleteMany).not.toHaveBeenCalled();
+	});
+
+	it("deletes expired usage when retention is enabled", async () => {
+		findUnique.mockResolvedValue({
+			usageRetentionEnabled: true,
+			usageRetentionMonths: 6,
+		});
+		const cronHandler = (await import("./retention.server")).default;
+
+		await cronHandler();
+
+		expect(deleteMany).toHaveBeenCalledTimes(5);
 	});
 });
