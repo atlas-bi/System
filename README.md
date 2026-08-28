@@ -17,7 +17,8 @@ Atlas System is a simple tool to monitor servers, databases, websites and other 
 </p>
 
 <p align="center">
-<a href="https://github.com/atlas-bi/System/actions/workflows/test.yaml" target="_blank"><img src="https://github.com/atlas-bi/System/actions/workflows/test.yml/badge.svg" /></a>
+<a href="https://github.com/atlas-bi/System/actions/workflows/test.yml" target="_blank"><img src="https://github.com/atlas-bi/System/actions/workflows/test.yml/badge.svg" /></a>
+<a href="https://codecov.io/gh/atlas-bi/System" target="_blank"><img src="https://codecov.io/gh/atlas-bi/System/branch/dev/graph/badge.svg" /></a>
 <a href="https://discord.gg/hdz2cpygQD"><img alt="discord chat" src="https://badgen.net/discord/online-members/hdz2cpygQD/" /></a>
 <a href="https://github.com/atlas-bi/system/releases"><img alt="latest release" src="https://badgen.net/github/release/atlas-bi/system" /></a>
 </p>
@@ -43,7 +44,8 @@ Use `pnpm` for the root project and commit `pnpm-lock.yaml`. Do not regenerate a
 
 - Run the monitor-focused unit and integration layers with `pnpm run test:monitor`
 - Run full Vitest coverage with `pnpm run test:coverage`
-- Coverage reports are written to `coverage/` as HTML, LCOV, and JSON summary files, and CI uploads the same directory as an artifact
+- Coverage reports are written to `coverage/` as HTML, LCOV, and JSON summary files
+- CI runs `pnpm run test:coverage` on push and pull requests, uploads `coverage/lcov.info` to [Codecov](https://codecov.io/gh/atlas-bi/System), and saves the full `coverage/` directory as a GitHub Actions artifact (`vitest-coverage`)
 
 ## 🏆 Credits
 
