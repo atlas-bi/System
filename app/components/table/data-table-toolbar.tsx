@@ -16,11 +16,12 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
 // import { priorities, statuses } from "../data/data"
+import type { DataTableFeatures } from "./features";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
 
 interface DataTableToolbarProps<TData> {
-	table: Table<TData>;
+	table: Table<DataTableFeatures, TData>;
 }
 
 export const statuses = [
@@ -72,7 +73,7 @@ export const priorities = [
 export function DataTableToolbar<TData>({
 	table,
 }: DataTableToolbarProps<TData>) {
-	const isFiltered = table.getState().columnFilters.length > 0;
+	const isFiltered = table.state.columnFilters.length > 0;
 
 	return (
 		<div className="flex items-center justify-between">

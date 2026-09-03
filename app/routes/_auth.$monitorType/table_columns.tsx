@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "~/components/table/features";
 import { Activity, AlertTriangle, ToggleLeft, ToggleRight } from "lucide-react";
 import { monitorTypes } from "~/models/monitor";
 import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
@@ -15,7 +16,7 @@ import {
 import { useFetcher } from "@remix-run/react";
 import { useEffect } from "react";
 
-export const columnsSsh: ColumnDef<any>[] = [
+export const columnsSsh: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "title",
 		header: ({ column }) => (
@@ -38,7 +39,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 		},
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "enabled",
@@ -78,7 +79,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Host" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("host")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "caption",
@@ -86,7 +87,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Caption" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("caption")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "model",
@@ -94,7 +95,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Model" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("model")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "name",
@@ -102,7 +103,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Name" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "dnsHostName",
@@ -110,7 +111,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="DNS Hostname" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("dnsHostName")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "domain",
@@ -118,7 +119,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Domain" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("domain")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "manufacturer",
@@ -126,7 +127,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Manufacturer" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("manufacturer")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "os",
@@ -134,7 +135,7 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Operating System" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("os")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "osVersion",
@@ -142,11 +143,11 @@ export const columnsSsh: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="OS Version" />
 		),
 		cell: ({ row }) => <div className="">{row.getValue("osVersion")}</div>,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 ];
 
-export const columnsPing: ColumnDef<any>[] = [
+export const columnsPing: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "title",
 		header: ({ column }) => (
@@ -169,7 +170,7 @@ export const columnsPing: ColumnDef<any>[] = [
 		},
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "enabled",

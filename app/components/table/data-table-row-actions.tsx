@@ -16,12 +16,13 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import type { DataTableFeatures } from "./features";
 
 // import { labels } from "../data/data"
 // import { taskSchema } from "../data/schema"
 
 interface DataTableRowActionsProps<TData> {
-	row: Row<TData>;
+	row: Row<DataTableFeatures, TData>;
 }
 
 export const labels = [

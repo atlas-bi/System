@@ -12,9 +12,10 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import { Button } from "../ui/button";
+import type { DataTableFeatures } from "./features";
 
 interface DataTableViewOptionsProps<TData> {
-	table: Table<TData>;
+	table: Table<DataTableFeatures, TData>;
 }
 
 export function DataTableViewOptions<TData>({

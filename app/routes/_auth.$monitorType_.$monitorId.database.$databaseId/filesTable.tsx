@@ -1,19 +1,15 @@
 import { useNavigate } from "@remix-run/react";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
-	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
 	VisibilityState,
 	flexRender,
-	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
-	getFilteredRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	useReactTable,
+	useTable,
 } from "@tanstack/react-table";
 import React from "react";
+import type { DataTableFeatures } from "~/components/table/features";
+import { dataTableFeatures } from "~/components/table/features";
 import { DataTablePagination } from "~/components/table/data-table-pagination";
 import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 import {
@@ -34,7 +30,7 @@ export const FilesTable = ({
 }: {
 	database: any;
 	files: DatabaseFile[];
-	columns: ColumnDef<any>[];
+	columns: ColumnDef<DataTableFeatures, any>[];
 }) => {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] =
@@ -51,27 +47,25 @@ export const FilesTable = ({
 		{ id: "fileName", desc: false },
 	]);
 
-	const table = useReactTable({
-		data: files,
-		columns,
-		state: {
-			sorting,
-			columnVisibility,
-			rowSelection,
-			columnFilters,
+	const table = useTable(
+		{
+			features: dataTableFeatures,
+			data: files,
+			columns,
+			state: {
+				sorting,
+				columnVisibility,
+				rowSelection,
+				columnFilters,
+			},
+			enableRowSelection: true,
+			onRowSelectionChange: setRowSelection,
+			onSortingChange: setSorting,
+			onColumnFiltersChange: setColumnFilters,
+			onColumnVisibilityChange: setColumnVisibility,
 		},
-		enableRowSelection: true,
-		onRowSelectionChange: setRowSelection,
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
-		onColumnVisibilityChange: setColumnVisibility,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFacetedRowModel: getFacetedRowModel(),
-		getFacetedUniqueValues: getFacetedUniqueValues(),
-	});
+		(state) => state,
+	);
 	const navigate = useNavigate();
 
 	return (

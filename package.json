@@ -12,12 +12,12 @@
 		"build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
 		"dev": "pnpm run build; pnpm run saml:cert; run-p dev:*  quirrel ",
 		"prod": "pnpm run build; pnpm run saml:cert; run-p dev:ldap dev:saml prod:server",
-		"dev:ldap": "docker run  -p 1389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
+		"dev:ldap": "docker run --rm --name dev-ldap -p 1389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
 		"dev:saml": "node ./test/saml-idp/bin/run.js --acsUrl http://localhost:3000/auth/asc --audience http://localhost:3000/login",
 		"dev:build": "cross-env NODE_ENV=development esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --watch",
 		"dev:remix": "cross-env NODE_ENV=development remix watch",
 		"asdfdev:remix:browser": "open-cli http://localhost:3000 --background",
-		"dev:smtp": "docker run -p 3080:80 -p 3025:25 -p 3143:143 rnwood/smtp4dev",
+		"dev:smtp": "docker run --rm -p 3080:80 -p 3025:25 -p 3143:143 rnwood/smtp4dev",
 		"dev:search": "pnpm exec dotenv meilisearch",
 		"dev:server": "cross-env NODE_ENV=development node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
 		"prod:server": "cross-env NODE_ENV=production node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
@@ -89,7 +89,7 @@
 		"@remix-run/node": "^2.17.4",
 		"@remix-run/react": "^2.17.4",
 		"@tailwindcss/postcss": "^4.3.0",
-		"@tanstack/react-table": "^8.9.3",
+		"@tanstack/react-table": "^9.0.0",
 		"@tediousjs/connection-string": "^1.0.0",
 		"asynckit": "^0.5.0",
 		"axios": "^1.5.0",
@@ -202,5 +202,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.76"
+	"version": "2.0.77"
 }
