@@ -1,3 +1,20 @@
+## [1.45.5](https://github.com/atlas-bi/System/compare/v1.45.4...v1.45.5) (2026-08-28)
+
+
+### Bug Fixes
+
+* **cert:** fixed cert check notification disabler ([7ab587a](https://github.com/atlas-bi/System/commit/7ab587aeaf02bcd1a43979362ad7699b1622ef00))
+
+## [1.45.4](https://github.com/atlas-bi/System/compare/v1.45.3...v1.45.4) (2026-08-28)
+
+
+### Bug Fixes
+
+* allow HTTP monitor deletion ([b585b4a](https://github.com/atlas-bi/System/commit/b585b4a5851e238a3951ecd1d99a8a8eb2167359))
+* enable HTTP status code selection ([f78cc73](https://github.com/atlas-bi/System/commit/f78cc73c619b04dd673d8c308ef53c8fded4f723))
+* include days in certificate errors ([342a408](https://github.com/atlas-bi/System/commit/342a4087931e7dd35ffb2bd61b652dc944104bff))
+* prevent duplicate notification submissions ([ee532f1](https://github.com/atlas-bi/System/commit/ee532f12b372e28fc031cadd4a62c5e247a6296d))
+
 ## [1.45.3](https://github.com/atlas-bi/System/compare/v1.45.2...v1.45.3) (2026-07-29)
 
 
