@@ -95,4 +95,40 @@ describe("monitor queue", () => {
 		expect(sqlServerMonitorMock).not.toHaveBeenCalled();
 		expect(tcpMonitorMock).not.toHaveBeenCalled();
 	});
+
+	it("dispatches windows and ubuntu monitors to their runners", async () => {
+		getMonitorMock.mockResolvedValueOnce({ id: "3", type: "windows" });
+		const queueHandler = (await import("./monitor.server")).default;
+		await queueHandler("3");
+		expect(windowsMonitorMock).toHaveBeenCalledWith({
+			monitor: { id: "3", type: "windows" },
+		});
+
+		getMonitorMock.mockResolvedValueOnce({ id: "4", type: "ubuntu" });
+		await queueHandler("4");
+		expect(ubuntuMonitorMock).toHaveBeenCalledWith({
+			monitor: { id: "4", type: "ubuntu" },
+		});
+	});
+
+	it("dispatches tcp monitors to the TCP runner", async () => {
+		getMonitorMock.mockResolvedValue({ id: "5", type: "tcp" });
+		const queueHandler = (await import("./monitor.server")).default;
+
+		await queueHandler("5");
+
+		expect(tcpMonitorMock).toHaveBeenCalledWith({
+			monitor: { id: "5", type: "tcp" },
+		});
+	});
+
+	it("returns without dispatch for unknown monitor types", async () => {
+		getMonitorMock.mockResolvedValue({ id: "6", type: "unknown" });
+		const queueHandler = (await import("./monitor.server")).default;
+
+		await expect(queueHandler("6")).resolves.toBeUndefined();
+
+		expect(httpMonitorMock).not.toHaveBeenCalled();
+		expect(tcpMonitorMock).not.toHaveBeenCalled();
+	});
 });

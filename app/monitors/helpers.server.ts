@@ -52,6 +52,7 @@ const parseCertificateInfo = function (info: any) {
 
 		// Should be no use, but just in case.
 		if (i > 500) {
+			/* v8 ignore next -- defensive guard for malformed certificate chains */
 			throw new Error("Dead loop occurred in parseCertificateInfo");
 		}
 		i++;

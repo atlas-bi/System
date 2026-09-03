@@ -14,10 +14,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import type { DataTableFeatures } from "./features";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
-	column: Column<TData, TValue>;
+	column: Column<DataTableFeatures, TData, TValue>;
 	title: string;
 }
 

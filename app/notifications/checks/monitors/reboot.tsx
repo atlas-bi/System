@@ -22,6 +22,10 @@ export default async function rebootNotifier({
 		new Date(oldMonitor.lastBootTime).getTime();
 
 	if (bootTimeChanged) {
+		const oldBoot = new Date(oldMonitor.lastBootTime);
+		const newBoot = new Date(monitor.lastBootTime);
+		const oldBootMs = oldBoot.getTime();
+		const newBootMs = newBoot.getTime();
 		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
 		const message = [
 			`[${monitor.host}] Reboot time changed.`,

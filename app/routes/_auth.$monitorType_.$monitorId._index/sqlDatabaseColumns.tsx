@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "~/components/table/features";
 import {
 	Activity,
 	AlertTriangle,
@@ -21,7 +22,7 @@ import {
 import { DatabaseUsage } from "@prisma/client";
 import { PingStat } from "./responseTime";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "name",
 		header: ({ column }) => (
@@ -34,7 +35,7 @@ export const columns: ColumnDef<any>[] = [
 		),
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 
 	{
@@ -75,7 +76,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Title" />
 		),
 		cell: ({ row }) => row.getValue("title"),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "state",
@@ -91,7 +92,7 @@ export const columns: ColumnDef<any>[] = [
 				{row.getValue("state")}
 			</div>
 		),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "recoveryModel",
@@ -99,7 +100,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Recovery Model" />
 		),
 		cell: ({ row }) => row.getValue("recoveryModel"),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "compatLevel",
@@ -107,7 +108,7 @@ export const columns: ColumnDef<any>[] = [
 			<DataTableColumnHeader column={column} title="Compatibility" />
 		),
 		cell: ({ row }) => row.getValue("compatLevel"),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "backupDataDate",
@@ -138,7 +139,7 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "backupLogDate",
@@ -166,7 +167,7 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "feeds",
