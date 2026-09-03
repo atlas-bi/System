@@ -1,4 +1,17 @@
-import { Button, Html, Head, Preview, Link, Tailwind, Text, Body, Container, Section, Heading, Hr } from "react-email";
+import {
+	Button,
+	Html,
+	Head,
+	Preview,
+	Link,
+	Tailwind,
+	Text,
+	Body,
+	Container,
+	Section,
+	Heading,
+	Hr,
+} from "react-email";
 import type { MonitorWithRelations } from "~/models/monitor.server";
 import { Header } from "../helpers";
 
