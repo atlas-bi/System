@@ -1,11 +1,12 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "~/components/table/features";
 import { Activity, AlertCircle, AlertTriangle } from "lucide-react";
 import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
 import { format } from "date-fns";
 import { Link } from "@remix-run/react";
 import { jsonParser } from "@/lib/utils";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "type",
 		header: () => <></>,
