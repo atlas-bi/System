@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@11.22.0",
+	"packageManager": "pnpm@11.24.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -12,12 +12,12 @@
 		"build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle",
 		"dev": "pnpm run build; pnpm run saml:cert; run-p dev:*  quirrel ",
 		"prod": "pnpm run build; pnpm run saml:cert; run-p dev:ldap dev:saml prod:server",
-		"dev:ldap": "docker run  -p 1389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
+		"dev:ldap": "docker run --rm --name dev-ldap -p 1389:1389 -v \"$(pwd)/test/ldap/config\":/ldifs bitnamilegacy/openldap:2.6.10-debian-12-r4",
 		"dev:saml": "node ./test/saml-idp/bin/run.js --acsUrl http://localhost:3000/auth/asc --audience http://localhost:3000/login",
 		"dev:build": "cross-env NODE_ENV=development esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --watch",
 		"dev:remix": "cross-env NODE_ENV=development remix watch",
 		"asdfdev:remix:browser": "open-cli http://localhost:3000 --background",
-		"dev:smtp": "docker run -p 3080:80 -p 3025:25 -p 3143:143 rnwood/smtp4dev",
+		"dev:smtp": "docker run --rm -p 3080:80 -p 3025:25 -p 3143:143 rnwood/smtp4dev",
 		"dev:search": "pnpm exec dotenv meilisearch",
 		"dev:server": "cross-env NODE_ENV=development node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
 		"prod:server": "cross-env NODE_ENV=production node --inspect --require ./node_modules/dotenv/config --require ./mocks ./build/server.js",
@@ -89,7 +89,7 @@
 		"@remix-run/node": "^2.17.4",
 		"@remix-run/react": "^2.17.4",
 		"@tailwindcss/postcss": "^4.3.0",
-		"@tanstack/react-table": "^8.9.3",
+		"@tanstack/react-table": "^9.0.0",
 		"@tediousjs/connection-string": "^1.0.0",
 		"asynckit": "^0.5.0",
 		"axios": "^1.5.0",
@@ -119,7 +119,7 @@
 		"https-proxy-agent": "^9.0.0",
 		"isbot": "^5.0.0",
 		"ldap-authentication": "^4.0.0",
-		"lucide-react": "^0.577.0",
+		"lucide-react": "^1.0.0",
 		"meilisearch": "^0.60.0",
 		"mime-types": "^3.0.0",
 		"morgan": "^1.10.0",
@@ -134,6 +134,7 @@
 		"react": "^19.0.0",
 		"react-chartjs-2": "^5.2.0",
 		"react-dom": "^19.0.0",
+		"react-email": "^6.6.4",
 		"react-hook-form": "^7.45.4",
 		"remix-auth": "4.2.0",
 		"remix-auth-form": "3.0.0",
@@ -150,7 +151,7 @@
 		"zod": "^4.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.9",
+		"@biomejs/biome": "2.5.11",
 		"@faker-js/faker": "^10.0.0",
 		"@semantic-release/changelog": "7.0.0",
 		"@semantic-release/commit-analyzer": "^13.0.0",
@@ -181,7 +182,7 @@
 		"msw": "^2.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.9.2",
+		"react-email": "6.9.3",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -202,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.74"
+	"version": "2.0.77"
 }

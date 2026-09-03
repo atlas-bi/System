@@ -71,7 +71,7 @@ jobs:
         run: corepack enable
 
       - name: 📥 Download deps
-        run: pnpm install --prod
+        run: pnpm install
 
       - name: 🔬 Build
         run: |
@@ -161,7 +161,7 @@ jobs:
           path: coverage
 
       - name: 📈 Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/lcov.info

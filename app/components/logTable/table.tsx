@@ -2,18 +2,12 @@
 
 import * as React from "react";
 import {
-	ColumnDef,
 	ColumnFiltersState,
 	PaginationState,
 	SortingState,
 	VisibilityState,
 	flexRender,
-	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
-	getFilteredRowModel,
-	getSortedRowModel,
-	useReactTable,
+	useTable,
 } from "@tanstack/react-table";
 
 import {
@@ -30,6 +24,7 @@ import { H3 } from "../ui/typography";
 import { LogTablePagination } from "./pagination";
 import { useEffect } from "react";
 import { useFetcher } from "@remix-run/react";
+import { dataTableFeatures } from "~/components/table/features";
 
 export function LogTable({ url }: { url: string }) {
 	type LogsFetcherData = {
@@ -93,31 +88,29 @@ export function LogTable({ url }: { url: string }) {
 	);
 	const defaultData = React.useMemo(() => [], []);
 
-	const table = useReactTable({
-		data: data ?? defaultData,
-		pageCount: pages ?? -1,
-		columns,
-		state: {
-			sorting,
-			columnVisibility,
-			rowSelection,
-			columnFilters,
-			pagination,
+	const table = useTable(
+		{
+			features: dataTableFeatures,
+			data: data ?? defaultData,
+			pageCount: pages ?? -1,
+			columns,
+			state: {
+				sorting,
+				columnVisibility,
+				rowSelection,
+				columnFilters,
+				pagination,
+			},
+			enableRowSelection: true,
+			manualPagination: true,
+			onPaginationChange: setPagination,
+			onRowSelectionChange: setRowSelection,
+			onSortingChange: setSorting,
+			onColumnFiltersChange: setColumnFilters,
+			onColumnVisibilityChange: setColumnVisibility,
 		},
-		enableRowSelection: true,
-		manualPagination: true,
-		onPaginationChange: setPagination,
-		onRowSelectionChange: setRowSelection,
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
-		onColumnVisibilityChange: setColumnVisibility,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		// getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFacetedRowModel: getFacetedRowModel(),
-		getFacetedUniqueValues: getFacetedUniqueValues(),
-	});
+		(state) => state,
+	);
 
 	return (
 		<div className="space-y-4">

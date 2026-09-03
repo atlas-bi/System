@@ -2,22 +2,13 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import type {
-	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
 	VisibilityState,
 } from "@tanstack/react-table";
-import {
-	flexRender,
-	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
-	getFilteredRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
+import { flexRender, useTable } from "@tanstack/react-table";
 import React from "react";
+import { dataTableFeatures } from "~/components/table/features";
 import { DataTablePagination } from "~/components/table/data-table-pagination";
 import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 
@@ -66,32 +57,30 @@ export default function Index() {
 		{ id: "title", desc: false },
 	]);
 
-	const table = useReactTable({
-		data: monitors,
-		columns: type == "windows" || type == "ubuntu" ? columnsSsh : columnsPing,
-		state: {
-			sorting,
-			columnVisibility,
-			rowSelection,
-			columnFilters,
-		},
-		enableRowSelection: true,
-		onRowSelectionChange: setRowSelection,
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
-		onColumnVisibilityChange: setColumnVisibility,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFacetedRowModel: getFacetedRowModel(),
-		getFacetedUniqueValues: getFacetedUniqueValues(),
-		initialState: {
-			pagination: {
-				pageSize: 25,
+	const table = useTable(
+		{
+			features: dataTableFeatures,
+			data: monitors,
+			columns: type == "windows" || type == "ubuntu" ? columnsSsh : columnsPing,
+			state: {
+				sorting,
+				columnVisibility,
+				rowSelection,
+				columnFilters,
+			},
+			enableRowSelection: true,
+			onRowSelectionChange: setRowSelection,
+			onSortingChange: setSorting,
+			onColumnFiltersChange: setColumnFilters,
+			onColumnVisibilityChange: setColumnVisibility,
+			initialState: {
+				pagination: {
+					pageSize: 25,
+				},
 			},
 		},
-	});
+		(state) => state,
+	);
 
 	const navigate = useNavigate();
 	return (

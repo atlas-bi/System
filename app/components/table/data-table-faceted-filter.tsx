@@ -19,9 +19,10 @@ import {
 	PopoverTrigger,
 } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
+import type { DataTableFeatures } from "./features";
 
 interface DataTableFacetedFilter<TData, TValue> {
-	column?: Column<TData, TValue>;
+	column?: Column<DataTableFeatures, TData, TValue>;
 	title?: string;
 	options: {
 		label: string;

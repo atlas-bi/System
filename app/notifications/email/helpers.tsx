@@ -1,6 +1,4 @@
-import { Section } from "@react-email/section";
-import { Link } from "@react-email/link";
-import { Img } from "@react-email/img";
+import { Section, Link, Img } from "react-email";
 
 export const Header = ({ hostname }: { hostname?: string }) => (
 	<Section className="mt-[32px]">

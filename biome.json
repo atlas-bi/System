@@ -1,12 +1,16 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.11/schema.json",
 	"files": {
 		"includes": [
 			"**",
 			"!!**/node_modules",
 			"!!**/build",
 			"!!**/public/build",
+			"!!**/coverage",
+			"!!**/.pnpm-store",
+			"!!**/.cache",
 			"!!**/test/saml-idp",
+			"!!**/coverage",
 			"!!**/data.ms",
 			"!!**/postgres-data"
 		]
