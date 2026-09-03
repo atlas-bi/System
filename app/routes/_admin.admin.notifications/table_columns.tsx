@@ -1,8 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "~/components/table/features";
 import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
 import { notificationTypes } from "~/models/notification";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "type",
 		header: ({ column }) => (

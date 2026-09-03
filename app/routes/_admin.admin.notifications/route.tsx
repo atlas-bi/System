@@ -6,16 +6,11 @@ import {
 	SortingState,
 	VisibilityState,
 	flexRender,
-	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
-	getFilteredRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	useReactTable,
+	useTable,
 } from "@tanstack/react-table";
 import Notification from "~/components/notificationForms/base";
 import React from "react";
+import { dataTableFeatures } from "~/components/table/features";
 import { DataTableToolbar } from "~/components/table/data-table-toolbar";
 import { getNotificationsDetail } from "~/models/notification.server";
 import { authenticate } from "~/services/auth.server";
@@ -63,27 +58,25 @@ export default function Index() {
 		{ id: "title", desc: false },
 	]);
 
-	const table = useReactTable({
-		data: notifications,
-		columns,
-		state: {
-			sorting,
-			columnVisibility,
-			rowSelection,
-			columnFilters,
+	const table = useTable(
+		{
+			features: dataTableFeatures,
+			data: notifications,
+			columns,
+			state: {
+				sorting,
+				columnVisibility,
+				rowSelection,
+				columnFilters,
+			},
+			enableRowSelection: true,
+			onRowSelectionChange: setRowSelection,
+			onSortingChange: setSorting,
+			onColumnFiltersChange: setColumnFilters,
+			onColumnVisibilityChange: setColumnVisibility,
 		},
-		enableRowSelection: true,
-		onRowSelectionChange: setRowSelection,
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
-		onColumnVisibilityChange: setColumnVisibility,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFacetedRowModel: getFacetedRowModel(),
-		getFacetedUniqueValues: getFacetedUniqueValues(),
-	});
+		(state) => state,
+	);
 	return (
 		<>
 			<div className="space-y-4">

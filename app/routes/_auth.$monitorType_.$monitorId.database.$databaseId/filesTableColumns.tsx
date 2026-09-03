@@ -3,11 +3,12 @@ import type { ColumnDef } from "@tanstack/react-table";
 import bytes from "bytes";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { useEffect } from "react";
+import type { DataTableFeatures } from "~/components/table/features";
 
 import { DataTableColumnHeader } from "~/components/table/data-table-column-header";
 import { Skeleton } from "~/components/ui/skeleton";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<DataTableFeatures, any>[] = [
 	{
 		accessorKey: "fileName",
 		header: ({ column }) => (
@@ -20,7 +21,7 @@ export const columns: ColumnDef<any>[] = [
 		),
 		enableSorting: true,
 		enableHiding: false,
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 
 	{
@@ -37,7 +38,7 @@ export const columns: ColumnDef<any>[] = [
 				)}
 			</div>
 		),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "filePath",
@@ -60,7 +61,7 @@ export const columns: ColumnDef<any>[] = [
 				{row.getValue("state")}
 			</div>
 		),
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 	{
 		accessorKey: "currentSize",
@@ -93,6 +94,6 @@ export const columns: ColumnDef<any>[] = [
 				</div>
 			);
 		},
-		sortingFn: "alphanumeric",
+		sortFn: "alphanumeric",
 	},
 ];
