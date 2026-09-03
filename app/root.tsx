@@ -1,4 +1,3 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
 import stylesheet from "@/styles/globals.css";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
@@ -12,13 +11,11 @@ import {
 	useRouteError,
 } from "@remix-run/react";
 
-// import remixImageStyles from 'remix-image/remix-image.css';
 import { H1 } from "./components/ui/typography";
 import { MoveLeft } from "lucide-react";
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: stylesheet },
-	...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
 export const meta: MetaFunction = () => [{ title: "Atlas System" }];
