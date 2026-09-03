@@ -84,6 +84,16 @@ export function UserNav() {
 									<span>Notification Methods</span>
 								</Link>
 							</DropdownMenuItem>
+							<DropdownMenuItem asChild>
+								<Link
+									to="/admin/settings"
+									prefetch="intent"
+									className="flex grow"
+								>
+									<Settings className="mr-2 h-4 w-4" />
+									<span>Data Retention</span>
+								</Link>
+							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>

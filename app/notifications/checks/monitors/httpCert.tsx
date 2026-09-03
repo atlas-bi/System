@@ -15,8 +15,11 @@ export default async function httpCertNotifier({
 }: {
 	monitor: MonitorWithRelations;
 }) {
-	// don't notify if disabled.
+	// don't notify if disabled. httpCheckCert is the monitor-level switch;
+	// the notifications UI is hidden when it is off, but httpCertNotify can
+	// remain true in the database from a previous configuration.
 	if (
+		!monitor.httpCheckCert ||
 		!monitor.httpCertNotify ||
 		monitor.type !== "http" ||
 		!monitor.httpUrl ||
@@ -41,7 +44,7 @@ export default async function httpCertNotifier({
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] ${snippet}.`;
-		html = render(
+		html = await render(
 			<InvalidEmail
 				hostname={process.env.HOSTNAME}
 				monitor={monitor}
@@ -55,14 +58,14 @@ export default async function httpCertNotifier({
 	} else if (Number(monitor.certDays) <= 21) {
 		subject = `🔓 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
-		})] Certificate expires in ${monitor.certDays}.`;
-		html = render(
+		})] Certificate expires in ${monitor.certDays} days.`;
+		html = await render(
 			<ErrorEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
 			{
 				pretty: false,
 			},
 		);
-		message = `Certificate expires in ${monitor.certDays}.`;
+		message = `Certificate expires in ${monitor.certDays} days.`;
 	}
 
 	if ((!subject || !html || !message) && monitor.httpCertNotifySentAt) {
@@ -70,7 +73,7 @@ export default async function httpCertNotifier({
 		subject = `🔒 [${monitor.name || monitor.title} (${
 			monitor.httpUrl
 		})] Certificate is valid.`;
-		html = render(
+		html = await render(
 			<SuccessEmail
 				subject={subject}
 				hostname={process.env.HOSTNAME}
@@ -84,7 +87,10 @@ export default async function httpCertNotifier({
 
 		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
 			try {
-				if (!subject || !html) return;
+				if (!subject || !html) {
+					/* v8 ignore next -- defensive guard; subject/html are set above */
+					return;
+				}
 				return await sendNotification({
 					notification,
 					subject,

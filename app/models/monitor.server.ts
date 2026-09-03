@@ -78,6 +78,15 @@ export async function deleteMonitor({ id }: Pick<Monitor, "id">) {
 	await prisma.drive.deleteMany({
 		where: { monitorId: id },
 	});
+	// delete CPU usage and CPUs
+	await prisma.cpuUsage.deleteMany({
+		where: {
+			cpu: { monitorId: id },
+		},
+	});
+	await prisma.cpu.deleteMany({
+		where: { monitorId: id },
+	});
 	// delete logs
 	await prisma.monitorLogs.deleteMany({
 		where: { monitorId: id },
@@ -85,6 +94,16 @@ export async function deleteMonitor({ id }: Pick<Monitor, "id">) {
 	// delete feeds
 	await prisma.monitorFeeds.deleteMany({
 		where: { monitorId: id },
+	});
+	// disconnect notification relations before deleting the monitor
+	await prisma.monitor.update({
+		where: { id },
+		data: {
+			connectionNotifyTypes: { set: [] },
+			rebootNotifyTypes: { set: [] },
+			httpCertNotifyTypes: { set: [] },
+			sqlFileSizePercentFreeNotifyTypes: { set: [] },
+		},
 	});
 
 	await prisma.monitor.deleteMany({
@@ -1351,8 +1370,8 @@ export function updateMonitor({
 		cpuProcessors?: string;
 		lastBootTime?: string | null | Date;
 		cpuMaxSpeed?: string | null;
-		certDays?: string;
-		certValid?: boolean;
+		certDays?: string | null;
+		certValid?: boolean | null;
 	};
 	feed?: {
 		memoryFree?: string;

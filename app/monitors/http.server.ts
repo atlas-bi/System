@@ -98,9 +98,12 @@ export async function HttpCheck({
 		};
 	}
 
+	// Explicitly disabling cert checks means we should not fail the request on
+	// invalid TLS either. Leave verification on when the flag is unset so
+	// existing monitors keep their previous behaviour.
 	const httpsAgentOptions = {
 		maxCachedSessions: 0, // Use Custom agent to disable session reuse (https://github.com/nodejs/node/issues/3940)
-		rejectUnauthorized: !httpIgnoreSsl,
+		rejectUnauthorized: httpCheckCert === false ? false : !httpIgnoreSsl,
 	};
 
 	let contentType = null;
@@ -181,7 +184,24 @@ export async function HttpCheck({
 		// return res;
 	} catch (e) {
 		console.log(e);
-		throw Error(e.code || e.message);
+		const err = e as any;
+		const code = String(err.code || err.cause?.code || "");
+		const message = String(err.message || err.cause?.message || "");
+		const certError =
+			/CERT|TLS|SSL|UNABLE_TO_VERIFY|UNABLE_TO_GET_ISSUER/i.test(
+				`${code} ${message}`,
+			);
+
+		// Certificate problems are handled by the cert notifier. Don't mark the
+		// HTTP check itself as failed — especially when cert checking is off.
+		if (certError) {
+			if (httpCheckCert) {
+				return { res, certValid: false, certDays };
+			}
+			return { res, certValid, certDays };
+		}
+
+		throw Error(err.message || err.code);
 		// Fix #2253
 		// Read more: https://stackoverflow.com/questions/1759956/curl-error-18-transfer-closed-with-outstanding-read-data-remaining
 		// if (!finalCall && typeof e.message === "string" && e.message.includes("maxContentLength size of -1 exceeded")) {
@@ -249,10 +269,15 @@ export default async function HttpMonitor({ monitor }: { monitor: Monitor }) {
 
 		const data = await updateMonitor({
 			id: monitor.id,
-			data: {
-				certValid,
-				certDays: certDays?.toString(),
-			},
+			data: httpCheckCert
+				? {
+						certValid,
+						certDays: certDays?.toString(),
+					}
+				: {
+						certValid: null,
+						certDays: null,
+					},
 			feed: {
 				ping: ping.toString(),
 			},

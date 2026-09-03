@@ -12,6 +12,46 @@ permissions:
   contents: read
 
 jobs:
+  database:
+    name: 🗄️ Database migrations
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: atlas
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/atlas
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: atlas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d atlas"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v7
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: ⎔ Setup pnpm
+        run: corepack enable
+
+      - name: 📥 Download deps
+        run: pnpm install
+
+      - name: 🗄️ Apply migrations
+        run: pnpm exec prisma migrate deploy
+
   build:
     name: 🧪 Build
     runs-on: ubuntu-latest
@@ -23,7 +63,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -49,7 +89,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -97,7 +137,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -119,6 +159,13 @@ jobs:
         with:
           name: vitest-coverage
           path: coverage
+
+      - name: 📈 Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          fail_ci_if_error: false
 
   # cypress:
   #   name: ⚫️ Cypress

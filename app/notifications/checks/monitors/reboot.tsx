@@ -17,10 +17,22 @@ export default async function rebootNotifier({
 	if (!monitor.rebootNotify) return;
 
 	// send notification if it has changed
-	if (monitor.lastBootTime != oldMonitor.lastBootTime) {
+	const bootTimeChanged =
+		new Date(monitor.lastBootTime).getTime() !==
+		new Date(oldMonitor.lastBootTime).getTime();
+
+	if (bootTimeChanged) {
+		const oldBoot = new Date(oldMonitor.lastBootTime);
+		const newBoot = new Date(monitor.lastBootTime);
+		const oldBootMs = oldBoot.getTime();
+		const newBootMs = newBoot.getTime();
 		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
-		const message = `[${monitor.host}] Reboot time changed.`;
-		const html = render(
+		const message = [
+			`[${monitor.host}] Reboot time changed.`,
+			`Old: ${oldBoot.toISOString()} (${oldBootMs})`,
+			`New: ${newBoot.toISOString()} (${newBootMs})`,
+		].join("\n");
+		const html = await render(
 			<SuccessEmail hostname={process.env.HOSTNAME} monitor={monitor} />,
 			{
 				pretty: false,
