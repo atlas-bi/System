@@ -1,3 +1,10 @@
+## [1.45.6](https://github.com/atlas-bi/System/compare/v1.45.5...v1.45.6) (2026-09-03)
+
+
+### Bug Fixes
+
+* fixed tables, fixed build errors ([2ec3fd9](https://github.com/atlas-bi/System/commit/2ec3fd9b4196e9b2c7b3bb402a5f282cd8df7ad3))
+
 ## [1.45.5](https://github.com/atlas-bi/System/compare/v1.45.4...v1.45.5) (2026-08-28)
 
 
