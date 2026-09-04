@@ -1,3 +1,10 @@
+## [1.45.7](https://github.com/atlas-bi/System/compare/v1.45.6...v1.45.7) (2026-09-04)
+
+
+### Bug Fixes
+
+* missing icon ([e2e0ea0](https://github.com/atlas-bi/System/commit/e2e0ea0244161ba59639cbb36e94d327689efcc4))
+
 ## [1.45.6](https://github.com/atlas-bi/System/compare/v1.45.5...v1.45.6) (2026-09-03)
 
 
