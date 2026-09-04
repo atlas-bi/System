@@ -2,7 +2,7 @@ import type { UserSerialized } from "~/models/user.server";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { BellRing, LogOut } from "lucide-react";
+import { BellRing, LogOut, Settings } from "lucide-react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
