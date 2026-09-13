@@ -151,7 +151,7 @@
 		"zod": "^4.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.12",
+		"@biomejs/biome": "2.5.13",
 		"@faker-js/faker": "^10.0.0",
 		"@semantic-release/changelog": "7.0.0",
 		"@semantic-release/commit-analyzer": "^13.0.0",
@@ -203,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.82"
+	"version": "2.0.83"
 }
