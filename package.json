@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@12.3.4",
+	"packageManager": "pnpm@12.4.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -120,7 +120,7 @@
 		"isbot": "^5.0.0",
 		"ldap-authentication": "^4.0.0",
 		"lucide-react": "^1.0.0",
-		"meilisearch": "^0.60.0",
+		"meilisearch": "^0.62.0",
 		"mime-types": "^3.0.0",
 		"morgan": "^1.10.0",
 		"mssql": "^12.0.0",
@@ -182,7 +182,7 @@
 		"msw": "^2.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.9.3",
+		"react-email": "6.9.5",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -203,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.81"
+	"version": "2.0.82"
 }
