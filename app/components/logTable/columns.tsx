@@ -40,6 +40,18 @@ export const columns: ColumnDef<DataTableFeatures, any>[] = [
 		),
 		cell: ({ row }) => {
 			const message = jsonParser(row.getValue("message"));
+			const renderedMessage =
+				message?.errno != null ? (
+					<>
+						{message.errno} {message.code}
+					</>
+				) : message?.stderr != null ? (
+					<>{message.stderr}</>
+				) : typeof message === "string" ? (
+					message
+				) : (
+					JSON.stringify(message)
+				);
 
 			return (
 				<div className="space-x-2">
@@ -55,17 +67,7 @@ export const columns: ColumnDef<DataTableFeatures, any>[] = [
 							</Link>
 						</>
 					)}
-					<span>
-						{message?.errno ? (
-							<>
-								{message?.errno} {message?.code}
-							</>
-						) : message?.stderr ? (
-							<>{message.stderr}</>
-						) : (
-							JSON.stringify(message)
-						)}
-					</span>
+					<span className="whitespace-pre-wrap">{renderedMessage}</span>
 				</div>
 			);
 		},
