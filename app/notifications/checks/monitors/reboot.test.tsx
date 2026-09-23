@@ -57,6 +57,23 @@ describe("rebootNotifier", () => {
 		expect(setMonitorRebootSentAt).not.toHaveBeenCalled();
 	});
 
+	it("ignores second-level boot time jitter", async () => {
+		await rebootNotifier({
+			monitor: {
+				...baseMonitor,
+				lastBootTime: new Date("2026-07-02T17:43:28.000Z"),
+			},
+			oldMonitor: {
+				...baseMonitor,
+				lastBootTime: new Date("2026-07-02T17:43:11.000Z"),
+			},
+		});
+
+		expect(logger).not.toHaveBeenCalled();
+		expect(sendNotification).not.toHaveBeenCalled();
+		expect(setMonitorRebootSentAt).not.toHaveBeenCalled();
+	});
+
 	it("notifies when boot time changes", async () => {
 		const oldBootTime = new Date("2026-08-27T10:00:00.000Z");
 		const newBootTime = new Date("2026-08-28T10:00:00.000Z");
