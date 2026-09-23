@@ -1,3 +1,10 @@
+## [1.45.8](https://github.com/atlas-bi/System/compare/v1.45.7...v1.45.8) (2026-09-23)
+
+
+### Bug Fixes
+
+* **reboot:** compare boot times at minute precision ([f37ea0f](https://github.com/atlas-bi/System/commit/f37ea0fd7efb72c881987aeeed922308fe1c6440))
+
 ## [1.45.7](https://github.com/atlas-bi/System/compare/v1.45.6...v1.45.7) (2026-09-04)
 
 
