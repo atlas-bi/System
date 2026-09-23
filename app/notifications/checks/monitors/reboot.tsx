@@ -16,10 +16,15 @@ export default async function rebootNotifier({
 	// don't notify if disabled.
 	if (!monitor.rebootNotify) return;
 
-	// send notification if it has changed
+	const toMinute = (value: Date | string | null | undefined) => {
+		const time = new Date(value ?? "").getTime();
+		if (Number.isNaN(time)) return null;
+		return Math.floor(time / 60_000);
+	};
+
+	// Ignore second-level jitter from host boot-time reporting.
 	const bootTimeChanged =
-		new Date(monitor.lastBootTime).getTime() !==
-		new Date(oldMonitor.lastBootTime).getTime();
+		toMinute(monitor.lastBootTime) !== toMinute(oldMonitor.lastBootTime);
 
 	if (bootTimeChanged) {
 		const oldBoot = new Date(oldMonitor.lastBootTime);
