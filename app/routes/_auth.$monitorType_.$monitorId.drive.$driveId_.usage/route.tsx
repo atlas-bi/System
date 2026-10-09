@@ -47,12 +47,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	});
 
 	const url = new URL(request.url);
+	const range = url.searchParams.get("range") || "last_24_hours";
 	let {
 		startDate,
 		endDate,
-	}: { startDate: Date | undefined; endDate: Date | undefined } = dateRange(
-		url.searchParams.get("range") || "last_24_hours",
-	);
+	}: { startDate: Date | undefined; endDate: Date | undefined } =
+		dateRange(range);
 
 	invariant(params.driveId);
 	const drive = await getDriveUsage({ id: params.driveId, startDate, endDate });
@@ -61,11 +61,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Not Found", { status: 404 });
 	}
 
-	const groupSize = dateOptions.filter(
-		(x) => x.value == url.searchParams.get("range"),
-	)?.[0]?.unit;
+	const groupSize = dateOptions.filter((x) => x.value == range)?.[0]?.unit;
 
-	if (url.searchParams.get("range") === "all_time") {
+	if (range === "all_time") {
 		startDate = undefined;
 		endDate = undefined;
 	}

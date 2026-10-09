@@ -62,6 +62,16 @@ export const MiniDrive = ({
 		drive.id,
 	]);
 
+	const usage = usageFetcher.data?.drive?.usage ?? [];
+	const latest = usage.reduce<(typeof usage)[number] | undefined>(
+		(newest, point) =>
+			!newest ||
+			new Date(point.createdAt).getTime() > new Date(newest.createdAt).getTime()
+				? point
+				: newest,
+		undefined,
+	);
+
 	return (
 		<Link
 			to={`/${monitor.type}/${monitor.id}/drive/${drive.id}`}
@@ -85,32 +95,26 @@ export const MiniDrive = ({
 					<ToggleLeft size={20} className="fill-slate-200 text-slate-400" />
 				)}
 				{usageFetcher.data ? (
-					(() => {
-						const usage = usageFetcher.data?.drive?.usage ?? [];
-						const latest = usage[0];
-						return (
-							<DoughnutChart
-								className="w-36 h-36"
-								data={{
-									labels: [
-										`Used ${bytes(Number(latest?.used))}`,
-										`Free ${bytes(Number(latest?.free))}`,
+					<DoughnutChart
+						className="w-36 h-36"
+						data={{
+							labels: [
+								`Used ${bytes(Number(latest?.used))}`,
+								`Free ${bytes(Number(latest?.free))}`,
+							],
+							datasets: [
+								{
+									label: "Drive Usage",
+									data: [
+										Number(latest?.used),
+										Number(latest?.used) + Number(latest?.free) == 0
+											? 100
+											: Number(latest?.free),
 									],
-									datasets: [
-										{
-											label: "Drive Usage",
-											data: [
-												Number(latest?.used),
-												Number(latest?.used) + Number(latest?.free) == 0
-													? 100
-													: Number(latest?.free),
-											],
-										},
-									],
-								}}
-							/>
-						);
-					})()
+								},
+							],
+						}}
+					/>
 				) : (
 					<Skeleton className="w-36 h-36 rounded-full" />
 				)}
@@ -146,8 +150,7 @@ export const MiniDrive = ({
 							<TableCell className="py-1">Used</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher.data?.drive?.usage?.[0]?.used)) ||
-									"-1"
+									bytes(Number(latest?.used)) || "-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
@@ -157,8 +160,7 @@ export const MiniDrive = ({
 							<TableCell className="py-1 font-medium">Free</TableCell>
 							<TableCell className="py-1 text-slate-800">
 								{usageFetcher.data ? (
-									bytes(Number(usageFetcher.data?.drive?.usage?.[0]?.free)) ||
-									"-1"
+									bytes(Number(latest?.free)) || "-1"
 								) : (
 									<Skeleton className="h-3 w-full max-w-[60px] rounded-sm" />
 								)}
