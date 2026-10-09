@@ -9,6 +9,7 @@ import {
 
 import { setDriveOnline } from "~/models/drive.server";
 import Notifier from "~/notifications/notifier";
+import { resolveBootTime } from "./bootTime";
 import { disposeSsh } from "./helpers.server";
 import { NodeSSH } from "node-ssh";
 import { decrypt } from "@/lib/utils";
@@ -139,7 +140,7 @@ export default async function UbuntuMonitor({ monitor }: { monitor: Monitor }) {
 				model,
 				os,
 				osVersion,
-				lastBootTime,
+				lastBootTime: resolveBootTime(oldMonitor?.lastBootTime, lastBootTime),
 				cpuManufacturer:
 					cpuInfo.filter(
 						(x: { field: string; data: string }) => x.field === "Vendor ID:",

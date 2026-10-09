@@ -11,6 +11,7 @@ import {
 
 import { setDriveOnline } from "~/models/drive.server";
 import Notifier from "~/notifications/notifier";
+import { resolveBootTime } from "./bootTime";
 import { disposeSsh } from "./helpers.server";
 import { differenceInDays } from "date-fns";
 
@@ -228,7 +229,10 @@ export default async function WindowsMonitor({
 				model: cs.Model,
 				os: os.Caption,
 				osVersion: os.Version,
-				lastBootTime: lastBoot.toISOString(),
+				lastBootTime: resolveBootTime(
+					oldMonitor?.lastBootTime,
+					lastBoot.toISOString(),
+				),
 				cpuManufacturer: pc.Manufacturer,
 				cpuModel: pc.Caption,
 				cpuCores: pc.NumberOfCores.toString(),

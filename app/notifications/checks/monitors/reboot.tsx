@@ -1,6 +1,7 @@
 import { setMonitorRebootSentAt } from "~/models/monitor.server";
 import type { MonitorWithRelations } from "~/models/monitor.server";
 import type { NotificationMeta } from "~/models/notification.server";
+import { isReboot } from "~/monitors/bootTime";
 import { Logger } from "~/notifications/logger";
 import { sendNotification } from "~/notifications/notifier";
 import { SuccessEmail } from "~/notifications/email/monitors/reboot";
@@ -16,17 +17,7 @@ export default async function rebootNotifier({
 	// don't notify if disabled.
 	if (!monitor.rebootNotify) return;
 
-	const toMinute = (value: Date | string | null | undefined) => {
-		const time = new Date(value ?? "").getTime();
-		if (Number.isNaN(time)) return null;
-		return Math.floor(time / 60_000);
-	};
-
-	// Ignore second-level jitter from host boot-time reporting.
-	const bootTimeChanged =
-		toMinute(monitor.lastBootTime) !== toMinute(oldMonitor.lastBootTime);
-
-	if (bootTimeChanged) {
+	if (isReboot(oldMonitor.lastBootTime, monitor.lastBootTime)) {
 		const oldBoot = new Date(oldMonitor.lastBootTime);
 		const newBoot = new Date(monitor.lastBootTime);
 		const subject = `⏰ [${monitor.host}] Reboot time changed.`;
