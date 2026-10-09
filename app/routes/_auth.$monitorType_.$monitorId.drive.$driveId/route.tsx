@@ -141,7 +141,20 @@ export default function Index() {
 				<div className="text-muted-foreground">{drive.description}</div>
 				<div className="space-y-2 grow">
 					{(() => {
-						const latest = usageFetcher.data?.drive?.usage?.[0];
+						const usage = usageFetcher.data?.drive?.usage ?? [];
+						const latest = usage.reduce<(typeof usage)[number] | undefined>(
+							(newest, point) => {
+								if (
+									!newest ||
+									new Date(point.createdAt).getTime() >
+										new Date(newest.createdAt).getTime()
+								) {
+									return point;
+								}
+								return newest;
+							},
+							undefined,
+						);
 						return (
 							<Table>
 								<TableBody>
