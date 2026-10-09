@@ -1,3 +1,10 @@
+## [1.45.9](https://github.com/atlas-bi/System/compare/v1.45.8...v1.45.9) (2026-10-09)
+
+
+### Bug Fixes
+
+* show current drive usage and ignore boot-time drift ([2f17a6d](https://github.com/atlas-bi/System/commit/2f17a6dd51c9a544c1db7267aac51566e54544bf))
+
 ## [1.45.8](https://github.com/atlas-bi/System/compare/v1.45.7...v1.45.8) (2026-09-23)
 
 
