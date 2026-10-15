@@ -43,11 +43,12 @@ const baseMonitor = {
 
 describe("collectionNotifier", () => {
 	beforeEach(() => {
-		logger.mockClear();
+		logger.mockReset();
 		render.mockClear();
-		sendNotification.mockClear();
-		setMonitorConnectionRetried.mockClear();
-		setMonitorConnectionSentAt.mockClear();
+		sendNotification.mockReset();
+		sendNotification.mockResolvedValue(undefined);
+		setMonitorConnectionRetried.mockReset();
+		setMonitorConnectionSentAt.mockReset();
 	});
 
 	it("does nothing when connection notifications are disabled", async () => {
@@ -209,6 +210,7 @@ describe("collectionNotifier", () => {
 				type: "error",
 			}),
 		);
+		expect(setMonitorConnectionSentAt).not.toHaveBeenCalled();
 	});
 
 	it("stops retrying after the configured retry count is exceeded", async () => {
