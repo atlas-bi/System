@@ -1,3 +1,11 @@
+## [1.45.10](https://github.com/atlas-bi/System/compare/v1.45.9...v1.45.10) (2026-10-15)
+
+
+### Bug Fixes
+
+* republish the release ([f6dba07](https://github.com/atlas-bi/System/commit/f6dba07d326e065c8dc5a0b122c27a3263eba9d8))
+* **smtp:** send monitor alerts on port 25 ([6f6780e](https://github.com/atlas-bi/System/commit/6f6780ec077f79625781d77805666f9f830c5a95))
+
 ## [1.45.9](https://github.com/atlas-bi/System/compare/v1.45.8...v1.45.9) (2026-10-09)
 
 
