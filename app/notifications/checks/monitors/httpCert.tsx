@@ -128,26 +128,33 @@ export default async function httpCertNotifier({
 	if (resend && subject && html) {
 		const subjectToSend = subject;
 		const htmlToSend = html;
-		monitor.httpCertNotifyTypes.map(async (notification: NotificationMeta) => {
-			try {
-				return await sendNotification({
-					notification,
-					subject: subjectToSend,
-					message: htmlToSend,
-				});
-			} catch (e) {
-				return Logger({
-					message: `Failed to send ${notification.name}: ${e}`,
-					type: "error",
-					monitor,
-				});
-			}
-		});
+		const delivered = await Promise.all(
+			monitor.httpCertNotifyTypes.map(
+				async (notification: NotificationMeta) => {
+					try {
+						await sendNotification({
+							notification,
+							subject: subjectToSend,
+							message: htmlToSend,
+						});
+						return true;
+					} catch (e) {
+						await Logger({
+							message: `Failed to send ${notification.name}: ${e}`,
+							type: "error",
+							monitor,
+						});
+						return false;
+					}
+				},
+			),
+		);
 		await Logger({
 			message: message || "",
 			type: "error",
 			monitor,
 		});
+		if (!delivered.some(Boolean)) return;
 		return setMonitorHttpCertSentAt({
 			id: monitor.id,
 			httpCertNotifySentAt: new Date(),

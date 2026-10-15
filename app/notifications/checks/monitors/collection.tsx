@@ -133,23 +133,29 @@ export default async function collectionNotifier({
 			},
 		);
 
-		monitor.connectionNotifyTypes.map(
-			async (notification: NotificationMeta) => {
-				try {
-					return await sendNotification({
-						notification,
-						subject,
-						message: html,
-					});
-				} catch (e) {
-					return Logger({
-						message: `Failed to send ${notification.name}: ${e}`,
-						type: "error",
-						monitor,
-					});
-				}
-			},
+		const delivered = await Promise.all(
+			monitor.connectionNotifyTypes.map(
+				async (notification: NotificationMeta) => {
+					try {
+						await sendNotification({
+							notification,
+							subject,
+							message: html,
+						});
+						return true;
+					} catch (e) {
+						await Logger({
+							message: `Failed to send ${notification.name}: ${e}`,
+							type: "error",
+							monitor,
+						});
+						return false;
+					}
+				},
+			),
 		);
+
+		if (!delivered.some(Boolean)) return;
 
 		return setMonitorConnectionSentAt({
 			id: monitor.id,

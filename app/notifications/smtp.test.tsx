@@ -14,6 +14,7 @@ vi.mock("@/lib/utils", () => ({
 	decrypt: vi.fn((value: string) => `decrypted:${value}`),
 }));
 
+import nodemailer from "nodemailer";
 import SMTP from "./smtp";
 
 const notification = {
@@ -48,6 +49,36 @@ describe("SMTP notifier", () => {
 			subject: "Alert",
 			html: "<p>offline</p>",
 		});
+	});
+
+	it("keeps port 25 on plain SMTP when the saved security value is SSL", async () => {
+		await SMTP({
+			notification: { ...notification, smtpPort: 25, smtpSecurity: "SSL" },
+			subject: "Alert",
+			message: "<p>offline</p>",
+		});
+
+		expect(nodemailer.createTransport).toHaveBeenCalledWith(
+			expect.objectContaining({
+				port: 25,
+				secure: false,
+			}),
+		);
+	});
+
+	it("uses implicit TLS on port 465", async () => {
+		await SMTP({
+			notification: { ...notification, smtpPort: 465, smtpSecurity: "tls" },
+			subject: "Alert",
+			message: "<p>offline</p>",
+		});
+
+		expect(nodemailer.createTransport).toHaveBeenCalledWith(
+			expect.objectContaining({
+				port: 465,
+				secure: true,
+			}),
+		);
 	});
 
 	it("requires SMTP host and recipient configuration", async () => {

@@ -122,19 +122,24 @@ export default async function percentFreeNotifier({
 			},
 		);
 
-		drive.percFreeNotifyTypes.map(async (notification: Notification) => {
-			try {
-				// await to prevent error from bubbling
-				return await sendNotification({ notification, subject, message: html });
-			} catch (e) {
-				return Logger({
-					message: `Failed to send ${notification.name}: ${e}`,
-					type: "error",
-					monitor,
-					drive,
-				});
-			}
-		});
+		const delivered = await Promise.all(
+			drive.percFreeNotifyTypes.map(async (notification: Notification) => {
+				try {
+					await sendNotification({ notification, subject, message: html });
+					return true;
+				} catch (e) {
+					await Logger({
+						message: `Failed to send ${notification.name}: ${e}`,
+						type: "error",
+						monitor,
+						drive,
+					});
+					return false;
+				}
+			}),
+		);
+
+		if (!delivered.some(Boolean)) return;
 
 		return setDrivePercFreeSentAt({
 			id: drive.id,
