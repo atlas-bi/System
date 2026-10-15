@@ -188,26 +188,31 @@ export default async function sqlFilePercentFreeNotifier({
 						},
 					);
 
-					monitor.sqlFileSizePercentFreeNotifyTypes.map(
-						async (notification: NotificationMeta) => {
-							try {
-								// await to prevent error from bubbling
-								return await sendNotification({
-									notification,
-									subject,
-									message: html,
-								});
-							} catch (e) {
-								return Logger({
-									message: `Failed to send ${notification.name}: ${e}`,
-									type: "error",
-									monitor,
-									file,
-									database,
-								});
-							}
-						},
+					const delivered = await Promise.all(
+						monitor.sqlFileSizePercentFreeNotifyTypes.map(
+							async (notification: NotificationMeta) => {
+								try {
+									await sendNotification({
+										notification,
+										subject,
+										message: html,
+									});
+									return true;
+								} catch (e) {
+									await Logger({
+										message: `Failed to send ${notification.name}: ${e}`,
+										type: "error",
+										monitor,
+										file,
+										database,
+									});
+									return false;
+								}
+							},
+						),
 					);
+
+					if (!delivered.some(Boolean)) return;
 
 					return setFilePercFreeSentAt({
 						id: file.id,

@@ -21,10 +21,13 @@ export default async function SMTP({
 		throw new Error("SMTP to/from email are required");
 	}
 
+	const port = Number(notification.smtpPort);
+	// Only 465 speaks TLS immediately. Opening TLS on 25 or 587 makes OpenSSL
+	// report "wrong version number" because the server answers with plain SMTP.
 	const config = {
 		host: notification.smtpHost,
-		port: Number(notification.smtpPort),
-		secure: notification.smtpSecurity === "SSL",
+		port,
+		secure: port === 465,
 		tls: {
 			rejectUnauthorized: !notification.ignoreSSLErrors,
 		},
