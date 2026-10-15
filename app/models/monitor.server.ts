@@ -26,76 +26,116 @@ export type {
 	Notification,
 } from "@prisma/client";
 
+const DELETE_BATCH = 1000;
+
+async function deleteInBatches(
+	loadIds: () => Promise<{ id: string }[]>,
+	remove: (ids: string[]) => Promise<unknown>,
+) {
+	for (;;) {
+		const rows = await loadIds();
+		if (rows.length === 0) {
+			return;
+		}
+		await remove(rows.map((row) => row.id));
+	}
+}
+
+async function enqueueSearchReindex(id: string) {
+	try {
+		await searchLoader.enqueue(id);
+	} catch (error) {
+		console.log("search reindex enqueue failed.", error);
+	}
+}
+
+export async function markMonitorDeleting({ id }: Pick<Monitor, "id">) {
+	await prisma.monitor.update({
+		where: { id },
+		data: { enabled: false, deleting: true },
+	});
+	enqueueSearchReindex(id);
+}
+
 export async function deleteMonitor({ id }: Pick<Monitor, "id">) {
-	// delete database file usage
-	await prisma.databaseFileUsage.deleteMany({
-		where: {
-			databaseFile: {
-				database: {
-					monitorId: id,
-				},
-			},
-		},
+	const existing = await prisma.monitor.findUnique({
+		where: { id },
+		select: { id: true },
 	});
-	// delete database files
+	if (!existing) {
+		enqueueSearchReindex(id);
+		return;
+	}
+
+	await deleteInBatches(
+		() =>
+			prisma.databaseFileUsage.findMany({
+				where: { databaseFile: { monitorId: id } },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) =>
+			prisma.databaseFileUsage.deleteMany({ where: { id: { in: ids } } }),
+	);
+	await deleteInBatches(
+		() =>
+			prisma.databaseUsage.findMany({
+				where: { database: { monitorId: id } },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) => prisma.databaseUsage.deleteMany({ where: { id: { in: ids } } }),
+	);
+	await deleteInBatches(
+		() =>
+			prisma.driveUsage.findMany({
+				where: { drive: { monitorId: id } },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) => prisma.driveUsage.deleteMany({ where: { id: { in: ids } } }),
+	);
+	await deleteInBatches(
+		() =>
+			prisma.cpuUsage.findMany({
+				where: { cpu: { monitorId: id } },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) => prisma.cpuUsage.deleteMany({ where: { id: { in: ids } } }),
+	);
+	await deleteInBatches(
+		() =>
+			prisma.monitorLogs.findMany({
+				where: { monitorId: id },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) => prisma.monitorLogs.deleteMany({ where: { id: { in: ids } } }),
+	);
+	await deleteInBatches(
+		() =>
+			prisma.monitorFeeds.findMany({
+				where: { monitorId: id },
+				select: { id: true },
+				take: DELETE_BATCH,
+			}),
+		(ids) => prisma.monitorFeeds.deleteMany({ where: { id: { in: ids } } }),
+	);
+
 	await prisma.databaseFile.deleteMany({
-		where: {
-			database: {
-				monitorId: id,
-			},
-		},
-	});
-	// delete database usage
-	await prisma.databaseUsage.deleteMany({
-		where: {
-			database: {
-				monitorId: id,
-			},
-		},
-	});
-	// delete database
-	await prisma.database.deleteMany({
-		where: {
-			monitorId: id,
-		},
-	});
-
-	// delete drive usage
-	await prisma.driveUsage.deleteMany({
-		where: {
-			drive: { monitorId: id },
-		},
-	});
-
-	// delete drive logs
-	await prisma.monitorLogs.deleteMany({
-		where: {
-			drive: { monitorId: id },
-		},
-	});
-
-	// delete drives
-	await prisma.drive.deleteMany({
 		where: { monitorId: id },
 	});
-	// delete CPU usage and CPUs
-	await prisma.cpuUsage.deleteMany({
-		where: {
-			cpu: { monitorId: id },
-		},
+	await prisma.database.deleteMany({
+		where: { monitorId: id },
+	});
+	await prisma.drive.deleteMany({
+		where: { monitorId: id },
 	});
 	await prisma.cpu.deleteMany({
 		where: { monitorId: id },
 	});
-	// delete logs
-	await prisma.monitorLogs.deleteMany({
-		where: { monitorId: id },
-	});
-	// delete feeds
-	await prisma.monitorFeeds.deleteMany({
-		where: { monitorId: id },
-	});
-	// disconnect notification relations before deleting the monitor
+
 	await prisma.monitor.update({
 		where: { id },
 		data: {
@@ -110,7 +150,7 @@ export async function deleteMonitor({ id }: Pick<Monitor, "id">) {
 		where: { id },
 	});
 
-	searchLoader.enqueue(id);
+	enqueueSearchReindex(id);
 }
 
 export function getMonitorMeta({ id }: Pick<Monitor, "id">) {
@@ -395,6 +435,7 @@ export function getMonitor({ id }: Pick<Monitor, "id">) {
 export function getMonitorTypes() {
 	return prisma.monitor.groupBy({
 		by: ["type"],
+		where: { deleting: false },
 		_count: { type: true },
 	});
 }
@@ -1255,7 +1296,7 @@ export function getMonitorLatestFeed({ id }: Pick<Monitor, "id">) {
 
 export function getMonitors({ type }: Pick<Monitor, "type">) {
 	return prisma.monitor.findMany({
-		where: { type },
+		where: { type, deleting: false },
 		select: {
 			id: true,
 			title: true,
