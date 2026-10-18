@@ -1,4 +1,4 @@
-import { Form, useFetcher, useNavigate, useSubmit } from "@remix-run/react";
+import { Form, useFetcher, useNavigate } from "@remix-run/react";
 import { ReactNode, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -41,7 +41,8 @@ export default function Monitor({
 }) {
 	const [open, setOpen] = useState(false);
 	const fetcher = useFetcher<{ monitor?: any; form?: { error?: string } }>();
-	const deleteSubmit = useSubmit();
+	const deleteFetcher = useFetcher<{ deleted?: boolean }>();
+	const isDeleting = deleteFetcher.state !== "idle";
 	const testFetcher = useFetcher<{
 		error?: any;
 		form?: { error?: string };
@@ -67,6 +68,13 @@ export default function Monitor({
 			}
 		}
 	}, [fetcher.state, fetcher.data, monitor.id, navigate]);
+
+	useEffect(() => {
+		if (deleteFetcher.state === "idle" && deleteFetcher.data?.deleted) {
+			setOpen(false);
+			navigate(data.type ? `/${data.type}` : "/");
+		}
+	}, [deleteFetcher.state, deleteFetcher.data, data.type, navigate]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -172,17 +180,24 @@ export default function Monitor({
 							<Button
 								type="button"
 								variant="outline"
+								disabled={isDeleting}
 								onClick={(e) => {
 									e.preventDefault();
-									deleteSubmit(
+									deleteFetcher.submit(
 										{ _action: "delete", id: data.id },
 										{ method: "post", action: "/monitor/new" },
 									);
-									setOpen(false);
 								}}
 								className="border-red-300"
 							>
-								Delete
+								{isDeleting ? (
+									<>
+										<Loader2 size={14} className="animate-spin mr-2" />{" "}
+										Deleting...
+									</>
+								) : (
+									<>Delete</>
+								)}
 							</Button>
 						)}
 						<div className="flex space-x-2">

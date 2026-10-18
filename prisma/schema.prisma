@@ -43,6 +43,7 @@ model Monitor {
   description String?
 
   enabled  Boolean @default(true)
+  deleting Boolean @default(false)
   hasError Boolean @default(false)
 
   host       String?
