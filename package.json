@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@12.10.1",
+	"packageManager": "pnpm@12.13.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -182,7 +182,7 @@
 		"msw": "^3.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.11.1",
+		"react-email": "6.11.2",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -203,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.90"
+	"version": "2.0.91"
 }
