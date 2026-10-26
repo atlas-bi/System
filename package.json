@@ -1,6 +1,6 @@
 {
 	"name": "atlas-system",
-	"packageManager": "pnpm@12.14.0",
+	"packageManager": "pnpm@12.15.0",
 	"private": true,
 	"sideEffects": false,
 	"scripts": {
@@ -79,7 +79,7 @@
 		"@react-email/img": "0.0.12",
 		"@react-email/link": "0.0.13",
 		"@react-email/preview": "0.0.14",
-		"@react-email/render": "2.1.0",
+		"@react-email/render": "2.1.1",
 		"@react-email/section": "0.0.17",
 		"@react-email/tailwind": "2.0.7",
 		"@react-email/text": "0.1.6",
@@ -182,7 +182,7 @@
 		"msw": "^3.0.0",
 		"open-cli": "^9.0.0",
 		"postcss": "^8.4.28",
-		"react-email": "6.11.2",
+		"react-email": "6.11.3",
 		"semantic-release": "^25.0.0",
 		"start-server-and-test": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -203,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.93"
+	"version": "2.0.94"
 }
