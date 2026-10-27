@@ -2,6 +2,7 @@ import { prisma } from "~/db.server";
 
 export async function getSearchData() {
 	const monitors = await prisma.monitor.findMany({
+		where: { deleting: false },
 		select: {
 			id: true,
 			type: true,
@@ -29,6 +30,7 @@ export async function getSearchData() {
 	});
 
 	const drives = await prisma.drive.findMany({
+		where: { monitor: { deleting: false } },
 		select: {
 			id: true,
 			title: true,
@@ -51,6 +53,7 @@ export async function getSearchData() {
 	});
 
 	const databases = await prisma.database.findMany({
+		where: { monitor: { deleting: false } },
 		select: {
 			id: true,
 			title: true,
@@ -69,6 +72,7 @@ export async function getSearchData() {
 	});
 
 	const files = await prisma.databaseFile.findMany({
+		where: { monitor: { deleting: false } },
 		select: {
 			id: true,
 			fileName: true,
