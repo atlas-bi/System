@@ -46,7 +46,7 @@
 	},
 	"dependencies": {
 		"@authenio/samlify-node-xmllint": "^2.0.0",
-		"@hookform/resolvers": "^5.0.0",
+		"@hookform/resolvers": "^6.0.0",
 		"@icons-pack/react-simple-icons": "^13.0.0",
 		"@prisma/adapter-pg": "^7.0.0",
 		"@prisma/client": "^7.0.0",
@@ -203,5 +203,5 @@
 			"biome check --write"
 		]
 	},
-	"version": "2.0.94"
+	"version": "2.0.95"
 }
