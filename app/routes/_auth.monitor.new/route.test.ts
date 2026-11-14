@@ -6,14 +6,16 @@ const {
 	authenticateMock,
 	createMonitorMock,
 	editMonitorMock,
-	deleteMonitorMock,
+	markMonitorDeletingMock,
+	enqueueDeleteMock,
 	httpCheckMock,
 	tcpCheckMock,
 } = vi.hoisted(() => ({
 	authenticateMock: vi.fn(),
 	createMonitorMock: vi.fn(),
 	editMonitorMock: vi.fn(),
-	deleteMonitorMock: vi.fn(),
+	markMonitorDeletingMock: vi.fn(),
+	enqueueDeleteMock: vi.fn(),
 	httpCheckMock: vi.fn(),
 	tcpCheckMock: vi.fn(),
 }));
@@ -25,7 +27,11 @@ vi.mock("~/services/auth.server", () => ({
 vi.mock("~/models/monitor.server", () => ({
 	createMonitor: createMonitorMock,
 	editMonitor: editMonitorMock,
-	deleteMonitor: deleteMonitorMock,
+	markMonitorDeleting: markMonitorDeletingMock,
+}));
+
+vi.mock("~/queues/deleteMonitor.server", () => ({
+	default: { enqueue: enqueueDeleteMock },
 }));
 
 vi.mock("~/monitors/http.server", () => ({
@@ -54,7 +60,8 @@ describe("monitor/new action", () => {
 		authenticateMock.mockReset();
 		createMonitorMock.mockReset();
 		editMonitorMock.mockReset();
-		deleteMonitorMock.mockReset();
+		markMonitorDeletingMock.mockReset();
+		enqueueDeleteMock.mockReset();
 		httpCheckMock.mockReset();
 		tcpCheckMock.mockReset();
 		authenticateMock.mockResolvedValue({ id: "user-1" });
@@ -141,7 +148,7 @@ describe("monitor/new action", () => {
 		expect(createMonitorMock).toHaveBeenCalled();
 	});
 
-	it("deletes a monitor and redirects home", async () => {
+	it("queues monitor deletion before the page leaves", async () => {
 		const response = await action(
 			remixArgs(
 				new Request("http://localhost/monitor/new", {
@@ -154,9 +161,10 @@ describe("monitor/new action", () => {
 			),
 		);
 
-		expect(deleteMonitorMock).toHaveBeenCalledWith({ id: "monitor-1" });
-		expect(response.status).toBe(302);
-		expect(response.headers.get("Location")).toBe("/");
+		expect(markMonitorDeletingMock).toHaveBeenCalledWith({ id: "monitor-1" });
+		expect(enqueueDeleteMock).toHaveBeenCalledWith("monitor-1");
+		expect(response.status).toBe(200);
+		await expect(response.json()).resolves.toEqual({ deleted: true });
 	});
 
 	it("requires ssh credentials for server monitors", async () => {
