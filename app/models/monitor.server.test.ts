@@ -45,6 +45,7 @@ vi.mock("~/db.server", () => ({
 		},
 		databaseFileUsage: {
 			findFirst: mocks.findFirst,
+			findMany: mocks.findMany,
 			deleteMany: mocks.deleteMany,
 		},
 		databaseUsage: {
@@ -55,7 +56,7 @@ vi.mock("~/db.server", () => ({
 			findMany: mocks.findMany,
 			deleteMany: mocks.deleteMany,
 		},
-		driveUsage: { deleteMany: mocks.deleteMany },
+		driveUsage: { findMany: mocks.findMany, deleteMany: mocks.deleteMany },
 		monitorLogs: {
 			create: mocks.create,
 			findFirst: mocks.findFirst,
@@ -68,7 +69,7 @@ vi.mock("~/db.server", () => ({
 			update: mocks.update,
 			deleteMany: mocks.deleteMany,
 		},
-		cpuUsage: { deleteMany: mocks.deleteMany },
+		cpuUsage: { findMany: mocks.findMany, deleteMany: mocks.deleteMany },
 		cpu: { deleteMany: mocks.deleteMany },
 		$transaction: mocks.transaction,
 	},
@@ -84,6 +85,7 @@ vi.mock("~/queues/monitor.server", () => ({
 import {
 	createMonitor,
 	deleteMonitor,
+	markMonitorDeleting,
 	editDatabase,
 	editFile,
 	editMonitor,
@@ -145,12 +147,28 @@ describe("monitor.server", () => {
 		);
 	});
 
+	describe("markMonitorDeleting", () => {
+		it("hides the monitor and enqueues a search refresh", async () => {
+			await markMonitorDeleting({ id: "http-monitor" });
+
+			expect(mocks.update).toHaveBeenCalledWith({
+				where: { id: "http-monitor" },
+				data: { enabled: false, deleting: true },
+			});
+			expect(mocks.enqueue).toHaveBeenCalledWith("http-monitor");
+		});
+	});
+
 	describe("deleteMonitor", () => {
-		it("deletes dependent records and enqueues search reindexing", async () => {
+		it("deletes dependent records in batches and enqueues search reindexing", async () => {
+			mocks.findMany
+				.mockResolvedValueOnce([{ id: "usage-1" }])
+				.mockResolvedValue([]);
+
 			await deleteMonitor({ id: "http-monitor" });
 
 			expect(mocks.deleteMany).toHaveBeenCalledWith({
-				where: { cpu: { monitorId: "http-monitor" } },
+				where: { id: { in: ["usage-1"] } },
 			});
 			expect(mocks.update).toHaveBeenCalledWith({
 				where: { id: "http-monitor" },
@@ -164,6 +182,15 @@ describe("monitor.server", () => {
 			expect(mocks.deleteMany).toHaveBeenCalledWith({
 				where: { id: "http-monitor" },
 			});
+			expect(mocks.enqueue).toHaveBeenCalledWith("http-monitor");
+		});
+
+		it("skips deletion when the monitor is already gone", async () => {
+			mocks.findUnique.mockResolvedValue(null);
+
+			await deleteMonitor({ id: "http-monitor" });
+
+			expect(mocks.deleteMany).not.toHaveBeenCalled();
 			expect(mocks.enqueue).toHaveBeenCalledWith("http-monitor");
 		});
 	});
@@ -297,6 +324,7 @@ describe("monitor.server", () => {
 			expect(mocks.findFirst).toHaveBeenCalled();
 			expect(mocks.groupBy).toHaveBeenCalledWith({
 				by: ["type"],
+				where: { deleting: false },
 				_count: { type: true },
 			});
 			expect(mocks.findMany).toHaveBeenCalledWith({

@@ -1,12 +1,13 @@
-import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { type ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { NodeSSH } from "node-ssh";
 import { namedAction } from "~/utils";
 import {
 	createMonitor,
-	deleteMonitor,
 	editMonitor,
+	markMonitorDeleting,
 } from "~/models/monitor.server";
+import deleteMonitorQueue from "~/queues/deleteMonitor.server";
 import { authenticate } from "~/services/auth.server";
 import { HttpCheck } from "~/monitors/http.server";
 import mssql from "mssql";
@@ -282,9 +283,11 @@ export async function action({ request }: ActionFunctionArgs) {
 		},
 		async delete(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
+			const id = values.id.toString();
 
-			await deleteMonitor({ id: values.id.toString() });
-			return redirect("/");
+			await deleteMonitorQueue.enqueue(id);
+			await markMonitorDeleting({ id });
+			return json({ deleted: true });
 		},
 		async test(formData) {
 			const { _action, ...values } = Object.fromEntries(formData);
