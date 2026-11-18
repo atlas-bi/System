@@ -36,6 +36,7 @@ export function getNotificationsDetail() {
 			tgThreadId: true,
 			tgSendSilently: true,
 			tgProtectMessage: true,
+			discordWebhookUrl: true,
 		},
 	});
 }
@@ -70,6 +71,7 @@ export function editNotification({
 	tgThreadId,
 	tgSendSilently,
 	tgProtectMessage,
+	discordWebhookUrl,
 }: Pick<
 	Notification,
 	| "id"
@@ -89,6 +91,7 @@ export function editNotification({
 	| "tgThreadId"
 	| "tgSendSilently"
 	| "tgProtectMessage"
+	| "discordWebhookUrl"
 >) {
 	return prisma.notification.update({
 		where: { id },
@@ -109,6 +112,7 @@ export function editNotification({
 			tgThreadId,
 			tgSendSilently,
 			tgProtectMessage,
+			discordWebhookUrl: discordWebhookUrl ? encrypt(discordWebhookUrl) : null,
 		},
 	});
 }
@@ -129,6 +133,7 @@ export function createNotification({
 	tgThreadId,
 	tgSendSilently,
 	tgProtectMessage,
+	discordWebhookUrl,
 }: Pick<
 	Notification,
 	| "name"
@@ -147,6 +152,7 @@ export function createNotification({
 	| "tgThreadId"
 	| "tgSendSilently"
 	| "tgProtectMessage"
+	| "discordWebhookUrl"
 >) {
 	return prisma.notification.create({
 		data: {
@@ -166,6 +172,7 @@ export function createNotification({
 			tgThreadId,
 			tgSendSilently,
 			tgProtectMessage,
+			discordWebhookUrl: discordWebhookUrl ? encrypt(discordWebhookUrl) : null,
 		},
 	});
 }

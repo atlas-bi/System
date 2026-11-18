@@ -40,6 +40,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			title: x.name,
 			smtpPassword: x.smtpPassword ? decrypt(x.smtpPassword) : undefined,
 			tgBotToken: x.tgBotToken ? decrypt(x.tgBotToken) : undefined,
+			discordWebhookUrl: x.discordWebhookUrl
+				? decrypt(x.discordWebhookUrl)
+				: undefined,
 		})),
 	});
 };
