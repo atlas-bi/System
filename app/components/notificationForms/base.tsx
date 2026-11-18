@@ -24,6 +24,7 @@ import {
 import { notificationTypes } from "~/models/notification";
 import { SmtpForm } from "~/components/notificationForms/smpt";
 import { TelegramForm } from "~/components/notificationForms/telegram";
+import { DiscordForm } from "~/components/notificationForms/discord";
 import { Loader2 } from "lucide-react";
 import type { Notification } from "~/models/notification.server";
 
@@ -138,6 +139,10 @@ export default function Notification({
 
 							{data?.type === "telegram" && (
 								<TelegramForm data={data} setData={setData} />
+							)}
+
+							{data?.type === "discord" && (
+								<DiscordForm data={data} setData={setData} />
 							)}
 						</div>
 					</div>

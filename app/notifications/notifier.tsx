@@ -3,6 +3,7 @@ import { getMonitor } from "~/models/monitor.server";
 import { getDriveLatestFeed } from "~/models/drive.server";
 import SMTP from "./smtp";
 import Telegram from "./telegram";
+import Discord from "./discord";
 import {
 	NotificationMeta,
 	getNotificationConnection,
@@ -78,5 +79,7 @@ export const sendNotification = async ({
 		return SMTP({ notification: meta, subject, message });
 	} else if (meta.type == "telegram") {
 		return Telegram({ notification: meta, message: subject });
+	} else if (meta.type == "discord") {
+		return Discord({ notification: meta, message: subject });
 	}
 };
