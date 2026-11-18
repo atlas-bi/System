@@ -13,6 +13,7 @@ const {
 	getNotificationConnection,
 	smtp,
 	telegram,
+	discord,
 } = vi.hoisted(() => ({
 	getMonitor: vi.fn(),
 	collectionNotifier: vi.fn(),
@@ -24,6 +25,7 @@ const {
 	getNotificationConnection: vi.fn(),
 	smtp: vi.fn(),
 	telegram: vi.fn(),
+	discord: vi.fn(),
 }));
 
 vi.mock("~/models/monitor.server", () => ({ getMonitor }));
@@ -33,6 +35,7 @@ vi.mock("~/models/notification.server", () => ({
 }));
 vi.mock("./smtp", () => ({ default: smtp }));
 vi.mock("./telegram", () => ({ default: telegram }));
+vi.mock("./discord", () => ({ default: discord }));
 vi.mock("./checks/monitors/collection", () => ({
 	default: collectionNotifier,
 }));
@@ -122,6 +125,7 @@ describe("sendNotification", () => {
 		getNotificationConnection.mockReset();
 		smtp.mockReset();
 		telegram.mockReset();
+		discord.mockReset();
 	});
 
 	it("returns early when the notification no longer exists", async () => {
@@ -135,6 +139,7 @@ describe("sendNotification", () => {
 
 		expect(smtp).not.toHaveBeenCalled();
 		expect(telegram).not.toHaveBeenCalled();
+		expect(discord).not.toHaveBeenCalled();
 	});
 
 	it("delegates to SMTP and Telegram", async () => {
@@ -168,5 +173,26 @@ describe("sendNotification", () => {
 			notification: telegramNotification,
 			message: "Alert",
 		});
+	});
+
+	it("delegates to Discord with the subject as the message", async () => {
+		const discordNotification = {
+			id: "n3",
+			type: "discord",
+			name: "discord",
+		};
+		getNotificationConnection.mockResolvedValueOnce(discordNotification);
+
+		await sendNotification({
+			notification: discordNotification,
+			subject: "Alert",
+			message: "offline",
+		});
+
+		expect(discord).toHaveBeenCalledWith({
+			notification: discordNotification,
+			message: "Alert",
+		});
+		expect(telegram).not.toHaveBeenCalled();
 	});
 });

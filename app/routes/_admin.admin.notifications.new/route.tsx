@@ -6,6 +6,7 @@ import { authenticate } from "~/services/auth.server";
 
 import SMTP from "~/notifications/smtp";
 import Telegram from "~/notifications/telegram";
+import Discord from "~/notifications/discord";
 import {
 	createNotification,
 	editNotification,
@@ -18,6 +19,10 @@ const isNullOrEmpty = (str: string | undefined | FormDataEntryValue) => {
 	}
 	return false;
 };
+
+// only accept Discord webhook URLs so the server can't be pointed at arbitrary hosts.
+const DISCORD_WEBHOOK_URL =
+	/^https:\/\/(?:[a-z]+\.)?discord(?:app)?\.com\/api\/(?:v\d+\/)?webhooks\/\d+\/[\w-]+/i;
 
 const validateForm = ({ values }: { values: any }) => {
 	if (isNullOrEmpty(values.name)) {
@@ -59,6 +64,21 @@ const validateForm = ({ values }: { values: any }) => {
 
 		if (isNullOrEmpty(values.tgChatId)) {
 			return json({ form: { error: "Chat ID is required." } });
+		}
+	}
+
+	if (values.type.toString() === "discord") {
+		if (isNullOrEmpty(values.discordWebhookUrl)) {
+			return json({ form: { error: "Webhook URL is required." } });
+		}
+
+		if (!DISCORD_WEBHOOK_URL.test(values.discordWebhookUrl.toString().trim())) {
+			return json({
+				form: {
+					error:
+						"Webhook URL must be a Discord webhook (https://discord.com/api/webhooks/...).",
+				},
+			});
 		}
 	}
 };
@@ -117,6 +137,9 @@ export async function action({ request }: ActionFunctionArgs) {
 					tgProtectMessage: values.tgProtectMessage
 						? values.tgProtectMessage.toString() == "true"
 						: null,
+					discordWebhookUrl: values.discordWebhookUrl
+						? values.discordWebhookUrl.toString().trim()
+						: null,
 				});
 
 				return json({ notification });
@@ -154,6 +177,9 @@ export async function action({ request }: ActionFunctionArgs) {
 				tgProtectMessage: values.tgProtectMessage
 					? values.tgProtectMessage.toString() == "true"
 					: null,
+				discordWebhookUrl: values.discordWebhookUrl
+					? values.discordWebhookUrl.toString().trim()
+					: null,
 			});
 
 			return json({ notification });
@@ -186,6 +212,17 @@ export async function action({ request }: ActionFunctionArgs) {
 			} else if (values.type === "telegram") {
 				try {
 					await Telegram({
+						message: "connection test",
+						notification: values as any,
+						test: true,
+					});
+				} catch (e) {
+					return json({ error: e });
+				}
+				return json({ success: "Connection successful, test message sent." });
+			} else if (values.type === "discord") {
+				try {
+					await Discord({
 						message: "connection test",
 						notification: values as any,
 						test: true,
