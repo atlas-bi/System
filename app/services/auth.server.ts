@@ -1,8 +1,7 @@
 import * as validator from "@authenio/samlify-node-xmllint";
 import { redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
-import { Strategy } from "remix-auth/strategy";
-import { FormStrategy } from "remix-auth-form";
+import { FormStrategy } from "remix-auth/form";
 import { SamlStrategy } from "remix-auth-saml";
 import fs from "node:fs";
 import invariant from "tiny-invariant";
@@ -10,10 +9,6 @@ import { SlimUserFields, updateUserProps } from "~/models/user.server";
 import { sessionStorage } from "~/services/session.server";
 
 import { verifyLogin } from "./ldap.server";
-
-// Create an instance of the authenticator, pass a generic with what
-// strategies will return and will store in the session
-export const authenticator = new Authenticator<SlimUserFields>();
 
 const sessionKey = "user";
 export const sessionErrorKey = "auth:error";
@@ -102,6 +97,22 @@ async function createAuthFailure(
 	});
 }
 
+const ldapStrategy = new FormStrategy(async ({ form }) => {
+	const email = form.get("email") as string;
+	const password = form.get("password") as string;
+	const user = await verifyLogin(email, password);
+	if (!user) throw "failed to login.";
+	return user;
+});
+
+// Create an instance of the authenticator with strategies that will return
+// and store SlimUserFields in the session
+export const authenticator = new Authenticator({
+	strategies: {
+		ldap: ldapStrategy,
+	},
+});
+
 export async function authenticateWithLdap(
 	request: Request,
 	{
@@ -118,26 +129,6 @@ export async function authenticateWithLdap(
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Failed to login";
 		return createAuthFailure(request, message, failureRedirect);
-	}
-}
-
-class SamlStrategyAdapter extends Strategy<SlimUserFields, never> {
-	name: string;
-
-	constructor(private strategy: SamlStrategy<SlimUserFields>) {
-		super(async () => {
-			throw new Error("SAML verification is handled by the wrapped strategy.");
-		});
-		this.name = strategy.name;
-	}
-
-	authenticate(request: Request) {
-		return this.strategy.authenticate(request, sessionStorage, {
-			name: "saml",
-			sessionKey,
-			sessionErrorKey,
-			sessionStrategyKey,
-		});
 	}
 }
 
@@ -241,22 +232,10 @@ if (process.env.SAML_IDP_METADATA) {
 		);
 
 		configuredSamlStrategy = samlStrategy;
-		authenticator.use(new SamlStrategyAdapter(samlStrategy), "saml");
 		metadata = samlStrategy.metadata();
 	} catch (e) {
 		if (process.env.NODE_ENV === "production") console.log(e);
 	}
 }
-// use ldap
-
-const ldapStrategy = new FormStrategy(async ({ form }) => {
-	const email = form.get("email") as string;
-	const password = form.get("password") as string;
-	const user = await verifyLogin(email, password);
-	if (!user) throw "failed to login.";
-	return user;
-});
-
-authenticator.use(ldapStrategy, "ldap");
 
 export { createUserSession, metadata };
