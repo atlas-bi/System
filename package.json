@@ -137,7 +137,6 @@
 		"react-email": "^6.6.4",
 		"react-hook-form": "^7.45.4",
 		"remix-auth": "5.0.0",
-		"remix-auth-form": "3.0.0",
 		"remix-auth-saml": "1.2.0",
 		"remix-utils": "^10.0.0",
 		"secure-webhooks": "^0.3.0",
