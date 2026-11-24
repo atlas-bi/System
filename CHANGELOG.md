@@ -1,3 +1,15 @@
+# [1.46.0](https://github.com/atlas-bi/System/compare/v1.45.11...v1.46.0) (2026-11-18)
+
+### Features
+
+* **notifications:** add Discord webhook notifications ([4b5cfec](https://github.com/atlas-bi/System/commit/4b5cfec62a5dff039a35956f768f0d240611cb09))
+
+## [1.45.11](https://github.com/atlas-bi/System/compare/v1.45.10...v1.45.11) (2026-11-17)
+
+### Bug Fixes
+
+* **monitors:** queue deletion so settings can return immediately ([1541de0](https://github.com/atlas-bi/System/commit/1541de0913c13ea17a176c96e850437a1467e42a))
+
 ## [1.45.10](https://github.com/atlas-bi/System/compare/v1.45.9...v1.45.10) (2026-10-15)
 
 
