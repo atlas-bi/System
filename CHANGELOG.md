@@ -1,3 +1,9 @@
+## [1.46.1](https://github.com/atlas-bi/System/compare/v1.46.0...v1.46.1) (2026-11-24)
+
+### Bug Fixes
+
+* **auth:** migrate Authenticator to remix-auth v5 API ([0f1b9dc](https://github.com/atlas-bi/System/commit/0f1b9dc25b034a8d0ca69f3b63d3683fd9663a9f))
+
 # [1.46.0](https://github.com/atlas-bi/System/compare/v1.45.11...v1.46.0) (2026-11-18)
 
 ### Features
